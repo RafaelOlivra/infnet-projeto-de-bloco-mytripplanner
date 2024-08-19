@@ -55,8 +55,8 @@
      * Pesquisa de APIs que forneçam os dados necessários para o app.
      * Análise de aplicações semelhantes ou possíveis competidores a fim de descobrir padrões e possíveis áreas de melhoria.
      * Esboço inicial da aplicação.
-  2. **Phase 2: Pesquisa de APIs** (2 semanas)
-     * Pesquisar APIs que forneçam dados para clima, trânsito, etc.
+  2. **Phase 2: Pesquisa de APIs Climáticas** (2 semanas)
+     * Pesquisar APIs que forneçam dados para clima.
      * Testes e validação das APIs.
   3. **Phase 3: Desenvolvimento da Interface e API** (3 semanas)
      * Criação da interface do usuário no Streamlit.
@@ -64,9 +64,16 @@
   4. **Phase 4: Testes e Iteração** (2 semanas)
      * Testes de usabilidade com um grupo de usuários.
      * Ajustes e melhorias baseados no feedback.
-  5. **Phase 5: Lançamento e Monitoramento** (2 semanas)
+  5. **Phase 5: Lançamento Inicial (Beta)** (2 semanas)
+     * Lançamento oficial do app beta com as funcionalidades básicas.
+     * Ajustes e melhorias baseados no feedback.
+  6. **Phase 6: Pesquisa de APIs de Trânsito** (2 semanas)
+     * Pesquisar APIs que forneçam dados de trânsito e rodízio de placas.
+  7. **Phase 7: Integração APIs de Trânsito** (4 semanas)
+     * Integração com APIs.
+  8. **Phase 8: Lançamento e Monitoramento** (2 semanas)
      * Lançamento oficial do app.
-     * Monitoramento e análise contínua de desempenho.
+     * Monitoramento e análise contínua de desempenho.   
 
 ## Architecture
 
@@ -87,7 +94,7 @@
 ## Communication
 
 * **How Will We Keep in Touch**:
-  * Análize semanal do progresso geral da aplicação.
+  * Análise semanal do progresso geral da aplicação.
   * Atualizações em um repositório do GitHub contendo todo o histórico da aplicação.
 
 * **Contact Persons**:
