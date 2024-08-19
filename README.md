@@ -17,6 +17,7 @@ O MyTripPlanner é um aplicativo de planejamento de viagens que ajuda os usuári
 Esse é um projeto fictício criado para o curso de Ciência de Dados da faculdade Infnet.
 
 ## Changelog
+ * 19/Aug/2024 * Atualizado Data Summary Report
  * 19/Aug/2024 * Atualizado README
  * 19/Aug/2024 * Adicionado Project Charter
  * 19/Aug/2024 * Atualizado BMC
