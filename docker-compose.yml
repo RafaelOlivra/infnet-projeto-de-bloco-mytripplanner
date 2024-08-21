@@ -1,0 +1,16 @@
+version: "3.1"
+services:
+    streamlit:
+        build: .
+        image: mytripplanner/streamlit
+        container_name: mytripplanner-streamlit
+        restart: unless-stopped
+        ports:
+            - "8501:8501"
+        volumes:
+            - ./app:/usr/src/app
+            - ./data:/usr/src/data
+        env_file:
+            - "./.env"
+        networks:
+            - default
