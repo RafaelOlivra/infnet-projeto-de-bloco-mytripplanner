@@ -8,8 +8,9 @@ services:
         ports:
             - "8501:8501"
         volumes:
-            - ./app:/usr/src/app
-            - ./data:/usr/src/data
+            - ./app:/usr/src/app:ro
+            - ./.env:/usr/src/.env:ro
+            - ./data:/usr/src/data:rw
         env_file:
             - "./.env"
         networks:

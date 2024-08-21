@@ -6,6 +6,6 @@ COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 ENV PYTHONUNBUFFERED 1
 COPY ./app ./app
-COPY ./.env ./app/.env
+COPY ./.env ./.env
 COPY ./data ./data
 CMD ["streamlit", "run", "app/app.py"]

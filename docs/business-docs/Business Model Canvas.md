@@ -21,8 +21,13 @@
 
 ### Desenvolvedores de Tecnologias e Plataformas
 
-* **Exemplos**: Plataformas de cloud computing (como AWS, Azure), serviços de integração de APIs.  
+* **Exemplos**: Plataformas de cloud computing (como AWS, Google Cloud,  Azure), serviços de integração de APIs.  
 * **Valor**: Oferecem a infraestrutura tecnológica necessária para a operação do app, incluindo hospedagem, processamento de dados, e integração contínua com APIs externas.
+
+### Provedores de Inteligência Artificial e Pesquisa
+
+* **Exemplos**: OpenAI, Perplexity AI, Phind.  
+* **Valor**: Estas parcerias podem fornecer tecnologias de inteligência artificial para melhorar a experiência do usuário, como chatbots para suporte ao cliente e algoritmos avançados para personalização e recomendação de viagens.
 
 ### Empresas de Tecnologia de Viagem
 
