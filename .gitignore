@@ -1,6 +1,7 @@
 # General
 .venv
 .env
+.vscode
 .ipynb_checkpoints
 *Zone.Identifier
 .ipynb_checkpoints
