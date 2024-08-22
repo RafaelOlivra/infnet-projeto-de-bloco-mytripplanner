@@ -24,11 +24,13 @@ st.write(
 st.write(
     '''
     ### Links Úteis
+    
     ### Artefatos
     - [Repositório no GitHub](https://github.com/RafaelOlivra/python-llms-if-tp1)
     - [Business Model Canvas](https://docs.google.com/drawings/d/1LDVFgGZBJcKsntF1MJgB_Y5skqeSBI1mjtDtm7hmOt8/edit)
     - [Project Charter](https://docs.google.com/document/d/1aqE3sguPtd9xvBwgypT2NwycYuOskVr0EFID9omDIic/edit?usp=sharing)
     - [Data Summary Report](https://docs.google.com/document/d/1jie_4x3r550BwLlOtSxuLYOwWTwRtqeiXuroQSZUtJQ/edit?usp=sharing)
+
     ### Fontes de dados e APIs
     Essas fontes **poderão** ser utilizadas no desenvolvimento do MyTripPlanner
     - [OpenWeatherMap](https://openweathermap.org/)
@@ -40,6 +42,7 @@ st.write(
     - [Perplexity AI](https://www.perplexity.ai/)
     - [Phind](https://www.phind.com/search?home=true)
     - [OpenAI](https://openai.com/)
+
     ### Inspirações
     - [Agenda 2030](https://brasil.un.org/pt-br/91863-agenda-2030-para-o-desenvolvimento-sustent%C3%A1vel)
     - [Streamlit Gallery](https://www.streamlit.io/gallery)
