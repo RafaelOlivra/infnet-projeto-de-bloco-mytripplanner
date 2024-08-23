@@ -6,6 +6,7 @@
 *Zone.Identifier
 .ipynb_checkpoints
 package.zip
+__pycache__
 
 # Compiled Python bytecode
 *.py[cod]

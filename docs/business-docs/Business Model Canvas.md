@@ -6,7 +6,7 @@
 
 ### Provedores de Dados Meteorológicos
 
-* **Exemplos:** INMET, OpenWeatherMap, Meteoblue.  
+* **Exemplos:** OpenWeatherMap, INMET,  Meteoblue.  
 * **Valor:** Fornecem dados climáticos essenciais para prever o tempo e enviar notificações aos usuários sobre condições meteorológicas adversas que possam afetar suas viagens.
 
 ### Provedores de Serviços de Mapas
