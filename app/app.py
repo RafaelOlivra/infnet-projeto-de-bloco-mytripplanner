@@ -21,6 +21,12 @@ load_dotenv(find_dotenv('../.env'))
 def Home():
 
     # Set page title
+    st.set_page_config(
+        page_title="MyTripPlanner",
+        page_icon="🗺️",
+        initial_sidebar_state="expanded",
+    )
+    
     st.title('🗺️ MyTripPlanner')
     st.write(
         '''
