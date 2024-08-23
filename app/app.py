@@ -24,6 +24,7 @@ def Home():
     st.set_page_config(
         page_title="MyTripPlanner",
         page_icon="🗺️",
+        layout='wide',
         initial_sidebar_state="expanded",
     )
     
@@ -49,11 +50,9 @@ def Home():
         Essas fontes **poderão** ser utilizadas no desenvolvimento do MyTripPlanner
         - [OpenWeatherMap](https://openweathermap.org/)
         - [Google Maps](https://cloud.google.com/maps-platform)
-        - [Waze](https://www.waze.com/pt-BR/)
-        - [Here Maps](https://developer.here.com/)
-        - [Perplexity AI](https://www.perplexity.ai/)
-        - [Phind](https://www.phind.com/search?home=true)
-        - [OpenAI](https://openai.com/)
+        - [Perplexity AI - EM ANÁLISE](https://www.perplexity.ai/)
+        - [Phind - EM ANÁLISE](https://www.phind.com/search?home=true)
+        - [OpenAI - EM ANÁLISE](https://openai.com/)
 
         ### Inspirações
         - [Agenda 2030](https://brasil.un.org/pt-br/91863-agenda-2030-para-o-desenvolvimento-sustent%C3%A1vel)

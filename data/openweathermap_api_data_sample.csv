@@ -1,0 +1,41 @@
+﻿,timestamp,date,city_name,state_name,temperature,weather,wind_speed
+0,1724446800,2024-08-23T18:00:00.000,Sorocaba,São Paulo,32.72,céu limpo,4.1
+1,1724457600,2024-08-23T21:00:00.000,Sorocaba,São Paulo,22.9,algumas nuvens,5.99
+2,1724468400,2024-08-24T00:00:00.000,Sorocaba,São Paulo,16.04,algumas nuvens,4.28
+3,1724479200,2024-08-24T03:00:00.000,Sorocaba,São Paulo,15.03,nuvens dispersas,4.73
+4,1724490000,2024-08-24T06:00:00.000,Sorocaba,São Paulo,15.36,nublado,3.56
+5,1724500800,2024-08-24T09:00:00.000,Sorocaba,São Paulo,19.99,nuvens dispersas,3.29
+6,1724511600,2024-08-24T12:00:00.000,Sorocaba,São Paulo,27.7,céu limpo,3.16
+7,1724522400,2024-08-24T15:00:00.000,Sorocaba,São Paulo,18.37,algumas nuvens,8.41
+8,1724533200,2024-08-24T18:00:00.000,Sorocaba,São Paulo,20.13,nublado,5.85
+9,1724544000,2024-08-24T21:00:00.000,Sorocaba,São Paulo,17.86,chuva leve,2.69
+10,1724554800,2024-08-25T00:00:00.000,Sorocaba,São Paulo,15.16,chuva leve,4.12
+11,1724565600,2024-08-25T03:00:00.000,Sorocaba,São Paulo,14.16,nublado,4.86
+12,1724576400,2024-08-25T06:00:00.000,Sorocaba,São Paulo,14.01,nublado,3.27
+13,1724587200,2024-08-25T09:00:00.000,Sorocaba,São Paulo,13.76,chuva leve,3.5
+14,1724598000,2024-08-25T12:00:00.000,Sorocaba,São Paulo,13.74,chuva moderada,3.24
+15,1724608800,2024-08-25T15:00:00.000,Sorocaba,São Paulo,12.6,chuva moderada,3.11
+16,1724619600,2024-08-25T18:00:00.000,Sorocaba,São Paulo,11.66,chuva moderada,3.29
+17,1724630400,2024-08-25T21:00:00.000,Sorocaba,São Paulo,10.72,chuva leve,4.3
+18,1724641200,2024-08-26T00:00:00.000,Sorocaba,São Paulo,9.82,nublado,5.13
+19,1724652000,2024-08-26T03:00:00.000,Sorocaba,São Paulo,8.78,nublado,3.15
+20,1724662800,2024-08-26T06:00:00.000,Sorocaba,São Paulo,7.93,céu limpo,4.06
+21,1724673600,2024-08-26T09:00:00.000,Sorocaba,São Paulo,12.03,céu limpo,5.15
+22,1724684400,2024-08-26T12:00:00.000,Sorocaba,São Paulo,16.97,céu limpo,4.53
+23,1724695200,2024-08-26T15:00:00.000,Sorocaba,São Paulo,18.09,céu limpo,4.48
+24,1724706000,2024-08-26T18:00:00.000,Sorocaba,São Paulo,12.92,céu limpo,4.79
+25,1724716800,2024-08-26T21:00:00.000,Sorocaba,São Paulo,9.47,céu limpo,4.55
+26,1724727600,2024-08-27T00:00:00.000,Sorocaba,São Paulo,8.76,céu limpo,4.3
+27,1724738400,2024-08-27T03:00:00.000,Sorocaba,São Paulo,8.13,céu limpo,3.89
+28,1724749200,2024-08-27T06:00:00.000,Sorocaba,São Paulo,7.74,céu limpo,3.5
+29,1724760000,2024-08-27T09:00:00.000,Sorocaba,São Paulo,13.55,céu limpo,4.82
+30,1724770800,2024-08-27T12:00:00.000,Sorocaba,São Paulo,20.07,céu limpo,5.04
+31,1724781600,2024-08-27T15:00:00.000,Sorocaba,São Paulo,22.29,céu limpo,4.2
+32,1724792400,2024-08-27T18:00:00.000,Sorocaba,São Paulo,15.29,céu limpo,5.42
+33,1724803200,2024-08-27T21:00:00.000,Sorocaba,São Paulo,11.26,céu limpo,3.85
+34,1724814000,2024-08-28T00:00:00.000,Sorocaba,São Paulo,10.62,céu limpo,3.22
+35,1724824800,2024-08-28T03:00:00.000,Sorocaba,São Paulo,10.43,céu limpo,2.72
+36,1724835600,2024-08-28T06:00:00.000,Sorocaba,São Paulo,10.7,céu limpo,2.11
+37,1724846400,2024-08-28T09:00:00.000,Sorocaba,São Paulo,17.47,céu limpo,1.38
+38,1724857200,2024-08-28T12:00:00.000,Sorocaba,São Paulo,25.03,céu limpo,1.27
+39,1724868000,2024-08-28T15:00:00.000,Sorocaba,São Paulo,27.74,céu limpo,0.7

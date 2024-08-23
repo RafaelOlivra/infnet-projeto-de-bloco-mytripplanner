@@ -11,11 +11,17 @@ O MyTripPlanner é um aplicativo de planejamento de viagens, projetado para ajud
 - **Recomendações Baseadas em IA**: Desfrute de uma experiência personalizada com recomendações inteligentes que levam em conta suas preferências e histórico de viagens para sugerir as melhores opções de rotas e atividades.
 - **Interface Intuitiva**: Planeje suas viagens facilmente com uma interface web amigável.
 
+## Preview
+
+Um preview atualizado do projeto atual pode ser acessado em:
+
 ## Disclaimer
 
 Esse é um projeto criado para o curso de Ciência de Dados da faculdade Infnet.
 
 ## Changelog
+ * 23/Aug/2024 * Atualizado Página Streamlit
+ * 24/Aug/2024 * Atualizado Business Docs
  * 22/Aug/2024 * Atualizado Business Docs
  * 21/Aug/2024 * Atualizado Business Docs
  * 19/Aug/2024 * Atualizado Data Summary Report
