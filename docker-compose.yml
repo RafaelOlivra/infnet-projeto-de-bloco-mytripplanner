@@ -6,6 +6,9 @@ services:
         image: mytripplanner/streamlit
         container_name: mytripplanner-streamlit
         restart: unless-stopped
+        volumes:
+            # For auto-reloading the streamlit app
+            - ./app:/app
         networks:
             - mytripplanner
 
