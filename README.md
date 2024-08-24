@@ -13,7 +13,7 @@ O MyTripPlanner é um aplicativo de planejamento de viagens, projetado para ajud
 
 ## Preview
 
-Um preview atualizado do projeto atual pode ser acessado em:
+Um preview atualizado do projeto atual pode ser acessado em: https://mytripplanner.rafaeloliveira.design:5943/
 
 ## Disclaimer
 

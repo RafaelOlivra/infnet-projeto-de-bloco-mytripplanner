@@ -1,17 +1,38 @@
 version: "3.1"
+
 services:
     streamlit:
         build: .
         image: mytripplanner/streamlit
         container_name: mytripplanner-streamlit
         restart: unless-stopped
-        ports:
-            - "8501:8501"
-        volumes:
-            - ./app:/usr/src/app:ro
-            - ./.env:/usr/src/.env:ro
-            - ./data:/usr/src/data:rw
-        env_file:
-            - "./.env"
         networks:
-            - default
+            - mytripplanner
+
+    caddy:
+        image: caddy:alpine
+        container_name: caddy
+        restart: unless-stopped
+        env_file:
+            - ./.env
+        ports:
+            - "${WEB_PORT_HTTP}:80"
+            - "${WEB_PORT_HTTPS}:443"
+            - "${WEB_PORT_HTTPS}:443/udp"
+        volumes:
+            # For extra proxy configurations and files such as cert files
+            - ./.caddy-config/:/etc/caddy/caddy-config/
+            # For the caddy data
+            - ./Caddyfile:/etc/caddy/Caddyfile
+            - caddy_data:/data
+            - caddy_config:/config
+        networks:
+            - mytripplanner
+
+networks:
+    mytripplanner:
+        driver: bridge
+
+volumes:
+    caddy_data:
+    caddy_config:

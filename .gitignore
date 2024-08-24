@@ -2,11 +2,13 @@
 .venv
 .env
 .vscode
+.caddy-config
 .ipynb_checkpoints
 *Zone.Identifier
 .ipynb_checkpoints
 package.zip
 __pycache__
+Caddyfile
 
 # Compiled Python bytecode
 *.py[cod]
