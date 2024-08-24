@@ -9,6 +9,7 @@
 package.zip
 __pycache__
 Caddyfile
+*.temp
 
 # Compiled Python bytecode
 *.py[cod]

@@ -4,6 +4,7 @@ from dotenv import load_dotenv, find_dotenv
 import pandas as pd
 from services.OpenWeatherMap import OpenWeatherMap
 from services.GoogleMaps import GoogleMaps
+from services.YelpScrapper import YelpScrapper
 
 ####################
 # CONFIGURATION
@@ -50,6 +51,7 @@ def Home():
         Essas fontes **poderão** ser utilizadas no desenvolvimento do MyTripPlanner
         - [OpenWeatherMap](https://openweathermap.org/)
         - [Google Maps](https://cloud.google.com/maps-platform)
+        - [Yelp](https://www.yelp.com.br/)
         - [Perplexity AI - EM ANÁLISE](https://www.perplexity.ai/)
         - [Phind - EM ANÁLISE](https://www.phind.com/search?home=true)
         - [OpenAI - EM ANÁLISE](https://openai.com/)
@@ -95,9 +97,8 @@ def openweathermap_example():
     # Show with Pandas
     st.write(df)
 
+
 # Google Maps Example
-
-
 def googlemaps_example():
     '''
     Google Maps Example
@@ -127,6 +128,32 @@ def googlemaps_example():
         origin="Sorocaba-SP", destination="São Paulo-SP")
     components.iframe(iframe_url, height=450)
 
+# Yelp Example
+
+
+def yelp_example():
+    '''
+    Yelp Example
+    '''
+    st.write(
+        '''
+        ### ⭐ Yelp (Via scraper)
+        - [Página de Busca](https://yelp.com/search?find_desc=Attractions&find_loc=Sorocaba,%20Sao+Paulo,%20Brasil&start=0&limit=10)
+        '''
+    )
+
+    # Create YelpScrapper instance
+    yelp = YelpScrapper()
+
+    # Get Attractions JSON
+    st.write('### Atrações Perto de Sorocaba-SP')
+    attractions = yelp.get_near_attractions_json(
+        city="Sorocaba", state="São Paulo")
+
+    # Show JSON data with Pandas
+    df = pd.read_json(attractions)
+    st.write(df)
+
 
 ####################
 # INIT
@@ -137,3 +164,5 @@ if __name__ == '__main__':
     openweathermap_example()
     st.divider()
     googlemaps_example()
+    st.divider()
+    yelp_example()
