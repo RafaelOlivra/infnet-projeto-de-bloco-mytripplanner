@@ -24,6 +24,11 @@
 * **Exemplos:** OpenAI, Perplexity AI, Phind.  
 * **Valor:** Fornecem tecnologias de inteligência artificial para melhorar a experiência do usuário, como chatbots para suporte ao cliente, algoritmos avançados para personalização e recomendação de viagens, previsão de demanda e otimização de rotas.
 
+### Provedores de Atrações e Serviços Locais
+
+* **Exemplos**:  Plataformas como o Yelp.  
+* **Valor:** Fornecem informações sobre atrações turísticas, restaurantes e outros pontos de interesse no destino de viagem, ajudando os usuários a encontrar as melhores opções para enriquecer sua experiência durante a viagem.
+
 ### Empresas de Tecnologia de Viagem
 
 * **Exemplos:** Agências de viagens online, aplicativos de reserva de hotéis e passagens.  

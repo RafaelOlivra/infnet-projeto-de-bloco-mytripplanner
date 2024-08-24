@@ -6,32 +6,39 @@ Este documento resume as fontes de dados que serão utilizadas no desenvolviment
 
 ## Fontes de Dados
 
-### [**OpenWeatherMap API**](https://www.geeksforgeeks.org/python-find-current-weather-of-any-city-using-openweathermap-api/)
+### [OpenWeatherMap API](https://www.geeksforgeeks.org/python-find-current-weather-of-any-city-using-openweathermap-api/)
 
 * **Tipo de Dados**: Condições climáticas atuais e previsões de curto prazo.  
 * **Objetivo de Uso**:  
   * Fornecer informações climáticas em tempo real e previsões para os próximos dias, focando nas localidades específicas dos usuários.  
   * Integrar dados climáticos diretamente no aplicativo para permitir que os usuários planejem suas viagens com base em condições meteorológicas precisas.
 
-### [**Google Maps API**](https://developers.google.com/maps/apis-by-platform?hl=pt-br)
+### [Google Maps API](https://developers.google.com/maps/apis-by-platform?hl=pt-br)
 
 * **Tipo de Dados**: Dados de trânsito em tempo real, mapeamento de rotas, e informações sobre locais de interesse.  
 * **Objetivo de Uso**:  
   * Fornecer informações sobre as condições de tráfego e rotas otimizadas, ajudando os usuários a planejar seus itinerários de viagem.
 
-### **7\. [OpenAI](https://openai.com/) (Em Análise)**
+### [Yelp](https://www.yelp.com.br/s%C3%A3o-paulo)
+
+*   
+  **Tipo de Dados:** Informações sobre atrações turísticas, restaurantes, e serviços locais.  
+* **Objetivo de Uso:**  
+  * Integrar informações sobre atrações e locais de interesse nos destinos de viagem, permitindo que os usuários descubram e planejem visitas a esses pontos durante suas viagens.
+
+### [OpenAI](https://openai.com/) (Em Análise)
 
 * **Tipo de Dados**: Inteligência Artificial para geração de textos e sugestões de roteiros.  
 * **Objetivo de Uso**:  
   * Integrar com o MyTripPlanner para gerar roteiros de viagem personalizados e oferecer recomendações baseadas em preferências do usuário e dados coletados.
 
-### **8\. [Perplexity AI](https://www.perplexity.ai/) (Em Análise)**
+### [Perplexity AI](https://www.perplexity.ai/) (Em Análise)
 
 * **Tipo de Dados**: Ferramenta de busca inteligente para oferecer respostas rápidas e precisas.  
 * **Objetivo de Uso**:  
   * Utilizar como alternativa para gerar roteiros e recomendações do MyTripPlanner, fornecendo informações adicionais relevantes para o planejamento de viagens.
 
-### **9\. [Phind](https://www.phind.com/) (Em Análise)**
+### [Phind](https://www.phind.com/) (Em Análise)
 
 * **Tipo de Dados**: Ferramenta de busca para desenvolvedores e pesquisadores.  
 * **Objetivo de Uso**:  

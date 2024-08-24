@@ -14,9 +14,10 @@
 * **Data Science Solutions**:  
   * Integrar um sistema de previsão e notificação que antecipe problemas climáticos.  
   * Integrar soluções de aprendizado de máquina para gerar recomendações de roteiros pertinentes ao destino escolhido.  
-  * Integrar essas previsões em uma interface amigável que permita ao usuário planejar suas viagens de forma fácil e eficiente.  
+  * Integrar soluções via Scraping para recomendar atrações relacionadas ao destino escolhido.  
+  * Integrar essas informações em uma interface amigável que permita ao usuário planejar suas viagens de forma fácil e eficiente.  
 * **What Will We Do**:  
-  * Desenvolver uma aplicação Streamlit integrada com API climáticas e provedores de Inteligência Artificial.  
+  * Desenvolver uma aplicação Streamlit integrada com API climáticas, provedores de Inteligência Artificial e Scraping de atrações turísticas.  
   * Criar uma aplicação que analisa dados regularmente e fornece notificações ao usuário.  
   * Construir uma interface de usuário intuitiva que permita fácil acesso e visualização das informações.  
 * **How Will The Customer consume it**:  
@@ -65,10 +66,10 @@
   5. **Phase 5: Lançamento Inicial (Beta)** (2 semanas)  
      * Lançamento oficial do app beta com as funcionalidades básicas.  
      * Ajustes e melhorias baseados no feedback.  
-  6. **Phase 6: Pesquisa de APIs de IA** (2 semanas)  
-     * Pesquisar APIs que forneçam opções para a criação de roteiros personalizados com base no destino e preferências do usuário.  
-  7. **Phase 7: Integração APIs de Trânsito** (4 semanas)  
-     * Integração com APIs.  
+  6. **Phase 6: Pesquisa de APIs de IA e Atrações** (2 semanas)  
+     * Pesquisar APIs que forneçam opções para a criação de roteiros personalizados com base no destino e preferências do usuário, essas soluções podem também incluir scraping direto de websites.  
+  7. **Phase 7: Integração APIs**  (4 semanas)  
+     * Integração com as novas APIs.  
   8. **Phase 8: Lançamento e Monitoramento** (2 semanas)  
      * Lançamento oficial do app.  
      * Monitoramento e análise contínua de desempenho.
@@ -76,11 +77,12 @@
 ## Architecture
 
 * **Data**:  
-  * **Expected Data**: Dados meteorológicos em tempo real, dados de localização de usuários, dados gerados de forma dinâmica por provedores de IA.  
+  * **Expected Data**: Dados meteorológicos em tempo real, dados de localização de usuários, dados gerados de forma dinâmica por provedores de IA, HTML proveniente de Scraping.  
   * **Data Movement**:  
     * Dados coletados de APIs externas são movidos para o banco de dados central do MyTripPlanner.  
     * Dados históricos são armazenados localmente e ficam disponíveis para análise.  
     * Roteiros recomendados por IA também serão salvos para consultas e aprimoramentos futuros.  
+    * Dados processados de páginas HTML serão processadas e salvas localmente no banco de dados.  
 * **Tools and Resources**:  
   * **Database SQLite** para armazenamento de dados.  
   * **Streamlit** como ferramenta para criação da aplicação inicial.  
