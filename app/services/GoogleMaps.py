@@ -32,7 +32,7 @@ class GoogleMaps:
         url = f"https://maps.googleapis.com/maps/api/directions/json?origin={self.url_encode(origin)}&destination={self.url_encode(destination)}&mode={self.url_encode(mode)}&key={self.api_key}"
         return self.fetch_json(url)
 
-    def get_google_maps_directions_iframe_url(self, origin, destination, zoom: int = 10):
+    def get_google_maps_directions_iframe_url(self, origin, destination, zoom: int | None = None):
         """
         Generate URL code for an iframe that displays Google Maps directions.
 
@@ -43,7 +43,12 @@ class GoogleMaps:
         Returns:
         - str: URL for the embeddable iframe.
         """
-        url = f"https://www.google.com/maps/embed/v1/directions?origin={self.url_encode(origin)}&destination={self.url_encode(destination)}&key={self.api_key}&zoom={int(zoom)}"
+        if zoom is not None and zoom.isnumeric():
+            zoom = '&zoom=' + int(zoom)
+        else:
+            zoom = ''
+
+        url = f"https://www.google.com/maps/embed/v1/directions?origin={self.url_encode(origin)}&destination={self.url_encode(destination)}&key={self.api_key}{zoom}"
         return url
 
     @lru_cache(maxsize=100)

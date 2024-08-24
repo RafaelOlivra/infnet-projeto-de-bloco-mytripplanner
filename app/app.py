@@ -27,7 +27,7 @@ def Home():
         layout='wide',
         initial_sidebar_state="expanded",
     )
-    
+
     st.title('🗺️ MyTripPlanner')
     st.write(
         '''
