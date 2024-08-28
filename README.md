@@ -19,6 +19,10 @@ Um preview atualizado do projeto atual pode ser acessado em: https://mytripplann
 
 Esse é um projeto criado para o curso de Ciência de Dados da faculdade Infnet.
 
+## Links Úteis
+
+- [Repositório Git](https://github.com/RafaelOlivra/python-llms-if-tp1)
+
 ## Changelog
  * 23/Aug/2024 * Atualizado Página Streamlit
  * 24/Aug/2024 * Atualizado Business Docs
