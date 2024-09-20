@@ -1,5 +1,7 @@
 import streamlit as st
+import datetime
 from model.Trip import Trip
+from services.CityStateData import CityStateData
 
 
 def Cadastrar():
@@ -21,14 +23,41 @@ def Cadastrar():
 
     # Form
     title = st.text_input('Título', 'Viagem de Férias')
-    origin_city = st.text_input('Origem (Cidade)', 'São Paulo')
-    origin_state = st.text_input('Origem (Estado)', 'SP')
-    destination_city = st.text_input('Destino (Cidade)', 'Rio de Janeiro')
-    destination_state = st.text_input('Destino (Estado)', 'RJ')
-    start_date = st.date_input(
-        'Data de Início', value=None, min_value=None, max_value=None, key=None)
-    end_date = st.date_input(
-        'Data de Término', value=None, min_value=None, max_value=None, key=None)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        origin_state = st.selectbox(
+            'Origem (Estado)', CityStateData().get_ufs())
+    with col2:
+        origin_city = st.selectbox(
+            'Origem (Cidade)', CityStateData().get_cities_by_uf(origin_state))
+
+    col1, col2 = st.columns(2)
+    with col1:
+        destination_state = st.selectbox(
+            'Destino (Estado)', CityStateData().get_ufs())
+    with col2:
+        destination_city = st.selectbox(
+            'Destino (Cidade)', CityStateData().get_cities_by_uf(destination_state))
+
+    # Datepicker
+    today = datetime.datetime.now()
+    week_from_today = today + datetime.timedelta(days=7)
+    date = st.date_input(
+        "Data da Viagem",
+        (today, week_from_today),
+        min_value=today,
+        max_value=today + datetime.timedelta(days=365),
+        format="DD/MM/YYYY"
+    )
+    if date:
+        if len(date) > 1:
+            start_date = date[0]
+            end_date = date[1]
+        else:
+            start_date = date[0]
+            end_date = False
+
     notes = st.text_area('Observações', 'Sem observações.')
 
     if st.button('Cadastrar'):

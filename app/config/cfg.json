@@ -1,4 +1,5 @@
 {
-    "data_dir": "data/.storage",
-    "log_dir": "data/.log"
+    "storage_dir": "./data/.storage",
+    "log_dir": "./data/.log",
+    "city_state_json": "./data/02_processed/estados-cidades.json"
 }

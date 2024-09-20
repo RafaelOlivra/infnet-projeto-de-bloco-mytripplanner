@@ -8,6 +8,8 @@ class Trip:
     title: str
     origin_city: str
     origin_state: str
+    origin_longitude: float
+    origin_latitude: float
     destination_city: str
     destination_state: str
     destination_longitude: float
@@ -38,6 +40,10 @@ class Trip:
                 self.title = trip_data.get("title", "")
                 self.origin_city = trip_data.get("origin_city", "")
                 self.origin_state = trip_data.get("origin_state", "")
+                self.origin_longitude = trip_data.get(
+                    "origin_longitude", 0.0)
+                self.origin_latitude = trip_data.get(
+                    "origin_latitude", 0.0)
                 self.destination_city = trip_data.get("destination_city", "")
                 self.destination_state = trip_data.get("destination_state", "")
                 self.destination_longitude = trip_data.get(
@@ -74,6 +80,13 @@ class Trip:
         self.destination_state = TripData["destination_state"]
 
         # If latitude and longitude are not provided, retrieve them using the geocoding API
+        if "origin_longitude" not in TripData or "origin_latitude" not in TripData:
+            self.origin_longitude, self.origin_latitude = self._get_coordinates(
+                self.origin_city, self.origin_state)
+        else:
+            self.destination_longitude = TripData["destination_longitude"]
+            self.destination_latitude = TripData["destination_latitude"]
+
         if "destination_longitude" not in TripData or "destination_latitude" not in TripData:
             self.destination_longitude, self.destination_latitude = self._get_coordinates(
                 self.destination_city, self.destination_state)
@@ -99,6 +112,8 @@ class Trip:
             "title": self.title,
             "origin_city": self.origin_city,
             "origin_state": self.origin_state,
+            "origin_longitude": self.origin_longitude,
+            "origin_latitude": self.origin_latitude,
             "destination_city": self.destination_city,
             "destination_state": self.destination_state,
             "destination_longitude": self.destination_longitude,

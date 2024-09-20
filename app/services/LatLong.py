@@ -3,7 +3,7 @@ from services.GoogleMaps import GoogleMaps
 
 
 class LatLong:
-    def __init__(self, api_key=None):
+    def __init__(self):
         return
 
     def get_coordinates(self, city, state):

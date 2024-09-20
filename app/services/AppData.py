@@ -13,7 +13,7 @@ class AppData:
     # Getters
     # ---------------------------
 
-    def get(self, group="app", id="", key=""):
+    def get(self, group="config", id="", key=""):
         # Data files are stored in the data folder
         # Each group has its own directory
         # Data are stored in a JSON format
@@ -29,42 +29,35 @@ class AppData:
             return None
 
         # App Config
-        if group == "app":
-            return self._get_config(key)
+        if group == "config":
+            return self.get_config(key)
 
         # API Keys
         if group == "api_key":
-            return self._get_api_key(key)
+            return self.get_api_key(key)
 
         # Trip Data
         if group == "trip":
-            return self._get_trip_data(id, key)
+            return self.get_trip_data(id, key)
 
     def get_config(self, key):
-        folder_map = self._get_storage_map()
-        file_path = folder_map["app"]["data"] + folder_map["app"]["file"]
-        if os.path.exists(file_path):
-            with open(file_path, "r") as f:
-                data = f.read()
-                data = json.loads(data)
+        config_file = "app/config/cfg.json"
+        if os.path.exists(config_file):
+            with open(config_file, "r") as f:
+                data = json.load(f)
                 if key in data:
                     return data[key]
 
-            return data
-        return None
-
     def get_api_key(self, key):
-
         key_map = {
             "openweathermap": "OPENWEATHERMAP_API_KEY",
             "googlemaps": "GOOGLEMAPS_API_KEY",
             "yelp": "YELP_API_KEY",
             "opencagedata": "OPENCAGEDATA_API_KEY",
         }
-
         return os.getenv(key_map[key])
 
-    def _get_trip_data(self, id, key):
+    def get_trip_data(self, id, key):
         id = self.sanitize_id(id)
         folder_map = self._get_storage_map()
         file_path = folder_map["trip"]["data"] + \
@@ -80,14 +73,9 @@ class AppData:
         return None
 
     def _get_storage_map(self):
+        storage_dir = self.get_config("storage_dir")
         return {
-            "trip": {
-                "data": "app/data/.storage/trip/"
-            },
-            "config": {
-                "data": "app/config/",
-                "file": "cfg.json",
-            },
+            "trip": storage_dir + "/trip/",
         }
 
     # --------------------------
