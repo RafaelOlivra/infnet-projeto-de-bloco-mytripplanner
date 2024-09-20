@@ -12,7 +12,7 @@ Caddyfile
 *.temp
 .run.powershell
 /data/.storage/
-.storage/
+*.storage
 
 # Compiled Python bytecode
 *.py[cod]
