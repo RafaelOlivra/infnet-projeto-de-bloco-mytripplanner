@@ -4,47 +4,62 @@ import json
 
 class CityStateData:
     def __init__(self):
-        # Load the json data with the city and state names
+        """
+        Initialize CityStateData by loading the city and state names from a JSON file.
+        """
+        # Load the JSON file with city and state data
         json_file = AppData().get_config("city_state_json")
         try:
             with open(json_file, "r", encoding="utf-8") as f:
                 self.city_state_data = json.load(f)
         except FileNotFoundError:
-            print("CityStateData: File not found.")
-        return
+            print(f"CityStateData: The file '{json_file}' was not found.")
+            self.city_state_data = {}
 
     def get_states(self):
-        states = []
-        data = self.city_state_data
-        states = data['estados']
-        for state in states:
-            states.append(state['nome'])
-        return states
+        """
+        Get a list of all state names.
+
+        Returns:
+            list: A list of state names.
+        """
+        return [state['nome'] for state in self.city_state_data.get('estados', [])]
 
     def get_ufs(self):
-        ufs = []
-        data = self.city_state_data
-        states = data['estados']
-        for state in states:
-            ufs.append(state['sigla'])
-        return ufs
+        """
+        Get a list of all state abbreviations (UFs).
+
+        Returns:
+            list: A list of state abbreviations (UFs).
+        """
+        return [state['sigla'] for state in self.city_state_data.get('estados', [])]
 
     def get_cities_by_state(self, state):
-        cities = []
-        data = self.city_state_data
-        states = data['estados']
-        for s in states:
-            if s['sigla'] == state:
-                cities = s['cidades']
-                break
-        return cities
+        """
+        Get a list of cities in a given state by its name.
+
+        Args:
+            state (str): The name of the state.
+
+        Returns:
+            list: A list of city names in the given state.
+        """
+        for s in self.city_state_data.get('estados', []):
+            if s['nome'].lower() == state.lower():
+                return s['cidades']
+        return []
 
     def get_cities_by_uf(self, uf):
-        cities = []
-        data = self.city_state_data
-        states = data['estados']
-        for s in states:
-            if s['sigla'] == uf:
-                cities = s['cidades']
-                break
-        return cities
+        """
+        Get a list of cities in a given state by its UF (abbreviation).
+
+        Args:
+            uf (str): The abbreviation of the state (UF).
+
+        Returns:
+            list: A list of city names in the given state.
+        """
+        for s in self.city_state_data.get('estados', []):
+            if s['sigla'].lower() == uf.lower():
+                return s['cidades']
+        return []

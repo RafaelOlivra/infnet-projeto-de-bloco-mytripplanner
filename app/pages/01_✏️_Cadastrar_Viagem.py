@@ -21,9 +21,9 @@ def Cadastrar():
         '''
     )
 
-    # Form
     title = st.text_input('Título', 'Viagem de Férias')
 
+    # City and State
     col1, col2 = st.columns(2)
     with col1:
         origin_state = st.selectbox(
