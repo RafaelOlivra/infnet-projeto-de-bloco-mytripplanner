@@ -15,12 +15,13 @@ import requests
 import os
 from datetime import datetime, timedelta
 from functools import lru_cache
+from services.AppData import AppData
 
 
 class OpenWeatherMap:
     def __init__(self, api_key=None):
         # Set the API key, either from the environment or directly from the parameter
-        self.api_key = api_key or os.environ.get("OPENWEATHERMAP_API_KEY")
+        self.api_key = api_key or AppData().get_api_key("openweathermap")
         if not self.api_key:
             raise ValueError("API key is required for OpenWeatherMap")
 

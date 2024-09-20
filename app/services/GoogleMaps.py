@@ -1,19 +1,21 @@
 import requests
 import os
 from datetime import datetime, timedelta
+from services.AppData import AppData
 from functools import lru_cache
 
 
 class GoogleMaps:
     def __init__(self, api_key=None):
         # Set the API key, either from the environment or directly from the parameter
-        self.api_key = api_key or os.environ.get("GOOGLEMAPS_API_KEY")
+        self.api_key = api_key or AppData().get_api_key("googlemaps")
         if not self.api_key:
             raise ValueError("API key is required for Google Maps API")
 
     def get_directions_url(self, origin: str, destination: str):
         base_url = "https://www.google.com/maps/dir/?api=1"
-        url = f"{base_url}&origin={self.url_encode(origin)}&destination={self.url_encode(destination)}"
+        url = f"{base_url}&origin={self.url_encode(origin)}&destination={
+            self.url_encode(destination)}"
         return url
 
     @lru_cache(maxsize=100)
@@ -29,7 +31,8 @@ class GoogleMaps:
         Returns:
         - dict: The directions data.
         """
-        url = f"https://maps.googleapis.com/maps/api/directions/json?origin={self.url_encode(origin)}&destination={self.url_encode(destination)}&mode={self.url_encode(mode)}&key={self.api_key}"
+        url = f"https://maps.googleapis.com/maps/api/directions/json?origin={self.url_encode(
+            origin)}&destination={self.url_encode(destination)}&mode={self.url_encode(mode)}&key={self.api_key}"
         return self.fetch_json(url)
 
     def get_google_maps_directions_iframe_url(self, origin, destination, zoom: int | None = None):
@@ -48,7 +51,8 @@ class GoogleMaps:
         else:
             zoom = ''
 
-        url = f"https://www.google.com/maps/embed/v1/directions?origin={self.url_encode(origin)}&destination={self.url_encode(destination)}&key={self.api_key}{zoom}"
+        url = f"https://www.google.com/maps/embed/v1/directions?origin={self.url_encode(
+            origin)}&destination={self.url_encode(destination)}&key={self.api_key}{zoom}"
         return url
 
     @lru_cache(maxsize=100)
@@ -78,3 +82,28 @@ class GoogleMaps:
         - str: The URL-encoded text.
         """
         return requests.utils.quote(text)
+
+    @lru_cache(maxsize=100)
+    def get_latitude_longitude(self, location: str):
+        """
+        Retrieve latitude and longitude for a given location using the Google Maps Geocoding API.
+
+        Args:
+        - location (str): The location (e.g., city, state, or address) to geocode.
+
+        Returns:
+        - tuple: A tuple containing (latitude, longitude).
+
+        Raises:
+        - ValueError: If the location cannot be geocoded.
+        """
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={
+            self.url_encode(location)}&key={self.api_key}"
+        data = self.fetch_json(url)
+
+        if data['status'] == 'OK' and len(data['results']) > 0:
+            location_data = data['results'][0]['geometry']['location']
+            return location_data['lat'], location_data['lng']
+        else:
+            raise ValueError(
+                f"Could not retrieve coordinates for location: {location}")
