@@ -59,9 +59,9 @@ class AppData:
 
     def get_trip_data(self, id, key):
         id = self.sanitize_id(id)
-        folder_map = self._get_storage_map()
-        file_path = folder_map["trip"]["data"] + \
-            id + "/" + folder_map["trip"][id]+'.json'
+        save_path = self._get_storage_map()["trip"]
+        file_path = save_path + '/' + id + '.json'
+
         if os.path.exists(file_path):
             with open(file_path, "r") as f:
                 data = f.read()
@@ -75,7 +75,7 @@ class AppData:
     def _get_storage_map(self):
         storage_dir = self.get_config("storage_dir")
         return {
-            "trip": storage_dir + "/trip/",
+            "trip": storage_dir + "/trip",
         }
 
     # --------------------------
@@ -90,10 +90,9 @@ class AppData:
 
         folder_map = self._get_storage_map()
 
-        # Check if group exists
+        # Check if we have the required parameters
         if group not in folder_map:
             return False
-        # Check if value is empty
         if value is None:
             return False
 
@@ -104,12 +103,13 @@ class AppData:
 
     def _save_trip_data(self, TripData):
         id = self.sanitize_id(TripData["trip_id"])
-        folder_map = self._get_storage_map()
-        file_path = folder_map["trip"]["data"] + id + '.json'
 
-        # Create directory if it doesn't exist
-        if not os.path.exists(folder_map["trip"]["data"]):
-            os.makedirs(folder_map["trip"]["data"])
+        save_path = self._get_storage_map()["trip"]
+        file_path = save_path + '/' + id + '.json'
+
+        # Create save directory if it doesn't exist
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
 
         with open(file_path, "w") as f:
             f.write(json.dumps(TripData))
@@ -117,8 +117,8 @@ class AppData:
 
     def _update_trip_data(self, id, key, value):
         id = self.sanitize_id(id)
-        folder_map = self._get_storage_map()
-        file_path = folder_map["trip"]["data"] + id + '.json'
+        save_path = self._get_storage_map()["trip"]
+        file_path = save_path + '/' + id + '.json'
 
         if os.path.exists(file_path):
             with open(file_path, "r") as f:
@@ -155,9 +155,9 @@ class AppData:
 
     def _delete_trip_data(self, id, key):
         id = self.sanitize_id(id)
-        folder_map = self._get_storage_map()
-        file_path = folder_map["trip"]["data"] + \
-            id + "/" + folder_map["trip"][id]+'.json'
+        save_path = self._get_storage_map()["trip"]
+        file_path = save_path + '/' + id + '.json'
+
         if os.path.exists(file_path):
             with open(file_path, "r") as f:
                 data = f.read()
@@ -167,7 +167,6 @@ class AppData:
                     with open(file_path, "w") as f:
                         f.write(json.dumps(data))
                     return True
-            return False
         return False
 
     # --------------------------
