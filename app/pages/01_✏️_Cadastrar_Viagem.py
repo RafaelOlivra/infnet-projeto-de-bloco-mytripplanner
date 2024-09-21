@@ -35,7 +35,7 @@ def Cadastrar():
                 'Origem (Estado)', CityStateData().get_ufs(), index=25)
         with sub_col2:
             origin_city = st.selectbox(
-                'Origem (Cidade)', CityStateData().get_cities_by_uf(origin_state), index=564)
+                'Origem (Cidade)', CityStateData().get_cities_by_uf(origin_state), index=0)
     with col2:
         st.write('#### Destino')
         sub_col1, sub_col2 = st.columns([2, 8])
@@ -44,7 +44,7 @@ def Cadastrar():
                 'Destino (Estado)', CityStateData().get_ufs(), index=18)
         with sub_col2:
             destination_city = st.selectbox(
-                'Destino (Cidade)', CityStateData().get_cities_by_uf(destination_state), index=67)
+                'Destino (Cidade)', CityStateData().get_cities_by_uf(destination_state), index=0)
 
     # Mostra um mapa com a origem e destino
     google_maps = GoogleMaps()
