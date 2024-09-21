@@ -1,7 +1,9 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import datetime
 from model.Trip import Trip
 from services.CityStateData import CityStateData
+from services.GoogleMaps import GoogleMaps
 
 
 def Cadastrar():
@@ -14,10 +16,10 @@ def Cadastrar():
     )
 
     # Tests
-    st.title('✏️ Cadastro de Viagem')
+    st.title('✏️ Planejamento de Viagem')
     st.write(
         '''
-        Preencha o formulário abaixo para cadastrar uma nova viagem.
+        Comece a planejar sua viagem preenchendo as informações abaixo.
         '''
     )
 
@@ -26,21 +28,36 @@ def Cadastrar():
     # City and State
     col1, col2 = st.columns(2)
     with col1:
-        origin_state = st.selectbox(
-            'Origem (Estado)', CityStateData().get_ufs())
+        st.write('#### Origem')
+        sub_col1, sub_col2 = st.columns([2, 8])
+        with sub_col1:
+            origin_state = st.selectbox(
+                'Origem (Estado)', CityStateData().get_ufs(), index=25)
+        with sub_col2:
+            origin_city = st.selectbox(
+                'Origem (Cidade)', CityStateData().get_cities_by_uf(origin_state), index=564)
     with col2:
-        origin_city = st.selectbox(
-            'Origem (Cidade)', CityStateData().get_cities_by_uf(origin_state))
+        st.write('#### Destino')
+        sub_col1, sub_col2 = st.columns([2, 8])
+        with sub_col1:
+            destination_state = st.selectbox(
+                'Destino (Estado)', CityStateData().get_ufs(), index=18)
+        with sub_col2:
+            destination_city = st.selectbox(
+                'Destino (Cidade)', CityStateData().get_cities_by_uf(destination_state), index=67)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        destination_state = st.selectbox(
-            'Destino (Estado)', CityStateData().get_ufs())
-    with col2:
-        destination_city = st.selectbox(
-            'Destino (Cidade)', CityStateData().get_cities_by_uf(destination_state))
+    # Mostra um mapa com a origem e destino
+    google_maps = GoogleMaps()
+    origin = f"{origin_city}, {origin_state}"
+    destination = f"{destination_city}, {destination_state}"
+    iframe_url = google_maps.get_google_maps_directions_iframe_url(
+        origin, destination)
+
+    with st.spinner('Carregando mapa...'):
+        components.iframe(iframe_url, height=450)
 
     # Datepicker
+    st.write('#### Quando?')
     today = datetime.datetime.now()
     week_from_today = today + datetime.timedelta(days=7)
     date = st.date_input(
@@ -58,6 +75,7 @@ def Cadastrar():
             start_date = date[0]
             end_date = False
 
+    st.write('#### Sobre a Viagem')
     notes = st.text_area('Observações', 'Sem observações.')
 
     if st.button('Cadastrar'):
