@@ -6,6 +6,7 @@ from services.CityStateData import CityStateData
 from services.GoogleMaps import GoogleMaps
 from views.WeatherView import WeatherView
 
+
 def Cadastrar():
     # Set page title
     st.set_page_config(
@@ -15,7 +16,6 @@ def Cadastrar():
         initial_sidebar_state="expanded",
     )
 
-    # Tests
     st.title('✏️ Planejamento de Viagem')
     st.write(
         '''
@@ -76,7 +76,8 @@ def Cadastrar():
             end_date = False
 
     st.write('#### Clima e Tempo')
-    st.write('Aqui você pode consultar o clima e tempo para a cidade de destino.')
+    st.write(f"Aqui você pode consultar o clima e tempo para {
+             destination} nos próximos 5 dias.")
     weather_view = WeatherView(destination_city, destination_state)
     weather_view.display_forecast()
 

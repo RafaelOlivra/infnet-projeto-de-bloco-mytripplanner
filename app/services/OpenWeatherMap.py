@@ -118,7 +118,7 @@ class OpenWeatherMap:
         return _self._flatten_forecast_data(hourly_forecast)
 
     @st.cache_data(ttl=86400)
-    def get_daily_forecast(_self, city_name: str, state_name: str, days: int = 5):
+    def get_next_5_days_forecast(_self, city_name: str, state_name: str, days: int = 5):
         """
         Retrieves the daily weather forecast for the next 'days' days by aggregating hourly forecast data.
 
