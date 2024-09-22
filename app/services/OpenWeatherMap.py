@@ -118,7 +118,7 @@ class OpenWeatherMap:
         return _self._flatten_forecast_data(hourly_forecast)
 
     @st.cache_data(ttl=86400)
-    def get_next_5_days_forecast(_self, city_name: str, state_name: str, days: int = 5):
+    def get_forecast_for_next_5_days(_self, city_name: str, state_name: str, days: int = 5):
         """
         Retrieves the daily weather forecast for the next 'days' days by aggregating hourly forecast data.
 
@@ -176,6 +176,80 @@ class OpenWeatherMap:
                 forecast['weather'])
             daily_forecast[date_str]['wind_speeds'].append(
                 forecast['wind_speed'])
+
+        # Finalize daily forecast by aggregating wind speeds and finding the most common weather description
+        for date_str, daily_data in daily_forecast.items():
+            # Get the most common weather description for the day
+            daily_data['weather'] = max(set(
+                daily_data['weather_descriptions']), key=daily_data['weather_descriptions'].count)
+
+            # Calculate average wind speed for the day
+            daily_data['wind_speed'] = sum(
+                daily_data['wind_speeds']) / len(daily_data['wind_speeds'])
+
+            # Remove the temporary fields
+            del daily_data['weather_descriptions']
+            del daily_data['wind_speeds']
+
+        return _self._flatten_forecast_data(daily_forecast)
+
+    @st.cache_data(ttl=86400)
+    def get_forecast_between_dates(_self, city_name: str, state_name: str, start_date: str, end_date: str):
+        """
+        Retrieves the weather forecast between specified start and end dates by aggregating hourly forecast data.
+
+        Args:
+            city_name (str): The name of the city.
+            state_name (str): The name of the state.
+            start_date (str): The start date in the format 'YYYY-MM-DD'.
+            end_date (str): The end date in the format 'YYYY-MM-DD'.
+
+        Returns:
+            Dict[str, Dict[str, Union[int, str, float]]]: A dictionary containing the forecast data for each day
+                between the specified dates.
+        """
+        # Fetch hourly forecast data
+        hourly_forecast = _self.get_hourly_forecast(
+            city_name, state_name, days=5)  # Fetching for the next 5 days
+
+        # Dictionary to hold the aggregated daily data
+        daily_forecast = {}
+
+        # Convert start_date and end_date to datetime objects
+        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+
+        # Iterate over each forecast entry in hourly_forecast
+        for forecast in hourly_forecast:
+            # Extract the date part from the "date" field (YYYY-MM-DD)
+            date_str = forecast['date'].split('T')[0]
+            forecast_date = datetime.strptime(date_str, '%Y-%m-%d')
+
+            # Check if the forecast date is within the specified range
+            if start_date <= forecast_date <= end_date:
+                if date_str not in daily_forecast:
+                    daily_forecast[date_str] = {
+                        'date': date_str,
+                        'timestamp': forecast['timestamp'],
+                        'city_name': city_name,
+                        'state_name': state_name,
+                        'temperature_min': float('inf'),
+                        'temperature_max': float('-inf'),
+                        'weather_descriptions': [],
+                        'wind_speeds': []
+                    }
+
+                # Update temperature_min and temperature_max for the day
+                daily_forecast[date_str]['temperature_min'] = min(
+                    daily_forecast[date_str]['temperature_min'], forecast['temperature'])
+                daily_forecast[date_str]['temperature_max'] = max(
+                    daily_forecast[date_str]['temperature_max'], forecast['temperature'])
+
+                # Append weather description and wind speed for later aggregation
+                daily_forecast[date_str]['weather_descriptions'].append(
+                    forecast['weather'])
+                daily_forecast[date_str]['wind_speeds'].append(
+                    forecast['wind_speed'])
 
         # Finalize daily forecast by aggregating wind speeds and finding the most common weather description
         for date_str, daily_data in daily_forecast.items():

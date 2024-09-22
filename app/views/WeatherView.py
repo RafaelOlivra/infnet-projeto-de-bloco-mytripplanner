@@ -30,7 +30,7 @@ class WeatherView:
         """
         Get the weather data for the specified city and state.
         """
-        return OpenWeatherMap().get_next_5_days_forecast(self.city_name, self.state_name, self.days)
+        return OpenWeatherMap().get_forecast_for_next_5_days(self.city_name, self.state_name, self.days)
 
     # Function to map weather description to icon (you can customize this as needed)
     def get_weather_icon(self, weather_desc):
