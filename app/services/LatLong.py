@@ -23,7 +23,7 @@ class LatLong:
         Raises:
             ValueError: If coordinates could not be retrieved.
         """
-        lat, lon = self.google_maps.get_latitude_longitude(city, state)
+        lat, lon = self.google_maps.get_latitude_longitude(city + ',' + state)
 
         if lat is None or lon is None:
             raise ValueError(f"Could not find coordinates for {

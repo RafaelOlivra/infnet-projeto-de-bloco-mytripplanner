@@ -75,6 +75,14 @@ def Cadastrar():
             start_date = date[0]
             end_date = False
 
+    st.write('#### Clima e Tempo')
+    st.write('Aqui você pode consultar o clima e tempo para a cidade de destino.')
+    st.write('Em breve...')
+
+    st.write('#### Roteiro')
+    st.write('Aqui você pode consultar e criar um roteiro da viagem.')
+    st.write('Em breve...')
+
     st.write('#### Sobre a Viagem')
     notes = st.text_area('Observações', 'Sem observações.')
 
@@ -91,7 +99,7 @@ def Cadastrar():
         }
 
         trip = Trip(trip_data=trip_data)
-        if trip.save():
+        if trip._save():
             st.success('Viagem cadastrada com sucesso!')
         else:
             st.error('Erro ao cadastrar a viagem.')

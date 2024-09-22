@@ -2,7 +2,7 @@ import requests
 import os
 from datetime import datetime, timedelta
 from services.AppData import AppData
-from functools import lru_cache
+import streamlit as st
 
 
 class GoogleMaps:
@@ -12,14 +12,51 @@ class GoogleMaps:
         if not self.api_key:
             raise ValueError("API key is required for Google Maps API")
 
+    @st.cache_data(ttl=86400)
+    def get_latitude_longitude(_self, location: str):
+        """
+        Retrieve latitude and longitude for a given location using the Google Maps Geocoding API.
+
+        Args:
+        - location (str): The location (e.g., city, state, or address) to geocode.
+
+        Returns:
+        - tuple: A tuple containing (latitude, longitude).
+
+        Raises:
+        - ValueError: If the location cannot be geocoded.
+        """
+        # Encode the location
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={
+            _self.url_encode(location)}&key={_self.api_key}"
+        data = _self.fetch_json(url)
+
+        # Check if the request was successful
+        if data.get('status') == 'OK' and len(data.get('results', [])) > 0:
+            location_data = data['results'][0]['geometry']['location']
+            return location_data['lat'], location_data['lng']
+        else:
+            raise ValueError(
+                f"Could not retrieve coordinates for location: {location}")
+
     def get_directions_url(self, origin: str, destination: str):
+        """
+        Generate Google Maps directions URL.
+
+        Args:
+        - origin (str): Starting location.
+        - destination (str): Destination location.
+
+        Returns:
+        - str: URL for Google Maps directions.
+        """
         base_url = "https://www.google.com/maps/dir/?api=1"
         url = f"{base_url}&origin={self.url_encode(origin)}&destination={
             self.url_encode(destination)}"
         return url
 
-    @lru_cache(maxsize=100)
-    def get_directions(self, origin: str, destination: str, mode: str = 'car'):
+    @st.cache_data(ttl=86400)
+    def get_directions(_self, origin: str, destination: str, mode: str = 'car'):
         """
         Get directions from an origin to a destination using Google Maps API.
 
@@ -31,9 +68,9 @@ class GoogleMaps:
         Returns:
         - dict: The directions data.
         """
-        url = f"https://maps.googleapis.com/maps/api/directions/json?origin={self.url_encode(
-            origin)}&destination={self.url_encode(destination)}&mode={self.url_encode(mode)}&key={self.api_key}"
-        return self.fetch_json(url)
+        url = f"https://maps.googleapis.com/maps/api/directions/json?origin={_self.url_encode(
+            origin)}&destination={_self.url_encode(destination)}&mode={_self.url_encode(mode)}&key={_self.api_key}"
+        return _self.fetch_json(url)
 
     def get_google_maps_directions_iframe_url(self, origin, destination, zoom: int | None = None):
         """
@@ -42,23 +79,19 @@ class GoogleMaps:
         Args:
         - origin (str): The starting location for directions.
         - destination (str): The destination location for directions.
+        - zoom (int, optional): The zoom level for the map.
 
         Returns:
         - str: URL for the embeddable iframe.
         """
-        if zoom is not None and zoom.isnumeric():
-            zoom = '&zoom=' + int(zoom)
-        else:
-            zoom = ''
-
+        zoom_param = f"&zoom={int(zoom)}" if zoom is not None else ""
         url = f"https://www.google.com/maps/embed/v1/directions?origin={self.url_encode(
-            origin)}&destination={self.url_encode(destination)}&key={self.api_key}{zoom}"
+            origin)}&destination={self.url_encode(destination)}&key={self.api_key}{zoom_param}"
         return url
 
-    @lru_cache(maxsize=100)
     def fetch_json(self, url: str):
         """
-        Fetches JSON data from the specified URL.
+        Fetch JSON data from the specified URL.
 
         Args:
             url (str): The URL to fetch the JSON data from.
@@ -81,29 +114,6 @@ class GoogleMaps:
         Returns:
         - str: The URL-encoded text.
         """
+        if not isinstance(text, str):
+            raise ValueError("Input must be a string")
         return requests.utils.quote(text)
-
-    @lru_cache(maxsize=100)
-    def get_latitude_longitude(self, location: str):
-        """
-        Retrieve latitude and longitude for a given location using the Google Maps Geocoding API.
-
-        Args:
-        - location (str): The location (e.g., city, state, or address) to geocode.
-
-        Returns:
-        - tuple: A tuple containing (latitude, longitude).
-
-        Raises:
-        - ValueError: If the location cannot be geocoded.
-        """
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={
-            self.url_encode(location)}&key={self.api_key}"
-        data = self.fetch_json(url)
-
-        if data['status'] == 'OK' and len(data['results']) > 0:
-            location_data = data['results'][0]['geometry']['location']
-            return location_data['lat'], location_data['lng']
-        else:
-            raise ValueError(
-                f"Could not retrieve coordinates for location: {location}")

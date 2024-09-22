@@ -24,42 +24,92 @@ class Trip:
     tags: list
 
     def __init__(self, trip_id: str = None, trip_data: dict = None):
-
         # If trip_id is provided, load the trip data
         if trip_id is not None:
             self.trip_id = trip_id
 
             # Load trip data
-            if not self.load():
+            if not self._load():
                 raise ValueError(
                     f"Trip with ID {self.trip_id} could not be loaded.")
         else:
-            # Create a new trip from the provided data
-            if trip_data is not None:
-                self.trip_id = self._generate_id()
-                self.title = trip_data.get("title", "")
-                self.origin_city = trip_data.get("origin_city", "")
-                self.origin_state = trip_data.get("origin_state", "")
-                self.origin_longitude = trip_data.get(
-                    "origin_longitude", 0.0)
-                self.origin_latitude = trip_data.get(
-                    "origin_latitude", 0.0)
-                self.destination_city = trip_data.get("destination_city", "")
-                self.destination_state = trip_data.get("destination_state", "")
-                self.destination_longitude = trip_data.get(
-                    "destination_longitude", 0.0)
-                self.destination_latitude = trip_data.get(
-                    "destination_latitude", 0.0)
-                self.start_date = trip_data.get("start_date", datetime.now())
-                self.end_date = trip_data.get("end_date", datetime.now())
-                self.weather = trip_data.get("weather", {})
-                self.directions = trip_data.get("directions", {})
-                self.places = trip_data.get("places", [])
-                self.activities = trip_data.get("activities", [])
-                self.notes = trip_data.get("notes", "")
-                self.tags = trip_data.get("tags", [])
+            self.create(trip_data)
 
-    def load(self):
+    def create(self, trip_data: dict):
+        if trip_data is None:
+            raise ValueError("Trip data is required to create a trip.")
+
+        self.trip_id = self._generate_id()
+        self.title = trip_data.get("title", "")
+        self.origin_city = trip_data.get("origin_city", "")
+        self.origin_state = trip_data.get("origin_state", "")
+
+        self.destination_city = trip_data.get("destination_city", "")
+        self.destination_state = trip_data.get("destination_state", "")
+
+        self.start_date = trip_data.get("start_date", datetime.now())
+        self.end_date = trip_data.get("end_date", datetime.now())
+        self.weather = trip_data.get("weather", {})
+        self.directions = trip_data.get("directions", {})
+        self.places = trip_data.get("places", [])
+        self.activities = trip_data.get("activities", [])
+        self.notes = trip_data.get("notes", "")
+        self.tags = trip_data.get("tags", [])
+
+        # If latitude and longitude are provided, use them,
+        # otherwise, retrieve them using the geocoding API
+        if "origin_longitude" in trip_data and "origin_latitude" in trip_data:
+            self.origin_longitude = trip_data["origin_longitude"]
+            self.origin_latitude = trip_data["origin_latitude"]
+        else:
+            self.origin_longitude, self.origin_latitude = self._get_coordinates(
+                self.origin_city, self.origin_state)
+
+        if "destination_longitude" in trip_data and "destination_latitude" in trip_data:
+            self.destination_longitude = trip_data["destination_longitude"]
+            self.destination_latitude = trip_data["destination_latitude"]
+        else:
+            self.destination_longitude, self.destination_latitude = self._get_coordinates(
+                self.destination_city, self.destination_state)
+
+    def update(self, trip_data: dict):
+        # Update trip data
+        self.title = trip_data.get("title", self.title)
+        self.origin_city = trip_data.get("origin_city", self.origin_city)
+        self.origin_state = trip_data.get("origin_state", self.origin_state)
+        self.destination_city = trip_data.get(
+            "destination_city", self.destination_city)
+        self.destination_state = trip_data.get(
+            "destination_state", self.destination_state)
+        self.start_date = trip_data.get("start_date", self.start_date)
+        self.end_date = trip_data.get("end_date", self.end_date)
+        self.weather = trip_data.get("weather", self.weather)
+        self.directions = trip_data.get("directions", self.directions)
+        self.places = trip_data.get("places", self.places)
+        self.activities = trip_data.get("activities", self.activities)
+        self.notes = trip_data.get("notes", self.notes)
+        self.tags = trip_data.get("tags", self.tags)
+
+        # Update the coordinates if the origin or destination city/state has changed
+        if trip_data.get("origin_city", self.origin_city) != self.origin_city or trip_data.get("origin_state", self.origin_state) != self.origin_state:
+            self.origin_city = trip_data.get("origin_city", self.origin_city)
+            self.origin_state = trip_data.get(
+                "origin_state", self.origin_state)
+            self._update_coordinates()
+
+        if trip_data.get("destination_city", self.destination_city) != self.destination_city or trip_data.get("destination_state", self.destination_state) != self.destination_state:
+            self.destination_city = trip_data.get(
+                "destination_city", self.destination_city)
+            self.destination_state = trip_data.get(
+                "destination_state", self.destination_state)
+            self._update_coordinates()
+
+        return self
+
+    def delete(self):
+        return AppData().delete("trip", self.trip_id)
+
+    def _load(self):
         # Fetch trip data from AppData
         TripData = AppData().get("trip", self.trip_id)
         if TripData is None:
@@ -105,7 +155,7 @@ class Trip:
 
         return True
 
-    def save(self):
+    def _save(self):
         # Create a dictionary with trip data to save
         TripData = {
             "trip_id": self.trip_id,
@@ -129,8 +179,15 @@ class Trip:
         }
         return AppData().save("trip", value=TripData)
 
-    def delete(self):
-        return AppData().delete("trip", self.trip_id)
+    def _update_coordinates(self):
+        # Update the latitude and longitude for the origin and destination cities
+        self.origin_longitude, self.origin_latitude = self._get_coordinates(
+            self.origin_city, self.origin_state)
+        self.destination_longitude, self.destination_latitude = self._get_coordinates(
+            self.destination_city, self.destination_state)
+
+        # Update the trip data with the new coordinates
+        return self._save()
 
     def _validate(self, TripData):
         # Required fields validation

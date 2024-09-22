@@ -1,21 +1,7 @@
-"""
-This module provides a class for interacting with the OpenWeatherMap API.
-The OpenWeatherMap class allows you to retrieve weather information and forecasts for a specific city and state.
-Attributes:
-    api_key (str): The API key required for accessing the OpenWeatherMap API.
-Methods:
-    get_current_weather(city_name: str, state_name: str): Retrieves the current weather data for a specific city and state.
-    get_coords(city_name: str, state_name: str): Retrieves the latitude and longitude coordinates for a specific city and state.
-    format_date(timestamp): Formats a timestamp into a string representation.
-    get_forecast(city_name: str, state_name: str, days=5): Retrieves the forecast data for a specific city and state for the next 'days' days.
-    flatten_weather_data(resp_json): Flattens the weather data from the API response into a dictionary.
-    flatten_forecast_data(resp_json): Flattens the forecast data from the API response into a list of dictionaries.
-"""
 import requests
-import os
 from datetime import datetime, timedelta
-from functools import lru_cache
 from services.AppData import AppData
+import streamlit as st
 
 
 class OpenWeatherMap:
@@ -25,7 +11,8 @@ class OpenWeatherMap:
         if not self.api_key:
             raise ValueError("API key is required for OpenWeatherMap")
 
-    def get_current_weather(self, city_name: str, state_name: str):
+    @st.cache_data(ttl=86400)
+    def get_current_weather(_self, city_name: str, state_name: str):
         """
         Retrieves the current weather data for a specific city and state.
 
@@ -37,12 +24,13 @@ class OpenWeatherMap:
             dict: The flattened weather data.
 
         """
-        lat, long = self.get_coords(city_name, state_name)
-        data = self.fetch_json(
-            url=f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={long}&lang=pt_br&appid={self.api_key}")
-        return self.flatten_weather_data(data)
+        lat, long = _self.get_coords(city_name, state_name)
+        data = _self._fetch_json(
+            url=f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={long}&lang=pt_br&appid={_self.api_key}")
+        return _self._flatten_weather_data(data)
 
-    def get_coords(self, city_name: str, state_name: str):
+    @st.cache_data(ttl=86400)
+    def get_coords(_self, city_name: str, state_name: str):
         """
         Retrieves the latitude and longitude coordinates of a given city and state.
 
@@ -53,11 +41,12 @@ class OpenWeatherMap:
         Returns:
             tuple: A tuple containing the latitude and longitude coordinates of the city.
         """
-        data = self.fetch_json(
-            url=f"http://api.openweathermap.org/geo/1.0/direct?q={self.url_encode(city_name)},{self.url_encode(state_name)},Brazil&lang=pt_br&appid={self.api_key}")
+        data = _self._fetch_json(
+            url=f"http://api.openweathermap.org/geo/1.0/direct?q={_self._url_encode(city_name)},{_self._url_encode(state_name)},Brazil&lang=pt_br&appid={self.api_key}")
         return data[0]['lat'], data[0]['lon']
 
-    def get_forecast(self, city_name: str, state_name: str, days: int = 5):
+    @st.cache_data(ttl=86400)
+    def get_forecast(_self, city_name: str, state_name: str, days: int = 5):
         """
         Retrieves the weather forecast for a given city and state.
 
@@ -78,9 +67,9 @@ class OpenWeatherMap:
                 - 'weather' (str): The description of the weather.
                 - 'wind_speed' (float): The wind speed in meters per second.
         """
-        lat, long = self.get_coords(city_name, state_name)
-        data = self.fetch_json(
-            url=f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={long}&units=metric&lang=pt_br&appid={self.api_key}")
+        lat, long = _self.get_coords(city_name, state_name)
+        data = _self._fetch_json(
+            url=f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={long}&units=metric&lang=pt_br&appid={_self.api_key}")
 
         forecast_list = data['list']
         days_forecast = {}
@@ -90,7 +79,7 @@ class OpenWeatherMap:
             forecast_timestamp = int(forecast['dt'])
             forecast_datetime = datetime.fromtimestamp(forecast_timestamp)
             forecast_date = forecast_datetime.date()
-            forecast_date_str = self.format_date(
+            forecast_date_str = _self._format_date(
                 forecast_timestamp)  # International datetime
 
             # Check if we are still within the selected days
@@ -111,10 +100,9 @@ class OpenWeatherMap:
                 'wind_speed': forecast['wind']['speed']
             })
 
-        return self.flatten_forecast_data(days_forecast)
+        return _self._flatten_forecast_data(days_forecast)
 
-    @lru_cache(maxsize=100)
-    def fetch_json(self, url: str):
+    def _fetch_json(_self, url: str):
         """
         Fetches JSON data from the specified URL.
 
@@ -129,7 +117,7 @@ class OpenWeatherMap:
         response.raise_for_status()
         return response.json()
 
-    def flatten_weather_data(self, resp_json: dict):
+    def _flatten_weather_data(self, resp_json: dict):
         """
         Flattens the weather data from the OpenWeatherMap API response JSON.
 
@@ -184,7 +172,7 @@ class OpenWeatherMap:
         }
         return flattened_data
 
-    def flatten_forecast_data(self, resp_json: dict):
+    def _flatten_forecast_data(self, resp_json: dict):
         """
         Flattens the forecast data from the OpenWeatherMap API response.
 
@@ -210,7 +198,7 @@ class OpenWeatherMap:
 
         return flattened_data
 
-    def format_date(self, timestamp: int):
+    def _format_date(self, timestamp: int):
         """
         Formats a timestamp into a string representation of date and time.
 
@@ -222,7 +210,7 @@ class OpenWeatherMap:
         """
         return datetime.fromtimestamp(timestamp).strftime('%Y-%m-%dT%H:%M:%S')
 
-    def url_encode(self, text):
+    def _url_encode(self, text):
         """
         Encode a text string for use in a URL.
 

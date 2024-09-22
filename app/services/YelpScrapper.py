@@ -4,13 +4,15 @@ import os
 import bs4
 import json
 from functools import lru_cache
+import streamlit as st
 
 
 class YelpScrapper:
     def __init__(self):
         return None
 
-    def get_near_attractions_json(self, city: str, state: str, start: int = 0, limit: int = 10):
+    @st.cache_data(ttl=86400)
+    def get_near_attractions_json(_self, city: str, state: str, start: int = 0, limit: int = 10):
         """
         Retrieves a JSON representation of nearby attractions in a given city and state.
 
@@ -23,9 +25,10 @@ class YelpScrapper:
         Returns:
             str: A JSON string representing the nearby attractions. If no attractions are found, an empty JSON object is returned.
         """
-        search_query = self.url_encode(f"{city} {state}")
-        url = f"https://www.yelp.com.br/search?find_desc=Atra%C3%A7%C3%B5es&find_loc={search_query}&start={start}&limit={limit}"
-        html = self.fetch_html(url)
+        search_query = _self.url_encode(f"{city} {state}")
+        url = f"https://www.yelp.com.br/search?find_desc=Atra%C3%A7%C3%B5es&find_loc={
+            search_query}&start={start}&limit={limit}"
+        html = _self.fetch_html(url)
 
         soup = bs4.BeautifulSoup(html, "html.parser")
         attractions = soup.select('a[href^="/biz/"]:has(img)')
@@ -45,8 +48,7 @@ class YelpScrapper:
         # Return the JSON data
         return json.dumps(cards)
 
-    @lru_cache(maxsize=100)
-    def fetch_html(self, url: str) -> str:
+    def fetch_html(_self, url: str) -> str:
         """
         Fetches the HTML content from the given URL.
 
