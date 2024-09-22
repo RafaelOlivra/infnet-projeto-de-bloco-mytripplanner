@@ -29,15 +29,15 @@ def openweathermap_example():
     owm = OpenWeatherMap()
 
     # Get Weather data
-    data = owm.get_forecast(city_name="Sorocaba",
-                            state_name="São Paulo", days=5)
+    data = owm.get_daily_forecast(city_name="Sorocaba",
+                                   state_name="São Paulo", days=5)
     st.write('### Dados do Tempo (Próximos 5 dias) (Sorocaba-SP)')
 
     # Create DataFrame
     df = pd.DataFrame(data)
 
     # Correct formats for display
-    df['timestamp'] = df['timestamp'].astype(str)  # Show without commas
+    df['timestamp'] = df['timestamp'].astype(str)
     df['date'] = pd.to_datetime(df['date'])
 
     # Show with Pandas

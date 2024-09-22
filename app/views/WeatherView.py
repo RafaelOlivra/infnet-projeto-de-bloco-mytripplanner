@@ -23,13 +23,13 @@ class WeatherView:
         """
         Get the weather data for the specified city and state.
         """
-        return OpenWeatherMap().get_forecast(self.city_name, self.state_name, self.days)
+        return OpenWeatherMap().get_daily_forecast(self.city_name, self.state_name, self.days)
 
-    def view(self):
+    def display_forecast(self):
         """
         Display the weather forecast for the specified city and state.
         """
         print(f"Tempo para {self.city_name}, {self.state_name}")
 
         df = pd.DataFrame(self.forecast)
-        st.dataframe(df)
+        st.dataframe(df, use_container_width=True)

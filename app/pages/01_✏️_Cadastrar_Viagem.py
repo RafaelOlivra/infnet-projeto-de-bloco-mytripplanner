@@ -4,7 +4,7 @@ import datetime
 from model.Trip import Trip
 from services.CityStateData import CityStateData
 from services.GoogleMaps import GoogleMaps
-
+from views.WeatherView import WeatherView
 
 def Cadastrar():
     # Set page title
@@ -77,7 +77,8 @@ def Cadastrar():
 
     st.write('#### Clima e Tempo')
     st.write('Aqui você pode consultar o clima e tempo para a cidade de destino.')
-    st.write('Em breve...')
+    weather_view = WeatherView(destination_city, destination_state)
+    weather_view.display_forecast()
 
     st.write('#### Roteiro')
     st.write('Aqui você pode consultar e criar um roteiro da viagem.')
