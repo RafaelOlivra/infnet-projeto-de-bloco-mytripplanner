@@ -3,7 +3,6 @@ import requests
 import os
 import bs4
 import json
-from functools import lru_cache
 import streamlit as st
 
 
@@ -12,23 +11,23 @@ class YelpScrapper:
         return None
 
     @st.cache_data(ttl=86400)
-    def get_near_attractions_json(_self, city: str, state: str, start: int = 0, limit: int = 10):
+    def get_near_attractions_json(_self, city_name: str, state_name: str, start: int = 0, limit: int = 10):
         """
         Retrieves a JSON representation of nearby attractions in a given city and state.
 
         Args:
-            city (str): The name of the city.
-            state (str): The name of the state.
+            city_name (str): The name of the city.
+            state_name (str): The name of the state.
             start (int, optional): The starting index of the attractions to retrieve. Defaults to 0.
             limit (int, optional): The maximum number of attractions to retrieve. Defaults to 10.
 
         Returns:
             str: A JSON string representing the nearby attractions. If no attractions are found, an empty JSON object is returned.
         """
-        search_query = _self.url_encode(f"{city} {state}")
-        url = f"https://www.yelp.com.br/search?find_desc=Atra%C3%A7%C3%B5es&find_loc={
+        search_query = _self._url_encode(f"{city_name}, {state_name}")
+        url = f"https://www.yelp.com.br/search?hl=pt_BR&find_desc=&find_loc={
             search_query}&start={start}&limit={limit}"
-        html = _self.fetch_html(url)
+        html = _self._fetch_html(url)
 
         soup = bs4.BeautifulSoup(html, "html.parser")
         attractions = soup.select('a[href^="/biz/"]:has(img)')
@@ -41,14 +40,17 @@ class YelpScrapper:
             card = {
                 "name": attraction.select_one('img')['alt'],
                 "url": f"https://www.yelp.com{attraction['href']}",
+                "description": "",
                 "image": attraction.select_one('img')['src']
             }
             cards.append(card)
+            if len(cards) >= limit:
+                break
 
         # Return the JSON data
         return json.dumps(cards)
 
-    def fetch_html(_self, url: str) -> str:
+    def _fetch_html(_self, url: str) -> str:
         """
         Fetches the HTML content from the given URL.
 
@@ -61,20 +63,6 @@ class YelpScrapper:
         Raises:
             requests.HTTPError: If there is an HTTP error during the request.
         """
-
-        # Create a temporary directory to store the response
-        # TODO: Implement a better way to handle temporary files
-        temp_dir = os.path.dirname(__file__)+"/../.temp"
-
-        # Create the directory if it doesn't exist
-        if not os.path.exists(temp_dir):
-            os.makedirs(temp_dir)
-
-        # Return the cached response if it exists
-        if os.path.exists(temp_dir+'/response.html'):
-            with open(temp_dir+'/response.html', 'r') as f:
-                return f.read()
-
         # Apply hardcoded proxy for now
         # TODO: Implement a better way to handle proxies
         proxy_prefix = 'http://api.scraperapi.com?api_key=ce1e058f17f38e5a9e49a9ee467375fd&&premium=true&url='
@@ -83,13 +71,9 @@ class YelpScrapper:
         response = requests.get(url)
         response.raise_for_status()
 
-        # Save the response to a file for debugging
-        with open(temp_dir+'/response.html', 'w') as f:
-            f.write(response.text)
-
         return response.text
 
-    def url_encode(self, text):
+    def _url_encode(self, text):
         """
         Encode a text string for use in a URL.
 

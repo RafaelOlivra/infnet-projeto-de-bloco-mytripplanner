@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 from services.AppData import AppData
 from services.LatLong import LatLong
+from services.OpenWeatherMap import OpenWeatherMap
 
 
 class Trip:
@@ -17,8 +18,7 @@ class Trip:
     start_date: datetime
     end_date: datetime
     weather: dict
-    directions: dict
-    places: list
+    goals: list
     activities: list
     notes: str
     tags: list
@@ -50,8 +50,7 @@ class Trip:
         self.start_date = trip_data.get("start_date", datetime.now())
         self.end_date = trip_data.get("end_date", datetime.now())
         self.weather = trip_data.get("weather", {})
-        self.directions = trip_data.get("directions", {})
-        self.places = trip_data.get("places", [])
+        self.goals = trip_data.get("goals", [])
         self.activities = trip_data.get("activities", [])
         self.notes = trip_data.get("notes", "")
         self.tags = trip_data.get("tags", [])
@@ -72,6 +71,10 @@ class Trip:
             self.destination_longitude, self.destination_latitude = self._get_coordinates(
                 self.destination_city, self.destination_state)
 
+        # Get weather data for the trip
+        self.weather = OpenWeatherMap().get_forecast_for_next_5_days(
+            self.destination_city, self.destination_state)
+
     def update(self, trip_data: dict):
         # Update trip data
         self.title = trip_data.get("title", self.title)
@@ -84,8 +87,7 @@ class Trip:
         self.start_date = trip_data.get("start_date", self.start_date)
         self.end_date = trip_data.get("end_date", self.end_date)
         self.weather = trip_data.get("weather", self.weather)
-        self.directions = trip_data.get("directions", self.directions)
-        self.places = trip_data.get("places", self.places)
+        self.goals = trip_data.get("goals", self.goals)
         self.activities = trip_data.get("activities", self.activities)
         self.notes = trip_data.get("notes", self.notes)
         self.tags = trip_data.get("tags", self.tags)
@@ -147,8 +149,7 @@ class Trip:
         self.start_date = TripData["start_date"]
         self.end_date = TripData["end_date"]
         self.weather = TripData.get("weather", {})
-        self.directions = TripData.get("directions", {})
-        self.places = TripData.get("places", [])
+        self.goals = TripData.get("goals", [])
         self.activities = TripData.get("activities", [])
         self.notes = TripData.get("notes", "")
         self.tags = TripData.get("tags", [])
@@ -171,8 +172,7 @@ class Trip:
             "start_date": self.start_date.strftime("%Y-%m-%d %H:%M"),
             "end_date": self.end_date.strftime("%Y-%m-%d %H:%M"),
             "weather": self.weather,
-            "directions": self.directions,
-            "places": self.places,
+            "goals": self.goals,
             "activities": self.activities,
             "notes": self.notes,
             "tags": self.tags
@@ -223,11 +223,12 @@ class Trip:
 
         # Default values for optional fields
         TripData["weather"] = TripData.get("weather", {})
-        TripData["directions"] = TripData.get("directions", {})
-        TripData["places"] = TripData.get("places", [])
         TripData["activities"] = TripData.get("activities", [])
-        TripData["notes"] = TripData.get("notes", "").strip()
         TripData["tags"] = TripData.get("tags", [])
+
+        # Make sure goals and notes are texts with no weird characters
+        TripData["goals"] = [goal.strip() for goal in TripData["goals"]]
+        TripData["notes"] = TripData["notes"].strip()
 
         return TripData
 

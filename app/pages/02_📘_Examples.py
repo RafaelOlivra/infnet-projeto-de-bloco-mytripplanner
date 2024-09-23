@@ -1,3 +1,4 @@
+from io import StringIO
 import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
@@ -30,7 +31,7 @@ def openweathermap_example():
 
     # Get Weather data
     data = owm.get_forecast_for_next_5_days(city_name="Sorocaba",
-                                            state_name="São Paulo", days=5)
+                                            state_name="São Paulo")
     st.write('### Dados do Tempo (Próximos 5 dias) (Sorocaba-SP)')
 
     # Create DataFrame
@@ -95,10 +96,10 @@ def yelp_example():
     # Get Attractions JSON
     st.write('### Atrações Perto de Sorocaba-SP')
     attractions = yelp.get_near_attractions_json(
-        city="Sorocaba", state="São Paulo")
+        city_name="Sorocaba", state_name="São Paulo")
 
     # Show JSON data with Pandas
-    df = pd.read_json(attractions)
+    df = pd.read_json(StringIO(attractions))
     st.write(df)
 
 

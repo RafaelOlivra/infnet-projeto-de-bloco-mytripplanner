@@ -11,7 +11,7 @@ class WeatherView:
     forecast = {}
     weather_data = {}
 
-    def __init__(self, city_name, state_name, days=5, weather_data=None):
+    def __init__(self, city_name="", state_name="", days=5, weather_data=None):
         """
         Initialize the WeatherView class.
 
@@ -30,7 +30,7 @@ class WeatherView:
         """
         Get the weather data for the specified city and state.
         """
-        return OpenWeatherMap().get_forecast_for_next_5_days(self.city_name, self.state_name, self.days)
+        return OpenWeatherMap().get_forecast_for_next_5_days(self.city_name, self.state_name)
 
     # Function to map weather description to icon (you can customize this as needed)
     def get_weather_icon(self, weather_desc):

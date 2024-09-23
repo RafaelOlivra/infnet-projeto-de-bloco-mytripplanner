@@ -1,10 +1,12 @@
 import streamlit as st
 import streamlit.components.v1 as components
+import streamlit_tags as st_tags
 import datetime
 from model.Trip import Trip
 from services.CityStateData import CityStateData
 from services.GoogleMaps import GoogleMaps
 from views.WeatherView import WeatherView
+from views.AttractionsView import AttractionsView
 
 
 def Cadastrar():
@@ -76,17 +78,37 @@ def Cadastrar():
             end_date = False
 
     st.write('#### Clima e Tempo')
-    st.write(f"Aqui você pode consultar o clima e tempo para {
-             destination} nos próximos 5 dias.")
+    st.write(f"Aqui você pode consultar o clima e tempo para **{
+             destination}** nos próximos 5 dias.")
     weather_view = WeatherView(destination_city, destination_state)
     weather_view.display_forecast()
 
-    st.write('#### Roteiro')
-    st.write('Aqui você pode consultar e criar um roteiro da viagem.')
+    st.write('#### Meu Roteiro')
+
+    st.write('Aqui você pode definir os objetivos da viagem, como visitar pontos turísticos, conhecer a cultura local, etc.')
+
+    attractions_ideas = AttractionsView(
+        city_name=destination_city, state_name=destination_state)
+    attractions_ideas.display_attractions()
+
+    goals = st.text_area(
+        'Objetivos', placeholder='Ex: Visitar o Museu do Ipiranga, Conhecer a Avenida Paulista, etc.')
+
+    st.write('##### Gerar Roteiro com IA')
+    st.write('Aqui você pode consultar e criar um roteiro da viagem com ajuda de Inteligência Artificial.')
     st.write('Em breve...')
 
     st.write('#### Sobre a Viagem')
-    notes = st.text_area('Observações', 'Sem observações.')
+    notes = st.text_area(
+        'Observações', '', placeholder='Ex: Levar roupas de banho, Protetor solar, etc.')
+    tags = st_tags.st_tags(
+        label='Tags',
+        text='Pressione enter para adicionar uma tag (Max. 5)',
+        value=[],
+        suggestions=['Viagem', 'Férias', 'Lazer', 'Trabalho', 'Negócios'],
+        maxtags=5,
+        key='1'
+    )
 
     if st.button('Cadastrar'):
         trip_data = {
@@ -97,6 +119,8 @@ def Cadastrar():
             "destination_state": destination_state,
             "start_date": start_date,
             "end_date": end_date,
+            "goals": goals,
+            'tags': tags,
             "notes": notes
         }
 
