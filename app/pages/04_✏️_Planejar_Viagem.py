@@ -61,7 +61,7 @@ def Cadastrar():
         '''
     )
 
-    title = st.text_input('Título', 'Viagem de Férias')
+    title = st.text_input('Título', placeholder='Viagem de Férias')
 
     # City and State
     col1, col2 = st.columns(2)
@@ -169,6 +169,11 @@ def Cadastrar():
             'tags': tags,
             "notes": notes
         }
+
+        # Make sure we have all the required data
+        if not all(trip_data.values()):
+            st.error('Por favor, preencha todos os campos obrigatórios.')
+            return
 
         trip = Trip(trip_data=trip_data)
         if trip._save():

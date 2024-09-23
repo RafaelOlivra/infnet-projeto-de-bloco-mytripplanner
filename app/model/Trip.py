@@ -3,6 +3,7 @@ from datetime import datetime
 from services.AppData import AppData
 from services.LatLong import LatLong
 from services.OpenWeatherMap import OpenWeatherMap
+import json
 
 
 class Trip:
@@ -108,6 +109,14 @@ class Trip:
 
         return self
 
+    def export(self, to="CSV"):
+        """
+        Export trip data to a file.
+        """
+        if to == "CSV":
+            # Save the data to a CSV file
+            return AppData().save("trip", value=self._get_trip_data_object(), format="CSV")
+
     def delete(self):
         return AppData().delete("trip", self.trip_id)
 
@@ -157,8 +166,11 @@ class Trip:
         return True
 
     def _save(self):
-        # Create a dictionary with trip data to save
-        TripData = {
+        return AppData().save("trip", value=self._to_json())
+
+    def _get_trip_data_object(self):
+        # Create a dictionary with trip data
+        return {
             "trip_id": self.trip_id,
             "title": self.title,
             "origin_city": self.origin_city,
@@ -169,15 +181,25 @@ class Trip:
             "destination_state": self.destination_state,
             "destination_longitude": self.destination_longitude,
             "destination_latitude": self.destination_latitude,
-            "start_date": self.start_date.strftime("%Y-%m-%d %H:%M"),
-            "end_date": self.end_date.strftime("%Y-%m-%d %H:%M"),
+            "start_date": self.start_date,
+            "end_date": self.end_date,
             "weather": self.weather,
             "goals": self.goals,
             "activities": self.activities,
             "notes": self.notes,
             "tags": self.tags
         }
-        return AppData().save("trip", value=TripData)
+
+    def _to_json(self):
+        return json.dumps(self._get_trip_data_object())
+
+    def _to_csv(self):
+        # Convert the trip data to a CSV string
+        trip_data = self._get_trip_data_object()
+        csv = f"trip_id,title,origin_city,origin_state,origin_longitude,origin_latitude,destination_city,destination_state,destination_longitude,destination_latitude,start_date,end_date,weather,goals,activities,notes,tags\n"
+        csv += f"{trip_data['trip_id']},{trip_data['title']},{trip_data['origin_city']},{trip_data['origin_state']},{trip_data['origin_longitude']},{trip_data['origin_latitude']},{trip_data['destination_city']},{trip_data['destination_state']},{
+            trip_data['destination_longitude']},{trip_data['destination_latitude']},{trip_data['start_date']},{trip_data['end_date']},{trip_data['weather']},{trip_data['goals']},{trip_data['activities']},{trip_data['notes']},{trip_data['tags']}\n"
+        return csv
 
     def _update_coordinates(self):
         # Update the latitude and longitude for the origin and destination cities

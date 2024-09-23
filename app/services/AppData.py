@@ -128,16 +128,16 @@ class AppData:
 
     def save(self, group="trip", id="", key="", value=""):
         """
-        Save data to the specified group and key.
+        Save or update data to the specified group and key.
 
         Args:
             group (str): The group to save data in (e.g., 'trip').
             id (str): The identifier for the data (used mainly for 'trip').
-            key (str): The specific key to store the value.
-            value (Any): The value to store.
+            key (str): The specific key to store or update the value.
+            value (Any): The value to store or update.
 
         Returns:
-            bool: True if the data was successfully saved, False otherwise.
+            bool: True if the data was successfully saved/updated, False otherwise.
         """
         folder_map = self._get_storage_map()
 
@@ -146,58 +146,55 @@ class AppData:
 
         # Trip Data
         if group == "trip":
-            print("Saving trip data")
-            return self._save_trip_data(value)
+            print("Saving or updating trip data")
+            save_path = folder_map.get("trip")
+            file_path = f"{save_path}/{id}.json"
+
+            # Load existing data if the file exists
+            if os.path.exists(file_path):
+                try:
+                    with open(file_path, "r") as f:
+                        data = json.load(f)
+                except Exception as e:
+                    print(f"Error reading existing trip data: {e}")
+                    return False
+
+                # Update the specific key if provided
+                if key:
+                    data[key] = value
+                else:
+                    data = value  # Overwrite with new data if no key is specified
+            else:
+                # No existing data, treat this as a new save
+                data = {key: value} if key else value
+
+            return self._save_to_file(file_path, data)
 
         return False
 
-    def _save_trip_data(self, TripData):
+    def _save_to_file(self, file_path, data):
         """
-        Save trip data to a file.
+        Save data to a file.
 
         Args:
-            TripData (dict): The trip data to save.
+            file_path (str): The file path to save the data to.
+            data (Any): The data to save.
 
         Returns:
             bool: True if saved successfully, False otherwise.
         """
-        id = self.sanitize_id(TripData["trip_id"])
-        save_path = self._get_storage_map().get("trip")
-        file_path = f"{save_path}/{id}.json"
+        # Ensure the directory exists
+        folder = os.path.dirname(file_path)
+        if not os.path.exists(folder):
+            os.makedirs(folder)
 
-        # Create save directory if it doesn't exist
-        if not os.path.exists(save_path):
-            os.makedirs(save_path)
-
-        with open(file_path, "w") as f:
-            json.dump(TripData, f)
-        return True
-
-    def _update_trip_data(self, id, key, value):
-        """
-        Update a specific key in an existing trip data file.
-
-        Args:
-            id (str): The trip ID.
-            key (str): The key to update.
-            value (Any): The value to update.
-
-        Returns:
-            bool: True if updated successfully, False otherwise.
-        """
-        id = self.sanitize_id(id)
-        save_path = self._get_storage_map().get("trip")
-        file_path = f"{save_path}/{id}.json"
-
-        if os.path.exists(file_path):
-            with open(file_path, "r") as f:
-                data = json.load(f)
-                data[key] = value
-
+        try:
             with open(file_path, "w") as f:
                 json.dump(data, f)
             return True
-        return False
+        except Exception as e:
+            print(f"Error saving data to file: {e}")
+            return False
 
     # --------------------------
     # Delete
