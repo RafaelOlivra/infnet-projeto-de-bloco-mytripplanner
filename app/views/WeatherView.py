@@ -117,7 +117,7 @@ class WeatherView:
                     # Display the weather and temperature using st.metric
                     st.metric(
                         label=f"{forecast_date}",
-                        value=f"{forecast['temperature_max']}°C",
-                        delta=f"Min: {forecast['temperature_min']}°C"
+                        value=f"{int(forecast['temperature_max'])}°C",
+                        delta=f"Min: {int(forecast['temperature_min'])}°C"
                     )
                     i += 1

@@ -9,16 +9,52 @@ from views.WeatherView import WeatherView
 from views.AttractionsView import AttractionsView
 
 
+# --------------------------
+# Session State
+# --------------------------
+if 'add_new_trip_form' not in st.session_state:
+    st.session_state.add_new_trip_form = {
+        'attractions': set()
+    }
+
+
+# --------------------------
+# Form State Handlers
+# --------------------------
+def update_selected_attractions(attraction_name, remove=False):
+    """
+    Update the selected attractions and save it using session state.
+    """
+    selected_attractions = get_selected_attractions()
+    if remove:
+        if attraction_name in selected_attractions:
+            selected_attractions.remove(attraction_name)
+    else:
+        selected_attractions.add(attraction_name)
+
+    st.session_state.add_new_trip_form['attractions'] = selected_attractions
+
+
+def get_selected_attractions():
+    """
+    Get the selected attractions from the session state.
+    """
+    return st.session_state.add_new_trip_form['attractions']
+
+
+# --------------------------
+# Add new trip form
+# --------------------------
 def Cadastrar():
     # Set page title
     st.set_page_config(
-        page_title="Cadastro de Viagem",
+        page_title="Planejar Viagem",
         page_icon="✏️",
         layout='wide',
         initial_sidebar_state="expanded",
     )
 
-    st.title('✏️ Planejamento de Viagem')
+    st.title('✏️ Planejar Viagem')
     st.write(
         '''
         Comece a planejar sua viagem preenchendo as informações abaixo.
@@ -83,21 +119,31 @@ def Cadastrar():
     weather_view = WeatherView(destination_city, destination_state)
     weather_view.display_forecast()
 
-    st.write('#### Meu Roteiro')
+    st.write('---')
+    st.write('### Meu Roteiro')
 
     st.write('Aqui você pode definir os objetivos da viagem, como visitar pontos turísticos, conhecer a cultura local, etc.')
 
+    st.write(f'#### Sugestões de Atrações em {
+             destination_city}, {destination_state}')
+    st.write('Selecione as atrações que deseja visitar durante a viagem.')
+
     attractions_ideas = AttractionsView(
         city_name=destination_city, state_name=destination_state)
-    attractions_ideas.display_attractions()
+    attractions_ideas.display_attractions(
+        display_selector=True, selected_attractions=get_selected_attractions(), on_change=update_selected_attractions)
 
+    st.write('#### Objetivos da Viagem')
+    st.write(
+        'Descreva os objetivos da viagem, como visitar pontos turísticos, conhecer a cultura local, etc.')
     goals = st.text_area(
         'Objetivos', placeholder='Ex: Visitar o Museu do Ipiranga, Conhecer a Avenida Paulista, etc.')
 
-    st.write('##### Gerar Roteiro com IA')
+    st.write('#### Gerar Roteiro com IA')
     st.write('Aqui você pode consultar e criar um roteiro da viagem com ajuda de Inteligência Artificial.')
     st.write('Em breve...')
 
+    st.write('---')
     st.write('#### Sobre a Viagem')
     notes = st.text_area(
         'Observações', '', placeholder='Ex: Levar roupas de banho, Protetor solar, etc.')
@@ -110,7 +156,7 @@ def Cadastrar():
         key='1'
     )
 
-    if st.button('Cadastrar'):
+    if st.button('Cadastrar', key='cadastrar', type='primary', use_container_width=True):
         trip_data = {
             "title": title,
             "origin_city": origin_city,
@@ -127,6 +173,12 @@ def Cadastrar():
         trip = Trip(trip_data=trip_data)
         if trip._save():
             st.success('Viagem cadastrada com sucesso!')
+
+            # Clear session state
+            st.session_state.add_new_trip_form = {
+                'attractions': set()
+            }
+
         else:
             st.error('Erro ao cadastrar a viagem.')
 
