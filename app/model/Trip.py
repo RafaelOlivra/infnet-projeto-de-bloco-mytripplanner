@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from services.AppData import AppData
+from services.TripData import TripData
 from services.LatLong import LatLong
 from services.OpenWeatherMap import OpenWeatherMap
 import json
@@ -118,63 +118,64 @@ class Trip:
         Export trip data to a file.
         """
         if to == "CSV":
-            # Save the data to a CSV file
-            return AppData().save("trip", value=self._get_trip_data_object(), format="CSV")
+            return self._to_csv()
+        else:
+            return self._to_json()
 
     def delete(self):
-        return AppData().delete("trip", self.trip_id)
+        return TripData().delete(self.trip_id)
 
     def _load(self):
-        # Fetch trip data from AppData
-        TripData = AppData().get("trip", self.trip_id)
+        # Fetch trip data from TripData
+        Trip = TripData().get_trip(self.trip_id)
 
-        if TripData is None:
+        if Trip is None:
             return False
 
         # Parse to json
-        TripData = json.loads(TripData)
+        Trip = json.loads(Trip)
 
         # Validate trip data before loading
-        if not self._validate(TripData):
+        if not self._validate(Trip):
             raise ValueError(f"Invalid trip data for Trip ID {self.trip_id}")
 
         # Sanitize the data
-        TripData = self._sanitize(TripData)
+        Trip = self._sanitize(Trip)
 
         # Assign sanitized data to object properties
-        self.title = TripData["title"]
-        self.origin_city = TripData["origin_city"]
-        self.origin_state = TripData["origin_state"]
-        self.destination_city = TripData["destination_city"]
-        self.destination_state = TripData["destination_state"]
+        self.title = Trip["title"]
+        self.origin_city = Trip["origin_city"]
+        self.origin_state = Trip["origin_state"]
+        self.destination_city = Trip["destination_city"]
+        self.destination_state = Trip["destination_state"]
 
         # If latitude and longitude are not provided, retrieve them using the geocoding API
-        if "origin_longitude" not in TripData or "origin_latitude" not in TripData:
+        if "origin_longitude" not in Trip or "origin_latitude" not in Trip:
             self.origin_longitude, self.origin_latitude = self._get_coordinates(
                 self.origin_city, self.origin_state)
         else:
-            self.origin_longitude = TripData["origin_longitude"]
-            self.origin_latitude = TripData["origin_latitude"]
+            self.origin_longitude = Trip["origin_longitude"]
+            self.origin_latitude = Trip["origin_latitude"]
 
-        if "destination_longitude" not in TripData or "destination_latitude" not in TripData:
+        if "destination_longitude" not in Trip or "destination_latitude" not in Trip:
             self.destination_longitude, self.destination_latitude = self._get_coordinates(
                 self.destination_city, self.destination_state)
         else:
-            self.destination_longitude = TripData["destination_longitude"]
-            self.destination_latitude = TripData["destination_latitude"]
+            self.destination_longitude = Trip["destination_longitude"]
+            self.destination_latitude = Trip["destination_latitude"]
 
-        self.start_date = TripData["start_date"]
-        self.end_date = TripData["end_date"]
-        self.weather = TripData.get("weather", {})
-        self.goals = TripData.get("goals", "")
-        self.activities = TripData.get("activities", [])
-        self.notes = TripData.get("notes", "")
-        self.tags = TripData.get("tags", [])
+        self.start_date = Trip["start_date"]
+        self.end_date = Trip["end_date"]
+        self.weather = Trip.get("weather", {})
+        self.goals = Trip.get("goals", "")
+        self.activities = Trip.get("activities", [])
+        self.notes = Trip.get("notes", "")
+        self.tags = Trip.get("tags", [])
 
         return True
 
     def _save(self):
-        if AppData().save("trip", value=self._to_json(), id=self.trip_id):
+        if TripData().save(value=self._to_json(), id=self.trip_id):
             return self.trip_id
         return False
 

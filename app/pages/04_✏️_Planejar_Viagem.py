@@ -3,6 +3,7 @@ import streamlit.components.v1 as components
 import streamlit_tags as st_tags
 import datetime
 from model.Trip import Trip
+from services.TripData import TripData
 from services.CityStateData import CityStateData
 from services.GoogleMaps import GoogleMaps
 from views.WeatherView import WeatherView
@@ -180,6 +181,13 @@ def Cadastrar():
         # Make sure we have all the required data
         if not all(trip_data.values()):
             st.error('Por favor, preencha todos os campos obrigatórios.')
+            return
+
+        # Make sure we don't have a trip with the same title
+        available_trips = TripData().get_available_trips()
+        if any(trip_data['title'] == trip['title'] for trip in available_trips):
+            st.error(
+                'Já existe uma viagem com o mesmo título. Por favor, escolha outro título.')
             return
 
         trip = Trip(trip_data=trip_data)
