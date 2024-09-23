@@ -23,9 +23,10 @@ Esse é um projeto criado para o curso de Ciência de Dados da faculdade Infnet.
 
 -   [Repositório Git](https://github.com/RafaelOlivra/python-llms-if-tp1)
 -   [Dados de Cidade e Estados](https://gist.github.com/letanure/3012978)
+-   [Dados de Turismo Gov.br](https://www.mapa.turismo.gov.br/mapa/init.html#/home)
 
 ## Changelog
-
+-   23/Sep/2024 \* Dev Protótipo Inicial Streamlit
 -   23/Aug/2024 \* Atualizado Página Streamlit
 -   24/Aug/2024 \* Atualizado Business Docs
 -   22/Aug/2024 \* Atualizado Business Docs

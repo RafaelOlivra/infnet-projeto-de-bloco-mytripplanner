@@ -14,8 +14,11 @@ from views.AttractionsView import AttractionsView
 # --------------------------
 if 'add_new_trip_form' not in st.session_state:
     st.session_state.add_new_trip_form = {
-        'attractions': set()
+        'attractions': set(),
     }
+
+if 'show_new_trip_form' not in st.session_state:
+    st.session_state.show_new_trip_form = True
 
 
 # --------------------------
@@ -179,22 +182,20 @@ def Cadastrar():
         if trip._save():
             st.success('Viagem cadastrada com sucesso!')
 
-            # Allow user to download the trip data as CSV
-            st.write('### Download dos Dados da Viagem')
-            st.write(
-                'Clique no botão abaixo para baixar os dados da viagem em formato CSV.')
-            csv_data = trip._to_csv()
-            st.download_button(
-                label='Baixar Dados da Viagem',
-                data=csv_data,
-                file_name=f'{trip.title.replace(" ", "_")}_trip_data.csv',
-                mime='text/csv'
-            )
+            # # Allow user to download the trip data as CSV
+            # st.write('### Download dos Dados da Viagem')
+            # st.write(
+            #     'Clique no botão abaixo para baixar os dados da viagem em formato CSV.')
+            # csv_data = trip._to_csv()
+            # st.download_button(
+            #     label='Baixar Dados da Viagem',
+            #     data=csv_data,
+            #     file_name=f'{trip.title.replace(" ", "_")}_trip_data.csv',
+            #     mime='text/csv'
+            # )
 
             # Clear session state
-            st.session_state.add_new_trip_form = {
-                'attractions': set()
-            }
+            del st.session_state.add_new_trip_form
 
         else:
             st.error('Erro ao cadastrar a viagem.')
