@@ -10,6 +10,7 @@ from io import StringIO
 
 
 class Trip:
+    trip_id: str
     title: str
     origin_city: str
     origin_state: str
@@ -22,7 +23,7 @@ class Trip:
     start_date: datetime
     end_date: datetime
     weather: dict
-    goals: list
+    goals: str
     activities: list
     notes: str
     tags: list
@@ -54,7 +55,7 @@ class Trip:
         self.start_date = trip_data.get("start_date", datetime.now())
         self.end_date = trip_data.get("end_date", datetime.now())
         self.weather = trip_data.get("weather", {})
-        self.goals = trip_data.get("goals", [])
+        self.goals = trip_data.get("goals", "")
         self.activities = trip_data.get("activities", [])
         self.notes = trip_data.get("notes", "")
         self.tags = trip_data.get("tags", [])
@@ -126,8 +127,12 @@ class Trip:
     def _load(self):
         # Fetch trip data from AppData
         TripData = AppData().get("trip", self.trip_id)
+
         if TripData is None:
             return False
+
+        # Parse to json
+        TripData = json.loads(TripData)
 
         # Validate trip data before loading
         if not self._validate(TripData):
@@ -148,8 +153,8 @@ class Trip:
             self.origin_longitude, self.origin_latitude = self._get_coordinates(
                 self.origin_city, self.origin_state)
         else:
-            self.destination_longitude = TripData["destination_longitude"]
-            self.destination_latitude = TripData["destination_latitude"]
+            self.origin_longitude = TripData["origin_longitude"]
+            self.origin_latitude = TripData["origin_latitude"]
 
         if "destination_longitude" not in TripData or "destination_latitude" not in TripData:
             self.destination_longitude, self.destination_latitude = self._get_coordinates(
@@ -161,7 +166,7 @@ class Trip:
         self.start_date = TripData["start_date"]
         self.end_date = TripData["end_date"]
         self.weather = TripData.get("weather", {})
-        self.goals = TripData.get("goals", [])
+        self.goals = TripData.get("goals", "")
         self.activities = TripData.get("activities", [])
         self.notes = TripData.get("notes", "")
         self.tags = TripData.get("tags", [])
@@ -169,7 +174,9 @@ class Trip:
         return True
 
     def _save(self):
-        return AppData().save("trip", value=self._to_json(), id=self.trip_id)
+        if AppData().save("trip", value=self._to_json(), id=self.trip_id):
+            return self.trip_id
+        return False
 
     def _get_trip_data_object(self):
         # Create a dictionary with trip data
@@ -192,6 +199,7 @@ class Trip:
             "notes": self.notes,
             "tags": self.tags
         }
+
         return json_data
 
     def _to_json(self):
@@ -274,7 +282,7 @@ class Trip:
         TripData["tags"] = TripData.get("tags", [])
 
         # Make sure goals and notes are texts with no weird characters
-        TripData["goals"] = [goal.strip() for goal in TripData["goals"]]
+        TripData["goals"] = TripData["goals"].strip()
         TripData["notes"] = TripData["notes"].strip()
 
         return TripData

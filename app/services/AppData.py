@@ -2,7 +2,6 @@ import requests
 import os
 import json
 from datetime import datetime, timedelta
-from functools import lru_cache
 
 
 class AppData:
@@ -37,7 +36,7 @@ class AppData:
         folder_map = self._get_storage_map()
 
         # Check if group exists in the storage map
-        if group not in folder_map or not key:
+        if group not in folder_map:
             return None
 
         # App Config
@@ -89,7 +88,7 @@ class AppData:
         }
         return os.getenv(key_map.get(key))
 
-    def get_trip_data(self, id, key):
+    def get_trip_data(self, id, key=""):
         """
         Retrieve trip data by ID and key.
 
@@ -107,7 +106,11 @@ class AppData:
         if os.path.exists(file_path):
             with open(file_path, "r") as f:
                 data = json.load(f)
-                return data.get(key)
+                if key:
+                    if key in data:
+                        return data[key]
+                    return None
+                return data
         return None
 
     def _get_storage_map(self):

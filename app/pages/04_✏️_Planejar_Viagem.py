@@ -7,6 +7,7 @@ from services.CityStateData import CityStateData
 from services.GoogleMaps import GoogleMaps
 from views.WeatherView import WeatherView
 from views.AttractionsView import AttractionsView
+import time
 
 
 # --------------------------
@@ -19,6 +20,9 @@ if 'add_new_trip_form' not in st.session_state:
 
 if 'show_new_trip_form' not in st.session_state:
     st.session_state.show_new_trip_form = True
+
+if 'selected_trip_id' not in st.session_state:
+    st.session_state.selected_trip_id = None
 
 
 # --------------------------
@@ -179,7 +183,8 @@ def Cadastrar():
             return
 
         trip = Trip(trip_data=trip_data)
-        if trip._save():
+        trip_id = trip._save()
+        if trip_id:
             st.success('Viagem cadastrada com sucesso!')
 
             # # Allow user to download the trip data as CSV
@@ -196,6 +201,12 @@ def Cadastrar():
 
             # Clear session state
             del st.session_state.add_new_trip_form
+
+            # Change to the trip view
+            st.session_state.selected_trip_id = trip_id
+            with st.spinner('Redirecionando...'):
+                time.sleep(2)
+                st.switch_page("pages/02_🗺️_Minhas_Viagens.py")
 
         else:
             st.error('Erro ao cadastrar a viagem.')

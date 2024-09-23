@@ -12,40 +12,14 @@ from views.AttractionsView import AttractionsView
 # --------------------------
 # Session State
 # --------------------------
-if 'add_new_trip_form' not in st.session_state:
-    st.session_state.add_new_trip_form = {
-        'attractions': set()
-    }
+if 'selected_trip_id' not in st.session_state:
+    st.session_state.selected_trip_id = None
 
 
 # --------------------------
-# Form State Handlers
+# View Trip Data
 # --------------------------
-def update_selected_attractions(attraction_name, remove=False):
-    """
-    Update the selected attractions and save it using session state.
-    """
-    selected_attractions = get_selected_attractions()
-    if remove:
-        if attraction_name in selected_attractions:
-            selected_attractions.remove(attraction_name)
-    else:
-        selected_attractions.add(attraction_name)
-
-    st.session_state.add_new_trip_form['attractions'] = selected_attractions
-
-
-def get_selected_attractions():
-    """
-    Get the selected attractions from the session state.
-    """
-    return st.session_state.add_new_trip_form['attractions']
-
-
-# --------------------------
-# Add new trip form
-# --------------------------
-def Minhas_Viagens():
+def View_Trip():
     # Set page title
     st.set_page_config(
         page_title="Minhas Viagens",
@@ -54,12 +28,15 @@ def Minhas_Viagens():
         initial_sidebar_state="expanded",
     )
 
-    st.title('🗺️ Minhas Viagens')
-    st.write(
-        '''
-        Aqui você pode cadastrar suas viagens e planejar seus roteiros de forma personalizada.
-        '''
-    )
+    st.title("🗺️ Minhas Viagens")
+    st.write("Aqui estão as viagens que você planejou:")
+
+    # Get the trips
+    trip_id = st.session_state.selected_trip_id
+    if trip_id:
+        trip = Trip(trip_id=trip_id)
+        trip_json = trip._to_json()
+        st.write(trip_json)
 
 
-Minhas_Viagens()
+View_Trip()
