@@ -179,6 +179,18 @@ def Cadastrar():
         if trip._save():
             st.success('Viagem cadastrada com sucesso!')
 
+            # Allow user to download the trip data as CSV
+            st.write('### Download dos Dados da Viagem')
+            st.write(
+                'Clique no botão abaixo para baixar os dados da viagem em formato CSV.')
+            csv_data = trip._to_csv()
+            st.download_button(
+                label='Baixar Dados da Viagem',
+                data=csv_data,
+                file_name=f'{trip.title.replace(" ", "_")}_trip_data.csv',
+                mime='text/csv'
+            )
+
             # Clear session state
             st.session_state.add_new_trip_form = {
                 'attractions': set()
