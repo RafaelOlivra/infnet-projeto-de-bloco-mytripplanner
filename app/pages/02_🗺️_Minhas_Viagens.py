@@ -29,7 +29,7 @@ def View_Trip():
     )
 
     st.title("🗺️ Minhas Viagens")
-    st.write("Aqui estão as viagens que você planejou:")
+    st.write("Aqui estão as viagens que você planejou. Se preferir você também pode importar um CSV com os dados da viagem.")
 
     available_trips = TripData().get_available_trips()
     selected_trip_id = st.session_state.selected_trip_id
