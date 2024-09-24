@@ -121,17 +121,6 @@ class Trip:
 
         return self
 
-    def export(self, to="CSV"):
-        """
-        Export trip data to a file.
-        """
-        if to == "CSV":
-            return self.to_csv()
-        elif to == "JSON":
-            return self.to_json()
-        else:
-            raise ValueError("Invalid export format.")
-
     def delete(self):
         return TripData().delete(self.id)
 
