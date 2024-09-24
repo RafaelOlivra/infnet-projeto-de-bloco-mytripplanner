@@ -69,11 +69,17 @@ def Cadastrar():
         '''
     )
 
-    st.write('#### Título')
+    # Title
+    st.write('### 🧳 1. Título')
     title = st.text_input('Dê um título para sua viagem.',
                           placeholder='Viagem de Férias')
 
+    if not title:
+        return
+
     # City and State
+    st.write('---')
+    st.write('### 🛫 2. Para Onde?')
     col1, col2 = st.columns(2)
     with col1:
         st.write('#### Origem')
@@ -104,8 +110,12 @@ def Cadastrar():
     with st.spinner('Carregando mapa...'):
         components.iframe(iframe_url, height=450)
 
-    # Datepicker
-    st.write('#### Quando?')
+    if not destination_city and not destination_state:
+        return
+
+    # Date
+    st.write('---')
+    st.write('### 📅 3. Quando?')
     today = datetime.datetime.now()
     week_from_today = today + datetime.timedelta(days=7)
     date = st.date_input(
@@ -123,25 +133,25 @@ def Cadastrar():
             start_date = date[0]
             end_date = False
 
-    st.write('#### Clima e Tempo')
-    st.write(f"Aqui você pode consultar o clima e tempo para **{
-             destination}** nos próximos 5 dias.")
-    weather_view = WeatherView(destination_city, destination_state)
-    weather_view.display_forecast()
+    with st.expander('🌤️ Clima e Tempo', expanded=True):
+        st.write(f"Aqui você pode consultar o clima e tempo para **{
+            destination}** nos próximos 5 dias.")
+        weather_view = WeatherView(destination_city, destination_state)
+        weather_view.display_forecast()
 
     st.write('---')
-    st.write('### Meu Roteiro')
+    st.write('### 🏟️ 4. Objetivos ')
 
     st.write('Aqui você pode definir os objetivos da viagem, como visitar pontos turísticos, conhecer a cultura local, etc.')
 
-    st.write(f'#### Sugestões de Atrações em {
-             destination_city}, {destination_state}')
-    st.write('Selecione as atrações que deseja visitar durante a viagem.')
+    with st.expander(f'💡 Sugestões de Atrações em {destination_city}, {destination_state}', expanded=True):
+        st.write(
+            'Você pode selecionar algumas das sugestões de atrações que para conhecer durante a viagem.')
 
-    attractions_ideas = AttractionsView(
-        city_name=destination_city, state_name=destination_state)
-    attractions_ideas.display_attractions(
-        display_selector=True, selected_attractions=get_selected_attractions(), on_change=update_selected_attractions)
+        attractions_ideas = AttractionsView(
+            city_name=destination_city, state_name=destination_state)
+        attractions_ideas.display_attractions(
+            display_selector=True, selected_attractions=get_selected_attractions(), on_change=update_selected_attractions)
 
     st.write('#### Objetivos da Viagem')
     st.write(
@@ -149,12 +159,16 @@ def Cadastrar():
     goals = st.text_area(
         'Objetivos', placeholder='Ex: Visitar o Museu do Ipiranga, Conhecer a Avenida Paulista, etc.')
 
-    st.write('#### Gerar Roteiro com IA')
+    if not goals:
+        return
+
+    st.write('---')
+    st.write('### 🤖 5. Gerar Roteiro com IA')
     st.write('Aqui você pode consultar e criar um roteiro da viagem com ajuda de Inteligência Artificial.')
     st.write('Em breve...')
 
     st.write('---')
-    st.write('#### Sobre a Viagem')
+    st.write('### ✏️ 6. Sobre a Viagem')
     notes = st.text_area(
         'Observações', '', placeholder='Ex: Levar roupas de banho, Protetor solar, etc.')
     tags = st_tags.st_tags(
@@ -183,13 +197,6 @@ def Cadastrar():
         # Make sure we have all the required data
         if not all(trip_data.values()):
             st.error('Por favor, preencha todos os campos obrigatórios.')
-            return
-
-        # Make sure we don't have a trip with the same title
-        available_trips = TripData().get_available_trips()
-        if any(trip_data['title'] == trip['title'] for trip in available_trips):
-            st.error(
-                'Já existe uma viagem com o mesmo título. Por favor, escolha outro título.')
             return
 
         trip = Trip(trip_data=trip_data)
