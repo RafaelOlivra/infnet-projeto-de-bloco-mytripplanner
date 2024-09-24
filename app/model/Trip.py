@@ -129,23 +129,29 @@ class Trip:
         return csv_data.getvalue()
 
     def from_json(self, json_string):
-        data = json.loads(json_string)
-        data["title"] = f"[Importado] {data['title']}"
-        data["trip_id"] = self._generate_id()
+        try:
+            data = json.loads(json_string)
+            data["trip_id"] = self._generate_id()
 
-        return Trip(trip_data=data)
+            return Trip(trip_data=data)
+        except Exception as e:
+            raise ValueError(
+                "The JSON data is not in the correct format. Please check the data and try again.")
 
     def from_csv(self, csv_data):
-        reader = csv.DictReader(StringIO(csv_data))
-        data = next(reader)
+        try:
+            reader = csv.DictReader(StringIO(csv_data))
+            data = next(reader)
 
-        weather_data = base64.b64decode(data.pop("weather_base64")).decode()
-        data["weather"] = json.loads(weather_data)
-        data["tags"] = [tag.strip() for tag in data["tags"].split(",")]
-        data["title"] = f"[Importado] {data['title']}"
-        data["trip_id"] = self._generate_id()
-
-        return Trip(trip_data=data)
+            weather_data = base64.b64decode(
+                data.pop("weather_base64")).decode()
+            data["weather"] = json.loads(weather_data)
+            data["tags"] = [tag.strip() for tag in data["tags"].split(",")]
+            data["trip_id"] = self._generate_id()
+            return Trip(trip_data=data)
+        except Exception as e:
+            raise ValueError(
+                "The CSV data is not in the correct format. Please check the data and try again.")
 
     # --------------------------
     # Data Handling
