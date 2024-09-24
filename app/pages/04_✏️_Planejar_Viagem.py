@@ -69,7 +69,8 @@ def Cadastrar():
         '''
     )
 
-    title = st.text_input('Título', placeholder='Viagem de Férias')
+    st.write('#### Título')	
+    title = st.text_input('Dê um título para sua viagem.', placeholder='Viagem de Férias')
 
     # City and State
     col1, col2 = st.columns(2)

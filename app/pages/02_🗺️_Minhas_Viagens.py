@@ -1,13 +1,14 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import streamlit_tags as st_tags
-import datetime
-from model.Trip import Trip
+import pandas as pd
 from services.CityStateData import CityStateData
 from services.GoogleMaps import GoogleMaps
 from views.WeatherView import WeatherView
 from views.AttractionsView import AttractionsView
 from services.TripData import TripData
+from model.Trip import Trip
+from io import StringIO
 
 # --------------------------
 # Session State
@@ -29,7 +30,7 @@ def View_Trip():
     )
 
     st.title("🗺️ Minhas Viagens")
-    st.write("Aqui estão as viagens que você planejou. Se preferir você também pode importar um CSV com os dados da viagem.")
+    st.write("Aqui estão as viagens que você planejou.")
 
     available_trips = TripData().get_available_trips()
     selected_trip_id = st.session_state.selected_trip_id
@@ -44,14 +45,38 @@ def View_Trip():
 
     # Display a select box for the available trips, if the selected trip is not in the available trips
     # the first trip in the list will be selected by default
-    selected_trip_id = st.selectbox("Selecione a viagem:", [trip.get("title") for trip in available_trips], index=available_trips.index(
+    selected_trip_id = st.selectbox("Selecione uma viagem:", [trip.get("title") for trip in available_trips], index=available_trips.index(
         next((trip for trip in available_trips if trip["title"] == selected_trip_id), available_trips[0])))
     selected_trip_id = next(
         (trip for trip in available_trips if trip["title"] == selected_trip_id), available_trips[0]).get("id")
 
-    trip = TripData().get_trip(selected_trip_id)
+    trip = Trip(trip_id=selected_trip_id)
+    df = pd.read_csv(StringIO(trip._to_csv()))
+    st.dataframe(df)
 
-    st.write(trip)
+    # Allow users to export the trip data
+    st.write('### ⬇️ Exportar Dados da Viagem')
+    st.write(
+        'Clique no botão abaixo para baixar os dados da viagem.')
+    col1, col2 = st.columns(2)
+    with col1:
+        csv_data = trip._to_csv()
+        st.download_button(
+            label='Baixar Dados da Viagem (CSV)',
+            data=csv_data,
+            file_name=f'{trip.slug}.csv',
+            mime='text/csv',
+            use_container_width=True
+        )
+    with col2:
+        json_data = trip._to_json()
+        st.download_button(
+            label='Baixar Dados da Viagem (JSON)',
+            data=json_data,
+            file_name=f'{trip.slug}.json',
+            mime='application/json',
+            use_container_width=True
+        )
 
 
 View_Trip()

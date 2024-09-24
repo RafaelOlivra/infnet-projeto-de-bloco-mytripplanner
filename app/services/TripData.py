@@ -71,16 +71,21 @@ class TripData:
         return False
 
     @st.cache_data(ttl=10)
-    def get_trip(_self, id, key=""):
+    def get_trip_data(_self, id, key=""):
         """
-        Retrieve trip data by ID and key.
+        Get the trip data for the specified trip ID.
+        Returns a json object.
+        """
+        data = _self.get_trip_json(id)
+        if data and key:
+            return data.get(key)
+        return data
 
-        Args:
-            id (str): The trip ID.
-            key (str): The specific key in the trip data.
-
-        Returns:
-            Any: The trip data value, or None if the file or key does not exist.
+    @st.cache_data(ttl=10)
+    def get_trip_json(_self, id):
+        """
+        Get the trip data for the specified trip ID.
+        Returns a json object.
         """
         id = AppData().sanitize_id(id)
         save_path = AppData()._get_storage_map().get("trip")
@@ -88,15 +93,10 @@ class TripData:
 
         if os.path.exists(file_path):
             with open(file_path, "r", encoding="utf-8") as f:
-
                 # Load the data
                 data = json.load(f)
                 data = json.loads(data)
 
-                if key:
-                    if key in data:
-                        return data.get(key)
-                    return None
                 return data
         return None
 
@@ -119,6 +119,6 @@ class TripData:
         """
         available_trips = []
         for trip_id in _self.get_available_trip_ids():
-            trip_title = _self.get_trip(trip_id, "title")
+            trip_title = _self.get_trip_data(trip_id, "title")
             available_trips.append({"id": trip_id, "title": trip_title})
         return available_trips

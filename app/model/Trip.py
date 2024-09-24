@@ -3,6 +3,7 @@ from datetime import datetime
 from services.TripData import TripData
 from services.LatLong import LatLong
 from services.OpenWeatherMap import OpenWeatherMap
+from services.Utils import Utils
 import json
 import csv
 import base64
@@ -11,6 +12,7 @@ from io import StringIO
 
 class Trip:
     trip_id: str
+    slug: str
     title: str
     origin_city: str
     origin_state: str
@@ -46,6 +48,7 @@ class Trip:
 
         self.trip_id = self._generate_id()
         self.title = trip_data.get("title", "")
+        self.slug = Utils().slugify(self.title)
         self.origin_city = trip_data.get("origin_city", "")
         self.origin_state = trip_data.get("origin_state", "")
 
@@ -83,6 +86,7 @@ class Trip:
     def update(self, trip_data: dict):
         # Update trip data
         self.title = trip_data.get("title", self.title)
+        self.slug = trip_data.get("slug", self.slug)
         self.origin_city = trip_data.get("origin_city", self.origin_city)
         self.origin_state = trip_data.get("origin_state", self.origin_state)
         self.destination_city = trip_data.get(
@@ -119,21 +123,20 @@ class Trip:
         """
         if to == "CSV":
             return self._to_csv()
-        else:
+        elif to == "JSON":
             return self._to_json()
+        else:
+            raise ValueError("Invalid export format.")
 
     def delete(self):
         return TripData().delete(self.trip_id)
 
     def _load(self):
         # Fetch trip data from TripData
-        Trip = TripData().get_trip(self.trip_id)
+        Trip = TripData().get_trip_data(self.trip_id)
 
         if Trip is None:
             return False
-
-        # Parse to json
-        Trip = json.loads(Trip)
 
         # Validate trip data before loading
         if not self._validate(Trip):
@@ -144,6 +147,8 @@ class Trip:
 
         # Assign sanitized data to object properties
         self.title = Trip["title"]
+        self.slug = Trip["slug"] if "slug" in Trip else Utils().slugify(
+            self.title)
         self.origin_city = Trip["origin_city"]
         self.origin_state = Trip["origin_state"]
         self.destination_city = Trip["destination_city"]
@@ -184,6 +189,7 @@ class Trip:
         json_data = {
             "trip_id": self.trip_id,
             "title": self.title,
+            "slug": self.slug,
             "origin_city": self.origin_city,
             "origin_state": self.origin_state,
             "origin_longitude": self.origin_longitude,
