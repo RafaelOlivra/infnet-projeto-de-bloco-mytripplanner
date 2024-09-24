@@ -45,12 +45,21 @@ def View_Trip():
         st.session_state.selected_trip_id = selected_trip_id
 
     # Display a select box for the available trips, if the selected trip is not in the available trips
-    # the first trip in the list will be selected by default
-    options = [trip.get("title") for trip in available_trips]
-    selected_trip_id = st.selectbox("Selecione uma viagem:", options=options, index=available_trips.index(
-        next((trip for trip in available_trips if trip["title"] == selected_trip_id), available_trips[0])))
-    selected_trip_id = next(
-        (trip for trip in available_trips if trip["title"] == selected_trip_id), available_trips[0]).get("id")
+    # the first trip in the list will be selected by default.
+    # Options can have the same name, but the id is unique. So we add a prefix to the title to make it unique.
+    options = [f"{trip['title']} ({trip['id']})" for trip in available_trips]
+
+    # Check selected_trip_id is contained in the options and set the selected index
+    selected_index = 0
+    for option in options:
+        # Check if the string contains the selected_trip_id
+        if selected_trip_id in option:
+            selected_index = options.index(option)
+            break
+
+    selected_trip_id = st.selectbox(
+        "Selecione uma viagem:", options=options, index=selected_index, key='select_trip')
+    selected_trip_id = selected_trip_id.split('(')[-1].split(')')[0]
 
     trip = Trip(id=selected_trip_id)
     df = pd.read_csv(StringIO(trip.to_csv()))

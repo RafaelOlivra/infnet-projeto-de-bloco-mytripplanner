@@ -31,13 +31,19 @@ def View_Trip():
         if uploaded_file is not None:
             file_type = uploaded_file.name.split('.')[-1]
             file_contents = uploaded_file.getvalue().decode('utf-8')
-            if file_type == 'csv':
-                trip = Trip().from_csv(file_contents)
-            elif file_type == 'json':
-                trip = Trip().from_json(file_contents)
-            else:
+
+            try:
+                if file_type == 'csv':
+                    trip = Trip().from_csv(file_contents)
+                elif file_type == 'json':
+                    trip = Trip().from_json(file_contents)
+                else:
+                    st.error(
+                        "Formato de arquivo inválido. Por favor, selecione um arquivo CSV ou JSON.")
+                    return
+            except Exception as e:
                 st.error(
-                    "Formato de arquivo inválido. Por favor, selecione um arquivo CSV ou JSON.")
+                    f"Erro ao importar viagem: {str(e)}")
                 return
 
     if trip:
