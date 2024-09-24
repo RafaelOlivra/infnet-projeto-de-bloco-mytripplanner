@@ -9,6 +9,7 @@ from views.AttractionsView import AttractionsView
 from services.TripData import TripData
 from model.Trip import Trip
 from io import StringIO
+import time
 
 # --------------------------
 # Session State
@@ -55,6 +56,7 @@ def View_Trip():
     st.dataframe(df)
 
     # Allow users to export the trip data
+    st.write('---')
     st.write('### ⬇️ Exportar Dados da Viagem')
     st.write(
         'Clique no botão abaixo para baixar os dados da viagem.')
@@ -77,6 +79,19 @@ def View_Trip():
             mime='application/json',
             use_container_width=True
         )
+
+    # Allow users to delete the trip
+    st.write('---')
+    st.write('### 🗑️ Deletar Viagem')
+    st.write('Clique no botão abaixo para deletar a viagem.')
+    st.error('**Atenção:** Esta ação é irreversível.')
+    if st.button('Deletar Viagem', key='delete_trip', type='primary', use_container_width=True):
+        TripData().delete(trip.id)
+        st.session_state.selected_trip_id = None
+        st.success('Viagem deletada com sucesso!')
+        with st.spinner('Atualizando...'):
+            time.sleep(2)
+            st.switch_page("pages/02_🗺️_Minhas_Viagens.py")
 
 
 View_Trip()

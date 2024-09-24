@@ -45,29 +45,17 @@ class TripData:
 
         return AppData()._save_to_file(file_path, data)
 
-    def delete(self, id, key):
+    def delete(self, id):
         """
-        Delete a specific key in trip data.
-
-        Args:
-            id (str): The trip ID.
-            key (str): The key to delete.
-
-        Returns:
-            bool: True if deleted successfully, False otherwise.
+        Delete the trip with the specified trip ID.
         """
         id = AppData().sanitize_id(id)
         save_path = AppData()._get_storage_map().get("trip")
         file_path = f"{save_path}/{id}.json"
 
         if os.path.exists(file_path):
-            with open(file_path, "r") as f:
-                data = json.load(f)
-                if key in data:
-                    del data[key]
-                    with open(file_path, "w") as f:
-                        json.dump(data, f)
-                    return True
+            os.remove(file_path)
+            return True
         return False
 
     @st.cache_data(ttl=10)
