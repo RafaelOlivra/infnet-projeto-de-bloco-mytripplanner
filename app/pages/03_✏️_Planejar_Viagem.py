@@ -193,15 +193,14 @@ def Cadastrar():
             return
 
         trip = Trip(trip_data=trip_data)
-        trip_id = trip._save()
-        if trip_id:
+        if trip:
             st.success('Viagem cadastrada com sucesso!')
 
             # Clear session state
             del st.session_state.add_new_trip_form
 
             # Change to the trip view
-            st.session_state.selected_trip_id = trip_id
+            st.session_state.selected_trip_id = trip.id
             with st.spinner('Redirecionando...'):
                 time.sleep(2)
                 st.switch_page("pages/02_🗺️_Minhas_Viagens.py")

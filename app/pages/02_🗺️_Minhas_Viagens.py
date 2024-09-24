@@ -50,8 +50,8 @@ def View_Trip():
     selected_trip_id = next(
         (trip for trip in available_trips if trip["title"] == selected_trip_id), available_trips[0]).get("id")
 
-    trip = Trip(trip_id=selected_trip_id)
-    df = pd.read_csv(StringIO(trip._to_csv()))
+    trip = Trip(id=selected_trip_id)
+    df = pd.read_csv(StringIO(trip.to_csv()))
     st.dataframe(df)
 
     # Allow users to export the trip data
@@ -60,18 +60,18 @@ def View_Trip():
         'Clique no botão abaixo para baixar os dados da viagem.')
     col1, col2 = st.columns(2)
     with col1:
-        csv_data = trip._to_csv()
+        csv_data = trip.to_csv()
         st.download_button(
-            label='Baixar Dados da Viagem (CSV)',
+            label='Exportar Dados da Viagem (CSV)',
             data=csv_data,
             file_name=f'{trip.slug}.csv',
             mime='text/csv',
             use_container_width=True
         )
     with col2:
-        json_data = trip._to_json()
+        json_data = trip.to_json()
         st.download_button(
-            label='Baixar Dados da Viagem (JSON)',
+            label='Exportar Dados da Viagem (JSON)',
             data=json_data,
             file_name=f'{trip.slug}.json',
             mime='application/json',

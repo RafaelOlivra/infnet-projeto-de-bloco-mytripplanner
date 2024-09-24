@@ -11,7 +11,7 @@ from io import StringIO
 
 
 class Trip:
-    trip_id: str
+    id: str
     slug: str
     title: str
     origin_city: str
@@ -30,23 +30,23 @@ class Trip:
     notes: str
     tags: list
 
-    def __init__(self, trip_id: str = None, trip_data: dict = None):
+    def __init__(self, id: str = None, trip_data: dict = None):
         # If trip_id is provided, load the trip data
-        if trip_id is not None:
-            self.trip_id = trip_id
+        if id is not None:
+            self.id = id
 
             # Load trip data
             if not self._load():
                 raise ValueError(
-                    f"Trip with ID {self.trip_id} could not be loaded.")
-        else:
+                    f"Trip with ID {self.id} could not be loaded.")
+        elif trip_data is not None:
             self.create(trip_data)
 
     def create(self, trip_data: dict):
         if trip_data is None:
             raise ValueError("Trip data is required to create a trip.")
 
-        self.trip_id = self._generate_id()
+        self.id = self._generate_id()
         self.title = trip_data.get("title", "")
         self.slug = Utils().slugify(self.title)
         self.origin_city = trip_data.get("origin_city", "")
@@ -55,8 +55,10 @@ class Trip:
         self.destination_city = trip_data.get("destination_city", "")
         self.destination_state = trip_data.get("destination_state", "")
 
-        self.start_date = trip_data.get("start_date", datetime.now())
-        self.end_date = trip_data.get("end_date", datetime.now())
+        self.start_date = trip_data.get(
+            "start_date", datetime.now().strftime(self._get_time_format()))
+        self.end_date = trip_data.get(
+            "end_date", datetime.now().strftime(self._get_time_format()))
         self.weather = trip_data.get("weather", {})
         self.goals = trip_data.get("goals", "")
         self.activities = trip_data.get("activities", [])
@@ -82,6 +84,8 @@ class Trip:
         # Get weather data for the trip
         self.weather = OpenWeatherMap().get_forecast_for_next_5_days(
             self.destination_city, self.destination_state)
+
+        return self._save()
 
     def update(self, trip_data: dict):
         # Update trip data
@@ -122,25 +126,25 @@ class Trip:
         Export trip data to a file.
         """
         if to == "CSV":
-            return self._to_csv()
+            return self.to_csv()
         elif to == "JSON":
-            return self._to_json()
+            return self.to_json()
         else:
             raise ValueError("Invalid export format.")
 
     def delete(self):
-        return TripData().delete(self.trip_id)
+        return TripData().delete(self.id)
 
     def _load(self):
         # Fetch trip data from TripData
-        Trip = TripData().get_trip_data(self.trip_id)
+        Trip = TripData().get_trip_data(self.id)
 
         if Trip is None:
             return False
 
         # Validate trip data before loading
         if not self._validate(Trip):
-            raise ValueError(f"Invalid trip data for Trip ID {self.trip_id}")
+            raise ValueError(f"Invalid trip data for Trip ID {self.id}")
 
         # Sanitize the data
         Trip = self._sanitize(Trip)
@@ -180,14 +184,14 @@ class Trip:
         return True
 
     def _save(self):
-        if TripData().save(value=self._to_json(), id=self.trip_id):
-            return self.trip_id
+        if TripData().save(value=self.to_json(), id=self.id):
+            return self
         return False
 
     def _get_trip_data_object(self):
         # Create a dictionary with trip data
-        json_data = {
-            "trip_id": self.trip_id,
+        return {
+            "trip_id": self.id,
             "title": self.title,
             "slug": self.slug,
             "origin_city": self.origin_city,
@@ -198,8 +202,8 @@ class Trip:
             "destination_state": self.destination_state,
             "destination_longitude": self.destination_longitude,
             "destination_latitude": self.destination_latitude,
-            "start_date": self.start_date.strftime("%Y-%m-%d %H:%M"),
-            "end_date": self.end_date.strftime("%Y-%m-%d %H:%M"),
+            "start_date": self.start_date,
+            "end_date": self.end_date,
             "weather": self.weather,
             "goals": self.goals,
             "activities": self.activities,
@@ -207,15 +211,13 @@ class Trip:
             "tags": self.tags
         }
 
-        return json_data
-
-    def _to_json(self):
+    def to_json(self):
         # Convert the trip data to a JSON string
         return json.dumps(self._get_trip_data_object())
 
-    def _to_csv(self):
+    def to_csv(self):
         # Load the JSON string
-        data = json.loads(self._to_json())
+        data = json.loads(self.to_json())
 
         # Serialize weather data to base64
         weather_data = data["weather"]
@@ -241,6 +243,43 @@ class Trip:
 
         return csv_data.getvalue()
 
+    def from_json(self, json_string):
+        # Load the JSON string
+        data = json.loads(json_string)
+
+        # Add [Imported] to the title
+        data["title"] = f"[Importado] {data['title']}"
+
+        # Generate a new trip ID
+        data["trip_id"] = self._generate_id()
+
+        # Return a new Trip object with the loaded data
+        return Trip(trip_data=data)
+
+    def from_csv(self, csv_data):
+        # Load the CSV data
+        reader = csv.DictReader(StringIO(csv_data))
+        header = reader.fieldnames
+        data = next(reader)
+
+        # Deserialize weather data from base64
+        weather_data = data["weather_base64"]
+        weather_data = base64.b64decode(weather_data).decode()
+        data["weather"] = json.loads(weather_data)
+        del data["weather_base64"]
+
+        # Convert tags to a list
+        data["tags"] = [tag.strip() for tag in data["tags"].split(",")]
+
+        # Add [Imported] to the title
+        data["title"] = f"[Importado] {data['title']}"
+
+        # Generate a new trip ID
+        data["trip_id"] = self._generate_id()
+
+        # Return a new Trip object with the loaded data
+        return Trip(trip_data=data)
+
     def _update_coordinates(self):
         # Update the latitude and longitude for the origin and destination cities
         self.origin_longitude, self.origin_latitude = self._get_coordinates(
@@ -262,8 +301,8 @@ class Trip:
 
         # Validate date format
         try:
-            datetime.strptime(TripData["start_date"], "%Y-%m-%d %H:%M")
-            datetime.strptime(TripData["end_date"], "%Y-%m-%d %H:%M")
+            datetime.strptime(TripData["start_date"], self._get_time_format())
+            datetime.strptime(TripData["end_date"], self._get_time_format())
         except ValueError:
             print("Invalid date format, should be YYYY-MM-DD HH:MM")
             return False
@@ -274,14 +313,15 @@ class Trip:
         # Clean up the data
         TripData["title"] = TripData["title"].strip()
 
-        # Convert start and end dates to datetime objects
+        # Convert start and end dates to datetime objects and format them
+        # back to the expected format (YYYY-MM-DD HH:MM) string
         try:
             TripData["start_date"] = datetime.strptime(
-                TripData["start_date"], "%Y-%m-%d %H:%M")
+                TripData["start_date"], self._get_time_format()).strftime(self._get_time_format())
             TripData["end_date"] = datetime.strptime(
-                TripData["end_date"], "%Y-%m-%d %H:%M")
+                TripData["end_date"], self._get_time_format()).strftime(self._get_time_format())
         except ValueError:
-            raise ValueError("Dates must be in the format YYYY-MM-DD")
+            raise ValueError("Dates must be in the format YYYY-MM-DD HH:MM")
 
         # Default values for optional fields
         TripData["weather"] = TripData.get("weather", {})
@@ -297,6 +337,9 @@ class Trip:
     def _generate_id(self):
         # Generate a unique ID for the trip
         return str(uuid.uuid4())
+
+    def _get_time_format(self):
+        return "%Y-%m-%d %H:%M"
 
     def _get_coordinates(self, city, state):
         # Get latitude and longitude using the geocoding API
