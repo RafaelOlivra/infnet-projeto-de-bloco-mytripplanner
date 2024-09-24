@@ -69,8 +69,9 @@ def Cadastrar():
         '''
     )
 
-    st.write('#### Título')	
-    title = st.text_input('Dê um título para sua viagem.', placeholder='Viagem de Férias')
+    st.write('#### Título')
+    title = st.text_input('Dê um título para sua viagem.',
+                          placeholder='Viagem de Férias')
 
     # City and State
     col1, col2 = st.columns(2)
@@ -195,18 +196,6 @@ def Cadastrar():
         trip_id = trip._save()
         if trip_id:
             st.success('Viagem cadastrada com sucesso!')
-
-            # # Allow user to download the trip data as CSV
-            # st.write('### Download dos Dados da Viagem')
-            # st.write(
-            #     'Clique no botão abaixo para baixar os dados da viagem em formato CSV.')
-            # csv_data = trip._to_csv()
-            # st.download_button(
-            #     label='Baixar Dados da Viagem',
-            #     data=csv_data,
-            #     file_name=f'{trip.title.replace(" ", "_")}_trip_data.csv',
-            #     mime='text/csv'
-            # )
 
             # Clear session state
             del st.session_state.add_new_trip_form
