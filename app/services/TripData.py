@@ -1,7 +1,5 @@
-import requests
 import os
 import json
-from datetime import datetime, timedelta
 import streamlit as st
 from services.AppData import AppData
 
@@ -9,19 +7,24 @@ from services.AppData import AppData
 class TripData:
     def __init__(self):
         """
-        Initialize the AppData class.
+        Initialize the TripData class.
         """
-        pass
+        self.app_data = AppData()
 
     def save(self, id="", key="", value=""):
         """
-        Save trip data to a JSON file.
+        Save or update trip data to a JSON file.
 
         Args:
-            trip_data (dict): The trip data to save.
+            id (str): Trip ID.
+            key (str): The key to update within the trip data. If empty, the entire value is replaced.
+            value (any): The value to store in the trip data.
+
+        Returns:
+            bool: True if the data was saved successfully, False otherwise.
         """
         print("Saving or updating trip data")
-        folder_map = AppData()._get_storage_map()
+        folder_map = self.app_data._get_storage_map()
         save_path = folder_map.get("trip")
         file_path = f"{save_path}/{id}.json"
 
@@ -40,17 +43,24 @@ class TripData:
             else:
                 data = value  # Overwrite with new data if no key is specified
         else:
-            # No existing data, treat this as a new save
+            # Create new data if file doesn't exist
             data = {key: value} if key else value
 
-        return AppData()._save_to_file(file_path, data)
+        # Save the updated or new data
+        return self.app_data._save_to_file(file_path, data)
 
     def delete(self, id):
         """
-        Delete the trip with the specified trip ID.
+        Delete the trip data for the specified trip ID.
+
+        Args:
+            id (str): The trip ID to delete.
+
+        Returns:
+            bool: True if the file was deleted, False otherwise.
         """
-        id = AppData().sanitize_id(id)
-        save_path = AppData()._get_storage_map().get("trip")
+        id = self.app_data.sanitize_id(id)
+        save_path = self.app_data._get_storage_map().get("trip")
         file_path = f"{save_path}/{id}.json"
 
         if os.path.exists(file_path):
@@ -59,54 +69,68 @@ class TripData:
         return False
 
     @st.cache_data(ttl=10)
-    def get_trip_data(_self, id, key=""):
+    def get_trip_data(self, id, key=""):
         """
-        Get the trip data for the specified trip ID.
-        Returns a json object.
+        Retrieve trip data for the specified trip ID. Optionally, return a specific key.
+
+        Args:
+            id (str): The trip ID.
+            key (str): Specific key to return from the trip data.
+
+        Returns:
+            dict or None: The trip data or the specific key value if found.
         """
-        data = _self.get_trip_json(id)
+        data = self.get_trip_json(id)
         if data and key:
             return data.get(key)
         return data
 
     @st.cache_data(ttl=10)
-    def get_trip_json(_self, id):
+    def get_trip_json(self, id):
         """
-        Get the trip data for the specified trip ID.
-        Returns a json object.
+        Retrieve the JSON data for the specified trip ID.
+
+        Args:
+            id (str): The trip ID.
+
+        Returns:
+            dict or None: The JSON data for the trip, or None if not found.
         """
-        id = AppData().sanitize_id(id)
-        save_path = AppData()._get_storage_map().get("trip")
+        id = self.app_data.sanitize_id(id)
+        save_path = self.app_data._get_storage_map().get("trip")
         file_path = f"{save_path}/{id}.json"
 
         if os.path.exists(file_path):
             with open(file_path, "r", encoding="utf-8") as f:
-                # Load the data
-                data = json.load(f)
-                data = json.loads(data)
-
-                return data
+                try:
+                    data = json.load(f)
+                    return data
+                except json.JSONDecodeError as e:
+                    print(f"Error loading trip JSON: {e}")
+                    return None
         return None
 
-    def get_available_trip_ids(_self):
+    def get_available_trip_ids(self):
         """
-        Retrieve a list of trip IDs.
+        Retrieve a list of available trip IDs.
 
         Returns:
             list: A list of trip IDs.
         """
-        save_path = AppData()._get_storage_map().get("trip")
+        save_path = self.app_data._get_storage_map().get("trip")
         if os.path.exists(save_path):
             return [f.split(".")[0] for f in os.listdir(save_path) if f.endswith(".json")]
         return []
 
-    def get_available_trips(_self):
+    def get_available_trips(self):
         """
-        Retrieve a list a dictionary of available trips.
-        The dictionary contains the trip ID and the trip title.
+        Retrieve a list of available trips with their IDs and titles.
+
+        Returns:
+            list: A list of dictionaries containing trip ID and title.
         """
         available_trips = []
-        for trip_id in _self.get_available_trip_ids():
-            trip_title = _self.get_trip_data(trip_id, "title")
+        for trip_id in self.get_available_trip_ids():
+            trip_title = self.get_trip_data(trip_id, "title")
             available_trips.append({"id": trip_id, "title": trip_title})
         return available_trips
