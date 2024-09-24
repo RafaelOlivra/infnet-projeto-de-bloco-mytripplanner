@@ -69,7 +69,7 @@ class TripData:
         return False
 
     @st.cache_data(ttl=10)
-    def get_trip_data(self, id, key=""):
+    def get_trip_data(_self, id, key=""):
         """
         Retrieve trip data for the specified trip ID. Optionally, return a specific key.
 
@@ -80,13 +80,13 @@ class TripData:
         Returns:
             dict or None: The trip data or the specific key value if found.
         """
-        data = self.get_trip_json(id)
+        data = _self.get_trip_json(id)
         if data and key:
             return data.get(key)
         return data
 
     @st.cache_data(ttl=10)
-    def get_trip_json(self, id):
+    def get_trip_json(_self, id):
         """
         Retrieve the JSON data for the specified trip ID.
 
@@ -96,14 +96,14 @@ class TripData:
         Returns:
             dict or None: The JSON data for the trip, or None if not found.
         """
-        id = self.app_data.sanitize_id(id)
-        save_path = self.app_data._get_storage_map().get("trip")
+        id = _self.app_data.sanitize_id(id)
+        save_path = _self.app_data._get_storage_map().get("trip")
         file_path = f"{save_path}/{id}.json"
 
         if os.path.exists(file_path):
             with open(file_path, "r", encoding="utf-8") as f:
                 try:
-                    data = json.load(f)
+                    data = json.loads(json.load(f))
                     return data
                 except json.JSONDecodeError as e:
                     print(f"Error loading trip JSON: {e}")

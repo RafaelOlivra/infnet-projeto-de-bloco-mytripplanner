@@ -105,10 +105,9 @@ def Cadastrar():
     origin = f"{origin_city}, {origin_state}"
     destination = f"{destination_city}, {destination_state}"
     iframe_url = google_maps.get_google_maps_directions_iframe_url(
-        origin, destination)
+        origin, destination, zoom=7)
 
-    with st.spinner('Carregando mapa...'):
-        components.iframe(iframe_url, height=450)
+    components.iframe(iframe_url, height=450)
 
     if not destination_city and not destination_state:
         return
@@ -139,6 +138,7 @@ def Cadastrar():
         weather_view = WeatherView(destination_city, destination_state)
         weather_view.display_forecast()
 
+    # Goals
     st.write('---')
     st.write('### 🏟️ 4. Objetivos ')
 
@@ -162,6 +162,7 @@ def Cadastrar():
     if not goals:
         return
 
+    # Trip AI generation
     st.write('---')
     st.write('### 🤖 5. Gerar Roteiro com IA')
     st.write('Aqui você pode consultar e criar um roteiro da viagem com ajuda de Inteligência Artificial.')
@@ -180,6 +181,7 @@ def Cadastrar():
         key='1'
     )
 
+    # Save trip
     if st.button('Cadastrar', key='cadastrar', type='primary', use_container_width=True):
         time_format = Trip()._get_time_format()
         trip_data = {
