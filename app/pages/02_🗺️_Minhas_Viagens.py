@@ -95,7 +95,10 @@ def View_Trip():
     st.write('### 🗑️ Deletar Viagem')
     st.write('Clique no botão abaixo para deletar a viagem.')
     st.error('**Atenção:** Esta ação é irreversível.')
-    if st.button('Deletar Viagem', key='delete_trip', type='primary', use_container_width=True):
+
+    confirm_delete = st.checkbox(
+        'Confirmar a exclusão da viagem', key='confirm_delete')
+    if st.button('Deletar Viagem', key='delete_trip', type='primary', use_container_width=True, disabled=(not confirm_delete)) and confirm_delete:
         TripData().delete(trip.id)
         st.session_state.selected_trip_id = None
         st.success('Viagem deletada com sucesso!')
