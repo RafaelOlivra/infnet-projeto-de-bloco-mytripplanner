@@ -62,7 +62,7 @@ def Cadastrar():
         initial_sidebar_state="expanded",
     )
 
-    st.title('✏️ Planejar Viagem')
+    st.title('✏️ Planejar Nova Viagem')
     st.write(
         '''
         Comece a planejar sua viagem preenchendo as informações abaixo.
@@ -181,23 +181,19 @@ def Cadastrar():
     )
 
     if st.button('Cadastrar', key='cadastrar', type='primary', use_container_width=True):
+        time_format = Trip()._get_time_format()
         trip_data = {
             "title": title,
             "origin_city": origin_city,
             "origin_state": origin_state,
             "destination_city": destination_city,
             "destination_state": destination_state,
-            "start_date": start_date,
-            "end_date": end_date,
+            "start_date": start_date.strftime(time_format),
+            "end_date": end_date.strftime(time_format),
             "goals": goals,
             'tags': tags,
             "notes": notes
         }
-
-        # Make sure we have all the required data
-        if not all(trip_data.values()):
-            st.error('Por favor, preencha todos os campos obrigatórios.')
-            return
 
         trip = Trip(trip_data=trip_data)
         if trip:

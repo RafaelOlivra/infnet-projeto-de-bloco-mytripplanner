@@ -227,10 +227,10 @@ class Trip:
     def _validate(self, trip_data):
         required_fields = ["title", "origin_city", "origin_state",
                            "destination_city", "destination_state", "start_date", "end_date"]
+
         for field in required_fields:
             if not trip_data.get(field):
                 return False
-
         try:
             datetime.strptime(trip_data["start_date"], self._get_time_format())
             datetime.strptime(trip_data["end_date"], self._get_time_format())
