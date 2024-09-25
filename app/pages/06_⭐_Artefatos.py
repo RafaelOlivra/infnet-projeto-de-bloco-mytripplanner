@@ -5,10 +5,10 @@ def About():
 
     # Set page title
     st.set_page_config(
-        page_title="MyTripPlanner",
-        page_icon="🗺️",
+        page_title="Artefatos",
+        page_icon="⭐",
         layout='wide',
-        initial_sidebar_state="expanded",
+        initial_sidebar_state="collapsed",
     )
 
     st.title('🗺️ MyTripPlanner')
