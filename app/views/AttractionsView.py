@@ -6,7 +6,7 @@ import json
 
 
 class AttractionsView:
-    def __init__(self, city_name: str = "", state_name: str = "", start: int = 0, limit: int = 12, attractions=None):
+    def __init__(self, city_name: str = "", state_name: str = "", start: int = 0, limit: int = 50, attractions=None):
         """
         Initialize the AttractionsView class.
 
