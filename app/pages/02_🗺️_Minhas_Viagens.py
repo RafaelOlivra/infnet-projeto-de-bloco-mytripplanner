@@ -8,7 +8,7 @@ import time
 # --------------------------
 # Session State
 # --------------------------
-if 'selected_trip_id' not in st.session_state:
+if "selected_trip_id" not in st.session_state:
     st.session_state.selected_trip_id = None
 
 
@@ -20,7 +20,7 @@ def View_Trip():
     st.set_page_config(
         page_title="Minhas Viagens",
         page_icon="🗺️",
-        layout='wide',
+        layout="wide",
         initial_sidebar_state="expanded",
     )
 
@@ -52,53 +52,67 @@ def View_Trip():
             break
 
     selected_trip_id = st.selectbox(
-        "Selecione uma viagem:", options=options, index=selected_index, key='select_trip')
-    selected_trip_id = selected_trip_id.split('(')[-1].split(')')[0]
+        "Selecione uma viagem:",
+        options=options,
+        index=selected_index,
+        key="select_trip",
+    )
+    selected_trip_id = selected_trip_id.split("(")[-1].split(")")[0]
 
     trip = Trip(id=selected_trip_id)
     df = pd.read_csv(StringIO(trip.to_csv()))
     st.dataframe(df)
 
     # Allow users to export the trip data
-    st.write('---')
-    st.write('### ⬇️ Exportar Dados da Viagem')
-    st.write(
-        'Clique no botão abaixo para baixar os dados da viagem.')
+    st.write("---")
+    st.write("### ⬇️ Exportar Dados da Viagem")
+    st.write("Clique no botão abaixo para baixar os dados da viagem.")
     col1, col2 = st.columns(2)
     with col1:
         csv_data = trip.to_csv()
         st.download_button(
-            label='Exportar Dados da Viagem (CSV)',
+            label="Exportar Dados da Viagem (CSV)",
             data=csv_data,
-            file_name=f'{trip.slug}.csv',
-            mime='text/csv',
-            use_container_width=True
+            file_name=f"{trip.slug}.csv",
+            mime="text/csv",
+            use_container_width=True,
         )
     with col2:
         json_data = trip.to_json()
         st.download_button(
-            label='Exportar Dados da Viagem (JSON)',
+            label="Exportar Dados da Viagem (JSON)",
             data=json_data,
-            file_name=f'{trip.slug}.json',
-            mime='application/json',
-            use_container_width=True
+            file_name=f"{trip.slug}.json",
+            mime="application/json",
+            use_container_width=True,
         )
 
     # Allow users to delete the trip
-    st.write('---')
-    st.write('### 🗑️ Deletar Viagem')
-    st.write('Clique no botão abaixo para deletar a viagem.')
-    st.error('**Atenção:** Esta ação é irreversível.')
+    st.write("---")
+    st.write("### 🗑️ Deletar Viagem")
+    st.write("Clique no botão abaixo para deletar a viagem.")
+    st.error("**Atenção:** Esta ação é irreversível.")
 
-    confirm_delete = st.checkbox(
-        'Confirmar a exclusão da viagem', key='confirm_delete')
-    if st.button('Deletar Viagem', key='delete_trip', type='primary', use_container_width=True, disabled=(not confirm_delete)) and confirm_delete:
+    confirm_delete = st.checkbox("Confirmar a exclusão da viagem", key="confirm_delete")
+    if (
+        st.button(
+            "Deletar Viagem",
+            key="delete_trip",
+            type="primary",
+            use_container_width=True,
+            disabled=(not confirm_delete),
+        )
+        and confirm_delete
+    ):
         TripData().delete(trip.id)
         st.session_state.selected_trip_id = None
-        st.success('Viagem deletada com sucesso!')
-        with st.spinner('Atualizando...'):
+        st.success("Viagem deletada com sucesso!")
+        with st.spinner("Atualizando..."):
             time.sleep(2)
             st.switch_page("pages/02_🗺️_Minhas_Viagens.py")
 
 
+# --------------------------
+# INIT
+# --------------------------
 View_Trip()

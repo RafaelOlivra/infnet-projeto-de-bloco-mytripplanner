@@ -55,5 +55,7 @@ def View_Trip():
             time.sleep(2)
             st.switch_page("pages/02_🗺️_Minhas_Viagens.py")
 
-
+# --------------------------
+# INIT
+# --------------------------
 View_Trip()

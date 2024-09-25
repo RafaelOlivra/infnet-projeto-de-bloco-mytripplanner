@@ -213,5 +213,7 @@ def Cadastrar():
         else:
             st.error('Erro ao cadastrar a viagem.')
 
-
+# --------------------------
+# INIT
+# --------------------------
 Cadastrar()

@@ -23,7 +23,7 @@ class CityStateData:
         Returns:
             list: A list of state names.
         """
-        return [state['nome'] for state in self.city_state_data.get('estados', [])]
+        return [state["nome"] for state in self.city_state_data.get("estados", [])]
 
     def get_ufs(self):
         """
@@ -32,7 +32,7 @@ class CityStateData:
         Returns:
             list: A list of state abbreviations (UFs).
         """
-        return [state['sigla'] for state in self.city_state_data.get('estados', [])]
+        return [state["sigla"] for state in self.city_state_data.get("estados", [])]
 
     def get_cities_by_state(self, state):
         """
@@ -44,9 +44,9 @@ class CityStateData:
         Returns:
             list: A list of city names in the given state.
         """
-        for s in self.city_state_data.get('estados', []):
-            if s['nome'].lower() == state.lower():
-                return s['cidades']
+        for s in self.city_state_data.get("estados", []):
+            if s["nome"].lower() == state.lower():
+                return s["cidades"]
         return []
 
     def get_cities_by_uf(self, uf):
@@ -59,7 +59,7 @@ class CityStateData:
         Returns:
             list: A list of city names in the given state.
         """
-        for s in self.city_state_data.get('estados', []):
-            if s['sigla'].lower() == uf.lower():
-                return s['cidades']
+        for s in self.city_state_data.get("estados", []):
+            if s["sigla"].lower() == uf.lower():
+                return s["cidades"]
         return []

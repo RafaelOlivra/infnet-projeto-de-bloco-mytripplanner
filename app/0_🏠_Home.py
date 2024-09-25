@@ -11,34 +11,32 @@ from services.YelpScrapper import YelpScrapper
 # ---------------------------
 
 # Load environment variables
-load_dotenv(find_dotenv('../.env'))
+load_dotenv(find_dotenv("../.env"))
 
 
 # --------------------------
-# Pages
+# Page
 # ---------------------------
-
-# Home Page
 def Home():
 
     # Set page title
     st.set_page_config(
         page_title="MyTripPlanner",
         page_icon="🗺️",
-        layout='wide',
+        layout="wide",
         initial_sidebar_state="expanded",
     )
 
-    st.title('🗺️ MyTripPlanner')
+    st.title("🗺️ MyTripPlanner")
     st.write(
-        '''
+        """
         O MyTripPlanner é um aplicativo de planejamento de viagens, projetado para ajudar os usuários a organizarem suas jornadas de forma eficiente e personalizada. O app oferece previsões meteorológicas detalhadas e sugestões de roteiros para o destino escolhido, utilizando dados precisos de diversas APIs e integração com Inteligência Artificial. Com o MyTripPlanner, os viajantes podem desfrutar de uma experiência tranquila e agradável, sem surpresas indesejadas pelo caminho.
-        '''
+        """
     )
 
 
-####################
+# --------------------------
 # INIT
-####################
-if __name__ == '__main__':
+# --------------------------
+if __name__ == "__main__":
     Home()

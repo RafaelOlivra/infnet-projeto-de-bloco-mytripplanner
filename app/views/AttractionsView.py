@@ -6,7 +6,14 @@ import json
 
 
 class AttractionsView:
-    def __init__(self, city_name: str = "", state_name: str = "", start: int = 0, limit: int = 50, attractions=None):
+    def __init__(
+        self,
+        city_name: str = "",
+        state_name: str = "",
+        start: int = 0,
+        limit: int = 50,
+        attractions=None,
+    ):
         """
         Initialize the AttractionsView class.
 
@@ -37,14 +44,17 @@ class AttractionsView:
                 return json.loads(json_string)
             else:
                 json_string = YelpScrapper().get_near_attractions_json(
-                    self.city_name, self.state_name, self.start, self.limit)
+                    self.city_name, self.state_name, self.start, self.limit
+                )
                 if json_string:
                     data = json.loads(json_string)
                     AttractionsData().save(self.id, data)
                     return data
                 return {}
 
-    def display_attractions(self, display_selector=False, selected_attractions=None, on_change=None):
+    def display_attractions(
+        self, display_selector=False, selected_attractions=None, on_change=None
+    ):
         """
         Display the attractions data in a grid layout.
 
@@ -60,8 +70,9 @@ class AttractionsView:
                     if display_selector:
                         self.display_attraction_selector(
                             attraction,
-                            selected=selected_attractions and attraction['name'] in selected_attractions,
-                            on_change=on_change
+                            selected=selected_attractions
+                            and attraction["name"] in selected_attractions,
+                            on_change=on_change,
                         )
                     else:
                         self.display_attraction_card(attraction)
@@ -75,9 +86,9 @@ class AttractionsView:
         Args:
             attraction (dict): Dictionary containing attraction data.
         """
-        st.image(attraction['image'], use_column_width=True)
+        st.image(attraction["image"], use_column_width=True)
         st.markdown(f"##### {attraction['name']}")
-        if attraction.get('description'):
+        if attraction.get("description"):
             st.markdown(f"{attraction['description']}")
         st.markdown(f"[Mais informações]({attraction['url']})")
 
@@ -90,33 +101,35 @@ class AttractionsView:
             on_change (function): Callback function to handle changes in selection (optional).
             selected (bool): Whether the attraction is pre-selected (default: False).
         """
-        st.image(attraction['image'], use_column_width=True)
+        st.image(attraction["image"], use_column_width=True)
 
         # Display a star for review_stars
         stars = ""
-        for _ in range(int(attraction['review_stars'])):
+        for _ in range(int(attraction["review_stars"])):
             stars += "⭐"
 
-        review_count = attraction.get('review_count')
+        review_count = attraction.get("review_count")
         review_count = f"({review_count} reviews)" if review_count else ""
-        title = attraction['name']
-        description = attraction.get('description') or ""
-        url = attraction.get('url')
+        title = attraction["name"]
+        description = attraction.get("description") or ""
+        url = attraction.get("url")
         url = f"[Mais informações]({url}) ⧉" if url else ""
 
-        st.write(f"""
+        st.write(
+            f"""
                     **{title}**  \
 
                     {stars} {review_count}  \
 
                     {url}
-                    """)
+                    """
+        )
 
-        if st.checkbox("Selecionar", key=attraction['name'], value=selected):
+        if st.checkbox("Selecionar", key=attraction["name"], value=selected):
             if on_change:
-                on_change(attraction['name'])
+                on_change(attraction["name"])
         elif on_change:
-            on_change(attraction['name'], remove=True)
+            on_change(attraction["name"], remove=True)
 
     # --------------------------
     # Utils

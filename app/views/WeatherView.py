@@ -30,7 +30,9 @@ class WeatherView:
         """
         Get the weather data for the specified city and state.
         """
-        return OpenWeatherMap().get_forecast_for_next_5_days(self.city_name, self.state_name)
+        return OpenWeatherMap().get_forecast_for_next_5_days(
+            self.city_name, self.state_name
+        )
 
     # Function to map weather description to icon (you can customize this as needed)
     def get_weather_icon(self, weather_desc):
@@ -82,7 +84,7 @@ class WeatherView:
             "furacão": "🌀",
             "chuva de granizo": "🌨️",
             # Default for unknown descriptions
-            "desconhecido": "🌡️"
+            "desconhecido": "🌡️",
         }
         # Default to thermometer emoji
         return weather_icons.get(weather_desc, "🌡️")
@@ -106,18 +108,19 @@ class WeatherView:
             if i < 5:  # Only show the first 5 days
                 with cols[i]:
                     # Display the weather icon
-                    weather_icon = self.get_weather_icon(forecast['weather'])
+                    weather_icon = self.get_weather_icon(forecast["weather"])
                     st.write(f"#### {weather_icon}")
 
                     # Format the date to DD-MM-YYYY
-                    forecast_timestamp = forecast['timestamp']
-                    forecast_date = datetime.fromtimestamp(
-                        forecast_timestamp).strftime('%d-%m-%Y')
+                    forecast_timestamp = forecast["timestamp"]
+                    forecast_date = datetime.fromtimestamp(forecast_timestamp).strftime(
+                        "%d-%m-%Y"
+                    )
 
                     # Display the weather and temperature using st.metric
                     st.metric(
                         label=f"{forecast_date}",
                         value=f"{int(forecast['temperature_max'])}°C",
-                        delta=f"Min: {int(forecast['temperature_min'])}°C"
+                        delta=f"Min: {int(forecast['temperature_min'])}°C",
                     )
                     i += 1

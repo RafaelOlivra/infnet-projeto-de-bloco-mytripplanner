@@ -27,7 +27,8 @@ class OpenWeatherMap:
         """
         lat, long = _self.get_coordinates(city_name, state_name)
         data = _self._fetch_json(
-            url=f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={long}&lang=pt_br&appid={_self.api_key}")
+            url=f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={long}&lang=pt_br&appid={_self.api_key}"
+        )
         return _self._flatten_weather_data(data)
 
     @st.cache_data(ttl=86400)
@@ -57,8 +58,9 @@ class OpenWeatherMap:
             tuple: A tuple containing the latitude and longitude coordinates of the city.
         """
         data = _self._fetch_json(
-            url=f"http://api.openweathermap.org/geo/1.0/direct?q={_self._url_encode(city_name)},{_self._url_encode(state_name)},Brazil&lang=pt_br&appid={_self.api_key}")
-        return data[0]['lat'], data[0]['lon']
+            url=f"http://api.openweathermap.org/geo/1.0/direct?q={_self._url_encode(city_name)},{_self._url_encode(state_name)},Brazil&lang=pt_br&appid={_self.api_key}"
+        )
+        return data[0]["lat"], data[0]["lon"]
 
     @st.cache_data(ttl=86400)
     def get_hourly_forecast(_self, city_name: str, state_name: str, days: int = 5):
@@ -84,18 +86,20 @@ class OpenWeatherMap:
         """
         lat, long = _self.get_coordinates(city_name, state_name)
         data = _self._fetch_json(
-            url=f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={long}&units=metric&lang=pt_br&appid={_self.api_key}")
+            url=f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={long}&units=metric&lang=pt_br&appid={_self.api_key}"
+        )
 
-        forecast_list = data['list']
+        forecast_list = data["list"]
         hourly_forecast = {}
         current_date = datetime.now().date()
 
         for forecast in forecast_list:
-            forecast_timestamp = int(forecast['dt'])
+            forecast_timestamp = int(forecast["dt"])
             forecast_datetime = datetime.fromtimestamp(forecast_timestamp)
             forecast_date = forecast_datetime.date()
             forecast_date_str = _self._format_date(
-                forecast_timestamp)  # International datetime
+                forecast_timestamp
+            )  # International datetime
 
             # Check if we are still within the selected days
             if forecast_date > current_date + timedelta(days=int(days)):
@@ -106,13 +110,13 @@ class OpenWeatherMap:
                 hourly_forecast[forecast_date_str] = []
 
             hourly_forecast[forecast_date_str] = {
-                'timestamp': forecast_timestamp,
-                'date': forecast_date_str,
-                'city_name': city_name,
-                'state_name': state_name,
-                'temperature': forecast['main']['temp'],
-                'weather': forecast['weather'][0]['description'],
-                'wind_speed': forecast['wind']['speed']
+                "timestamp": forecast_timestamp,
+                "date": forecast_date_str,
+                "city_name": city_name,
+                "state_name": state_name,
+                "temperature": forecast["main"]["temp"],
+                "weather": forecast["weather"][0]["description"],
+                "wind_speed": forecast["wind"]["speed"],
             }
 
         return _self._flatten_forecast_data(hourly_forecast)
@@ -141,7 +145,8 @@ class OpenWeatherMap:
         """
         # Reuse the hourly forecast function to get all the hourly data
         hourly_forecast = _self.get_hourly_forecast(
-            city_name, state_name, days=5)  # Fetching for the next 5 days
+            city_name, state_name, days=5
+        )  # Fetching for the next 5 days
 
         # Dictionary to hold the aggregated daily data
         daily_forecast = {}
@@ -149,52 +154,57 @@ class OpenWeatherMap:
         # Iterate over each forecast entry in hourly_forecast
         for forecast in hourly_forecast:
             # Extract the date part from the "date" field (YYYY-MM-DD)
-            date_str = forecast['date'].split('T')[0]
+            date_str = forecast["date"].split("T")[0]
 
             # Initialize daily forecast data if this is the first entry for this day
             if date_str not in daily_forecast:
 
                 daily_forecast[date_str] = {
-                    'date': date_str,
-                    'timestamp': forecast['timestamp'],
-                    'city_name': city_name,
-                    'state_name': state_name,
-                    'temperature_min': float('inf'),
-                    'temperature_max': float('-inf'),
-                    'weather_descriptions': [],
-                    'wind_speeds': []
+                    "date": date_str,
+                    "timestamp": forecast["timestamp"],
+                    "city_name": city_name,
+                    "state_name": state_name,
+                    "temperature_min": float("inf"),
+                    "temperature_max": float("-inf"),
+                    "weather_descriptions": [],
+                    "wind_speeds": [],
                 }
 
             # Update temperature_min and temperature_max for the day
-            daily_forecast[date_str]['temperature_min'] = min(
-                daily_forecast[date_str]['temperature_min'], forecast['temperature'])
-            daily_forecast[date_str]['temperature_max'] = max(
-                daily_forecast[date_str]['temperature_max'], forecast['temperature'])
+            daily_forecast[date_str]["temperature_min"] = min(
+                daily_forecast[date_str]["temperature_min"], forecast["temperature"]
+            )
+            daily_forecast[date_str]["temperature_max"] = max(
+                daily_forecast[date_str]["temperature_max"], forecast["temperature"]
+            )
 
             # Append weather description and wind speed for later aggregation
-            daily_forecast[date_str]['weather_descriptions'].append(
-                forecast['weather'])
-            daily_forecast[date_str]['wind_speeds'].append(
-                forecast['wind_speed'])
+            daily_forecast[date_str]["weather_descriptions"].append(forecast["weather"])
+            daily_forecast[date_str]["wind_speeds"].append(forecast["wind_speed"])
 
         # Finalize daily forecast by aggregating wind speeds and finding the most common weather description
         for date_str, daily_data in daily_forecast.items():
             # Get the most common weather description for the day
-            daily_data['weather'] = max(set(
-                daily_data['weather_descriptions']), key=daily_data['weather_descriptions'].count)
+            daily_data["weather"] = max(
+                set(daily_data["weather_descriptions"]),
+                key=daily_data["weather_descriptions"].count,
+            )
 
             # Calculate average wind speed for the day
-            daily_data['wind_speed'] = sum(
-                daily_data['wind_speeds']) / len(daily_data['wind_speeds'])
+            daily_data["wind_speed"] = sum(daily_data["wind_speeds"]) / len(
+                daily_data["wind_speeds"]
+            )
 
             # Remove the temporary fields
-            del daily_data['weather_descriptions']
-            del daily_data['wind_speeds']
+            del daily_data["weather_descriptions"]
+            del daily_data["wind_speeds"]
 
         return _self._flatten_forecast_data(daily_forecast)
 
     @st.cache_data(ttl=86400)
-    def get_forecast_between_dates(_self, city_name: str, state_name: str, start_date: str, end_date: str):
+    def get_forecast_between_dates(
+        _self, city_name: str, state_name: str, start_date: str, end_date: str
+    ):
         """
         Retrieves the weather forecast between specified start and end dates by aggregating hourly forecast data.
 
@@ -210,60 +220,66 @@ class OpenWeatherMap:
         """
         # Fetch hourly forecast data
         hourly_forecast = _self.get_hourly_forecast(
-            city_name, state_name, days=5)  # Fetching for the next 5 days
+            city_name, state_name, days=5
+        )  # Fetching for the next 5 days
 
         # Dictionary to hold the aggregated daily data
         daily_forecast = {}
 
         # Convert start_date and end_date to datetime objects
-        start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
 
         # Iterate over each forecast entry in hourly_forecast
         for forecast in hourly_forecast:
             # Extract the date part from the "date" field (YYYY-MM-DD)
-            date_str = forecast['date'].split('T')[0]
-            forecast_date = datetime.strptime(date_str, '%Y-%m-%d')
+            date_str = forecast["date"].split("T")[0]
+            forecast_date = datetime.strptime(date_str, "%Y-%m-%d")
 
             # Check if the forecast date is within the specified range
             if start_date <= forecast_date <= end_date:
                 if date_str not in daily_forecast:
                     daily_forecast[date_str] = {
-                        'date': date_str,
-                        'timestamp': forecast['timestamp'],
-                        'city_name': city_name,
-                        'state_name': state_name,
-                        'temperature_min': float('inf'),
-                        'temperature_max': float('-inf'),
-                        'weather_descriptions': [],
-                        'wind_speeds': []
+                        "date": date_str,
+                        "timestamp": forecast["timestamp"],
+                        "city_name": city_name,
+                        "state_name": state_name,
+                        "temperature_min": float("inf"),
+                        "temperature_max": float("-inf"),
+                        "weather_descriptions": [],
+                        "wind_speeds": [],
                     }
 
                 # Update temperature_min and temperature_max for the day
-                daily_forecast[date_str]['temperature_min'] = min(
-                    daily_forecast[date_str]['temperature_min'], forecast['temperature'])
-                daily_forecast[date_str]['temperature_max'] = max(
-                    daily_forecast[date_str]['temperature_max'], forecast['temperature'])
+                daily_forecast[date_str]["temperature_min"] = min(
+                    daily_forecast[date_str]["temperature_min"], forecast["temperature"]
+                )
+                daily_forecast[date_str]["temperature_max"] = max(
+                    daily_forecast[date_str]["temperature_max"], forecast["temperature"]
+                )
 
                 # Append weather description and wind speed for later aggregation
-                daily_forecast[date_str]['weather_descriptions'].append(
-                    forecast['weather'])
-                daily_forecast[date_str]['wind_speeds'].append(
-                    forecast['wind_speed'])
+                daily_forecast[date_str]["weather_descriptions"].append(
+                    forecast["weather"]
+                )
+                daily_forecast[date_str]["wind_speeds"].append(forecast["wind_speed"])
 
         # Finalize daily forecast by aggregating wind speeds and finding the most common weather description
         for date_str, daily_data in daily_forecast.items():
             # Get the most common weather description for the day
-            daily_data['weather'] = max(set(
-                daily_data['weather_descriptions']), key=daily_data['weather_descriptions'].count)
+            daily_data["weather"] = max(
+                set(daily_data["weather_descriptions"]),
+                key=daily_data["weather_descriptions"].count,
+            )
 
             # Calculate average wind speed for the day
-            daily_data['wind_speed'] = sum(
-                daily_data['wind_speeds']) / len(daily_data['wind_speeds'])
+            daily_data["wind_speed"] = sum(daily_data["wind_speeds"]) / len(
+                daily_data["wind_speeds"]
+            )
 
             # Remove the temporary fields
-            del daily_data['weather_descriptions']
-            del daily_data['wind_speeds']
+            del daily_data["weather_descriptions"]
+            del daily_data["wind_speeds"]
 
         return _self._flatten_forecast_data(daily_forecast)
 
@@ -333,7 +349,7 @@ class OpenWeatherMap:
             "Sunrise (UTC)": resp_json.get("sys", {}).get("sunrise"),
             "Sunset (UTC)": resp_json.get("sys", {}).get("sunset"),
             "Timezone (s)": resp_json.get("timezone"),
-            "Timestamp (dt)": resp_json.get("dt")
+            "Timestamp (dt)": resp_json.get("dt"),
         }
         return flattened_data
 
@@ -350,17 +366,25 @@ class OpenWeatherMap:
         """
         flattened_data = []
         for timestamp, entry in data.items():
-            flattened_data.append({
-                "timestamp": entry["timestamp"],
-                "date": entry["date"],
-                "city_name": entry["city_name"],
-                "state_name": entry["state_name"],
-                "temperature": entry["temperature"] if "temperature" in entry else None,
-                "temperature_min": entry["temperature_min"] if "temperature_min" in entry else None,
-                "temperature_max": entry["temperature_max"] if "temperature_max" in entry else None,
-                "weather": entry["weather"],
-                "wind_speed": entry["wind_speed"]
-            })
+            flattened_data.append(
+                {
+                    "timestamp": entry["timestamp"],
+                    "date": entry["date"],
+                    "city_name": entry["city_name"],
+                    "state_name": entry["state_name"],
+                    "temperature": (
+                        entry["temperature"] if "temperature" in entry else None
+                    ),
+                    "temperature_min": (
+                        entry["temperature_min"] if "temperature_min" in entry else None
+                    ),
+                    "temperature_max": (
+                        entry["temperature_max"] if "temperature_max" in entry else None
+                    ),
+                    "weather": entry["weather"],
+                    "wind_speed": entry["wind_speed"],
+                }
+            )
 
         return flattened_data
 
@@ -374,7 +398,7 @@ class OpenWeatherMap:
         Returns:
             str: The formatted date and time string.
         """
-        return datetime.fromtimestamp(timestamp).strftime('%Y-%m-%dT%H:%M:%S')
+        return datetime.fromtimestamp(timestamp).strftime("%Y-%m-%dT%H:%M:%S")
 
     def _url_encode(self, text):
         """

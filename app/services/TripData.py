@@ -119,7 +119,9 @@ class TripData:
         """
         save_path = self.app_data._get_storage_map().get("trip")
         if os.path.exists(save_path):
-            return [f.split(".")[0] for f in os.listdir(save_path) if f.endswith(".json")]
+            return [
+                f.split(".")[0] for f in os.listdir(save_path) if f.endswith(".json")
+            ]
         return []
 
     def get_available_trips(self):
