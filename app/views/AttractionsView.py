@@ -91,10 +91,26 @@ class AttractionsView:
             selected (bool): Whether the attraction is pre-selected (default: False).
         """
         st.image(attraction['image'], use_column_width=True)
-        st.markdown(f"##### {attraction['name']}")
-        if attraction.get('description'):
-            st.markdown(f"{attraction['description']}")
-        st.markdown(f"[Mais informações]({attraction['url']})")
+
+        # Display a star for review_stars
+        stars = ""
+        for _ in range(int(attraction['review_stars'])):
+            stars += "⭐"
+
+        review_count = attraction.get('review_count')
+        review_count = f"({review_count} reviews)" if review_count else ""
+        title = attraction['name']
+        description = attraction.get('description') or ""
+        url = attraction.get('url')
+        url = f"[Mais informações]({url}) ⧉" if url else ""
+
+        st.write(f"""
+                    **{title}**  \
+
+                    {stars} {review_count}  \
+
+                    {url}
+                    """)
 
         if st.checkbox("Selecionar", key=attraction['name'], value=selected):
             if on_change:

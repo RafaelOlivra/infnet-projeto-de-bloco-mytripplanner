@@ -41,7 +41,7 @@ class YelpScrapper:
             anchor = attraction.select_one('a[href^="/biz/"]:has(img)')
             # Review are inside a font element with text (x reviews)
             reviews = attraction.select('span')
-            review_text = "Sem avaliações"
+            review_text = ""
             review_stars = -1
             for review in reviews:
                 if " reviews)" in review.text:
