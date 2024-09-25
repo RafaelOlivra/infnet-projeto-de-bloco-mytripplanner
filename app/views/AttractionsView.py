@@ -36,9 +36,9 @@ class AttractionsView:
         Display the attractions data.
         """
         if self.attractions_data and len(self.attractions_data) > 0:
-            cols = st.columns(6)
+            cols = st.columns(5)
             for idx, attraction in enumerate(self.attractions_data):
-                with cols[idx % 6]:
+                with cols[idx % 5]:
                     if display_selector:
                         self.display_attraction_selector(
                             attraction, selected=selected_attractions and attraction['name'] in selected_attractions, on_change=on_change)

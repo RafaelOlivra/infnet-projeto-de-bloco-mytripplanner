@@ -30,18 +30,35 @@ class YelpScrapper:
         html = _self._fetch_html(url)
 
         soup = bs4.BeautifulSoup(html, "html.parser")
-        attractions = soup.select('a[href^="/biz/"]:has(img)')
+        attractions = soup.select('li div[data-testid="serp-ia-card"]')
+        # attractions = soup.select('a[href^="/biz/"]:has(img)')
 
         if not attractions:
             return {}
 
         cards = []
         for attraction in attractions:
+            anchor = attraction.select_one('a[href^="/biz/"]:has(img)')
+            # Review are inside a font element with text (x reviews)
+            reviews = attraction.select('span')
+            review_text = "Sem avaliações"
+            review_stars = -1
+            for review in reviews:
+                if " reviews)" in review.text:
+                    review_text = review.text.replace(
+                        " reviews)", "").replace("(", "")
+                    review_stars = 0
+                    review_stars = float(review.previous_sibling.text)
+                    if review_stars > 5 or review_stars < 0:
+                        review_stars = -1
+
             card = {
-                "name": attraction.select_one('img')['alt'],
-                "url": f"https://www.yelp.com{attraction['href']}",
+                "name": anchor.select_one('img')['alt'],
+                "url": f"https://www.yelp.com{anchor['href']}",
+                "review_count": review_text,
+                "review_stars": review_stars,
                 "description": "",
-                "image": attraction.select_one('img')['src']
+                "image": anchor.select_one('img')['src']
             }
             cards.append(card)
             if len(cards) >= limit:
@@ -50,6 +67,7 @@ class YelpScrapper:
         # Return the JSON data
         return json.dumps(cards)
 
+    @st.cache_data(ttl=86400)
     def _fetch_html(_self, url: str) -> str:
         """
         Fetches the HTML content from the given URL.
