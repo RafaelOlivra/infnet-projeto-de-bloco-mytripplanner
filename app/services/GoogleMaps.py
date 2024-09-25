@@ -6,13 +6,21 @@ import streamlit as st
 
 class GoogleMaps:
     def __init__(self, api_key=None):
-        # Set the API key, either from the environment or directly from the parameter
+        """
+        Initializes the GoogleMaps class.
+
+        Args:
+        - api_key (str, optional): The API key for Google Maps. If not provided, it attempts to retrieve the key
+          from AppData.
+
+        Raises:
+        - ValueError: If the API key is not provided or cannot be retrieved from AppData.
+        """
         self.api_key = api_key or AppData().get_api_key("googlemaps")
         if not self.api_key:
             raise ValueError("API key is required for Google Maps API")
 
-    @st.cache_data(ttl=86400)
-    def get_latitude_longitude(_self, location: str) -> tuple[float, float]:
+    def get_latitude_longitude(self, location: str) -> tuple[float, float]:
         """
         Retrieve latitude and longitude for a given location using the Google Maps Geocoding API.
 
@@ -25,8 +33,8 @@ class GoogleMaps:
         Raises:
         - ValueError: If the location cannot be geocoded.
         """
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={_self._url_encode(location)}&key={_self.api_key}"
-        data = _self._fetch_json(url)
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={self._url_encode(location)}&key={self.api_key}"
+        data = self._fetch_json(url)
 
         # Check if the request was successful
         if data.get("status") == "OK" and len(data.get("results", [])) > 0:
@@ -35,48 +43,71 @@ class GoogleMaps:
         else:
             raise ValueError(f"Could not retrieve coordinates for location: {location}")
 
-    def get_directions_url(_self, origin: str, destination: str) -> str:
+    def get_directions_url(
+        self, origin: str, destination: str, location_mode: str | None = "coordinates"
+    ) -> str:
         """
         Generate Google Maps directions URL.
 
         Args:
         - origin (str): Starting location.
         - destination (str): Destination location.
+        - location_mode (str, optional): Whether to use coordinates or addresses. Defaults to "coordinates".
 
         Returns:
         - str: URL for Google Maps directions.
         """
+        if location_mode == "coordinates":
+            origin_lat_long = self.get_latitude_longitude(origin)
+            destination_lat_long = self.get_latitude_longitude(destination)
+            origin = f"{origin_lat_long[0]}, {origin_lat_long[1]}"
+            destination = f"{destination_lat_long[0]}, {destination_lat_long[1]}"
+        else:
+            origin = self._url_encode(origin)
+            destination = self._url_encode(destination)
+
         base_url = "https://www.google.com/maps/dir/?api=1"
-        url = f"{base_url}&origin={_self._url_encode(origin)}&destination={_self._url_encode(destination)}"
+        url = f"{base_url}&origin={origin}&destination={destination}"
         return url
 
     def get_directions(
-        _self, origin: str, destination: str, mode: str | None = None
+        self,
+        origin: str,
+        destination: str,
+        mode: str | None = None,
+        location_mode: str | None = "coordinates",
     ) -> dict:
         """
-        Get directions from an origin to a destination using Google Maps API.
+        Get directions from an origin to a destination using the Google Maps Directions API.
 
         Args:
         - origin (str): The starting location for directions.
         - destination (str): The destination location for directions.
-        - mode (str, optional): The mode of transportation. Defaults to 'car'.
+        - mode (str, optional): The mode of transportation (e.g., driving, walking). Defaults to 'car'.
 
         Returns:
         - dict: The directions data.
         """
-        origin_lat_long = _self.get_latitude_longitude(origin)
-        destination_lat_long = _self.get_latitude_longitude(destination)
+        if location_mode == "coordinates":
+            origin_lat_long = self.get_latitude_longitude(origin)
+            destination_lat_long = self.get_latitude_longitude(destination)
+            origin = f"{origin_lat_long[0]}, {origin_lat_long[1]}"
+            destination = f"{destination_lat_long[0]}, {destination_lat_long[1]}"
+        else:
+            origin = self._url_encode(origin)
+            destination = self._url_encode(destination)
 
         mode_param = f"&mode={mode}" if mode else ""
-        url = f"https://maps.googleapis.com/maps/api/directions/json?key={_self.api_key}&origin={origin_lat_long[0]},{origin_lat_long[1]}&destination={destination_lat_long[0]},{destination_lat_long[1]}{mode_param}"
-        return _self._fetch_json(url)
+        url = f"https://maps.googleapis.com/maps/api/directions/json?key={self.api_key}&origin={origin}&destination={destination}{mode_param}"
+        return self._fetch_json(url)
 
     def get_google_maps_directions_iframe_url(
-        _self,
+        self,
         origin: str,
         destination: str,
         zoom: int | None = None,
         mode: str | None = None,
+        location_mode: str | None = "coordinates",
     ) -> str:
         """
         Generate URL code for an iframe that displays Google Maps directions.
@@ -85,17 +116,23 @@ class GoogleMaps:
         - origin (str): The starting location for directions.
         - destination (str): The destination location for directions.
         - zoom (int, optional): The zoom level for the map.
-        - mode (str, optional): The mode of transportation.
+        - mode (str, optional): The mode of transportation (e.g., driving, walking).
 
         Returns:
         - str: URL for the embeddable iframe.
         """
-        origin_lat_long = _self.get_latitude_longitude(origin)
-        destination_lat_long = _self.get_latitude_longitude(destination)
+        if location_mode == "coordinates":
+            origin_lat_long = self.get_latitude_longitude(origin)
+            destination_lat_long = self.get_latitude_longitude(destination)
+            origin = f"{origin_lat_long[0]}, {origin_lat_long[1]}"
+            destination = f"{destination_lat_long[0]}, {destination_lat_long[1]}"
+        else:
+            origin = self._url_encode(origin)
+            destination = self._url_encode(destination)
 
         zoom_param = f"&zoom={zoom}" if zoom is not None else ""
         mode_param = f"&mode={mode}" if mode else ""
-        url = f"https://www.google.com/maps/embed/v1/directions?key={_self.api_key}&origin={origin_lat_long[0]},{origin_lat_long[1]}&destination={destination_lat_long[0]},{destination_lat_long[1]}&units=metric{zoom_param}{mode_param}"
+        url = f"https://www.google.com/maps/embed/v1/directions?key={self.api_key}&origin={origin}&destination={destination}&units=metric{zoom_param}{mode_param}"
         return url
 
     @st.cache_data(ttl=86400)
@@ -104,13 +141,13 @@ class GoogleMaps:
         Fetch JSON data from the specified URL.
 
         Args:
-            url (str): The URL to fetch the JSON data from.
+        - url (str): The URL to fetch the JSON data from.
 
         Returns:
-            dict: The JSON data as a dictionary.
+        - dict: The JSON data as a dictionary.
 
         Raises:
-            requests.exceptions.RequestException: For any network-related errors.
+        - requests.exceptions.RequestException: For any network-related errors.
         """
         try:
             response = requests.get(url)
@@ -119,7 +156,7 @@ class GoogleMaps:
         except requests.exceptions.RequestException as e:
             raise ValueError(f"Error fetching data from {url}: {str(e)}")
 
-    def _url_encode(_self, text: str) -> str:
+    def _url_encode(self, text: str) -> str:
         """
         Encode a text string for use in a URL.
 

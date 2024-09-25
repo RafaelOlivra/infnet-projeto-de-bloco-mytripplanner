@@ -298,11 +298,11 @@ class Trip:
 
     def _get_travel_by_options(self):
         options = {
-            "driving": "🚗 Dirigindo",
-            "walking": "🚶 Caminhando",
-            "bicycling": "🚴 Pedalando",
+            "driving": "🚗 Carro",
+            "walking": "🚶 A pé",
+            "bicycling": "🚴 Bicicleta",
             "transit": "🚇 Transporte Público",
-            "flying": "✈️ Voando",
+            "flying": "✈️ Avião",
         }
 
         return options

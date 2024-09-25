@@ -63,3 +63,18 @@ class CityStateData:
             if s["sigla"].lower() == uf.lower():
                 return s["cidades"]
         return []
+
+    def uf_to_state(self, uf):
+        """
+        Get the full name of a state given its abbreviation.
+
+        Args:
+            uf (str): The abbreviation of the state (UF).
+
+        Returns:
+            str: The full name of the state.
+        """
+        for s in self.city_state_data.get("estados", []):
+            if s["sigla"].lower() == uf.lower():
+                return s["nome"]
+        return ""
