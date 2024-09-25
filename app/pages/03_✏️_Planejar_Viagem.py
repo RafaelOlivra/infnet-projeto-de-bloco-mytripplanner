@@ -270,7 +270,6 @@ def Cadastrar():
             # Change to the trip view
             st.session_state.selected_trip_id = trip.id
             with st.spinner("Redirecionando..."):
-                time.sleep(2)
                 st.switch_page("pages/02_🗺️_Minhas_Viagens.py")
 
         else:
