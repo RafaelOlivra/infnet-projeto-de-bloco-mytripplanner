@@ -41,7 +41,7 @@ def Home():
         """
         )
         open_google_sheet_importer = st.button(
-            "Ver minhas viagens", use_container_width=True, key="open_my_trips"
+            "Ver Minhas Viagens", use_container_width=True, key="open_my_trips"
         )
         if open_google_sheet_importer:
             switch_page("minhas viagens")
@@ -54,7 +54,7 @@ def Home():
         """
         )
         open_csv_sheet_importer = st.button(
-            "Planejar nova viagem", use_container_width=True, key="open_trip_planner"
+            "Planejar Nova Viagem", use_container_width=True, key="open_trip_planner"
         )
         if open_csv_sheet_importer:
             switch_page("planejar viagem")
