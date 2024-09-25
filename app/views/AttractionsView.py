@@ -125,7 +125,7 @@ class AttractionsView:
                     """
         )
 
-        if st.checkbox("Selecionar", key=attraction["name"], value=selected):
+        if st.checkbox("Selecionar", key=url, value=selected):
             if on_change:
                 on_change(attraction["name"])
         elif on_change:
