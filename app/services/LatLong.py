@@ -26,7 +26,6 @@ class LatLong:
         lat, lon = self.google_maps.get_latitude_longitude(city + ',' + state)
 
         if lat is None or lon is None:
-            raise ValueError(f"Could not find coordinates for {
-                             city}, {state}.")
+            raise ValueError(f"Could not find coordinates for {city}, {state}.")
 
         return lat, lon
