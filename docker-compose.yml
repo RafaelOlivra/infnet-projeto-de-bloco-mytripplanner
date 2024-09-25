@@ -8,8 +8,8 @@ services:
         restart: unless-stopped
         volumes:
             # For auto-reloading the streamlit app
-            - ./app/:/app/
-            - ./data/:/data/
+            - ./app/:/usr/src/app/app/
+            - ./data/:/usr/src/app/data/
         networks:
             - mytripplanner
 
