@@ -1,4 +1,3 @@
-
 import requests
 import os
 import bs4
@@ -11,7 +10,9 @@ class YelpScrapper:
         return None
 
     @st.cache_data(ttl=86400)
-    def get_near_attractions_json(_self, city_name: str, state_name: str, start: int = 0, limit: int = 10):
+    def get_near_attractions_json(
+        _self, city_name: str, state_name: str, start: int = 0, limit: int = 10
+    ):
         """
         Retrieves a JSON representation of nearby attractions in a given city and state.
 
@@ -25,8 +26,7 @@ class YelpScrapper:
             str: A JSON string representing the nearby attractions. If no attractions are found, an empty JSON object is returned.
         """
         search_query = _self._url_encode(f"{city_name}, {state_name}")
-        url = f"https://www.yelp.com.br/search?hl=pt_BR&find_desc=&find_loc={
-            search_query}&start={start}&limit={limit}"
+        url = f"https://www.yelp.com.br/search?hl=pt_BR&find_desc=&find_loc={search_query}&start={start}&limit={limit}"
         html = _self._fetch_html(url)
 
         soup = bs4.BeautifulSoup(html, "html.parser")
@@ -40,25 +40,24 @@ class YelpScrapper:
         for attraction in attractions:
             anchor = attraction.select_one('a[href^="/biz/"]:has(img)')
             # Review are inside a font element with text (x reviews)
-            reviews = attraction.select('span')
+            reviews = attraction.select("span")
             review_text = ""
             review_stars = -1
             for review in reviews:
                 if " reviews)" in review.text:
-                    review_text = review.text.replace(
-                        " reviews)", "").replace("(", "")
+                    review_text = review.text.replace(" reviews)", "").replace("(", "")
                     review_stars = 0
                     review_stars = float(review.previous_sibling.text)
                     if review_stars > 5 or review_stars < 0:
                         review_stars = -1
 
             card = {
-                "name": anchor.select_one('img')['alt'],
+                "name": anchor.select_one("img")["alt"],
                 "url": f"https://www.yelp.com{anchor['href']}",
                 "review_count": review_text,
                 "review_stars": review_stars,
                 "description": "",
-                "image": anchor.select_one('img')['src']
+                "image": anchor.select_one("img")["src"],
             }
             cards.append(card)
             if len(cards) >= limit:
@@ -83,7 +82,7 @@ class YelpScrapper:
         """
         # Apply hardcoded proxy for now
         # TODO: Implement a better way to handle proxies
-        proxy_prefix = 'http://api.scraperapi.com?api_key=ce1e058f17f38e5a9e49a9ee467375fd&&premium=true&url='
+        proxy_prefix = "http://api.scraperapi.com?api_key=ce1e058f17f38e5a9e49a9ee467375fd&&premium=true&url="
         url = proxy_prefix + url
 
         response = requests.get(url)
