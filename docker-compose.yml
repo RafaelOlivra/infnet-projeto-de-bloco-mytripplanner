@@ -7,7 +7,7 @@ services:
         container_name: mytripplanner-streamlit
         restart: unless-stopped
         volumes:
-            # For auto-reloading the streamlit app
+            # For auto-reloading the streamlit app and data
             - ./app/:/usr/src/app/app/
             - ./data/:/usr/src/app/data/
         networks:
