@@ -6,15 +6,17 @@ import json
 
 
 class AttractionsView:
-    id = ""
-    city_name = ""
-    state_name = ""
-    start = 0
-    limit = 12
-    attractions = {}
-
     def __init__(self, city_name: str = "", state_name: str = "", start: int = 0, limit: int = 12, attractions=None):
+        """
+        Initialize the AttractionsView class.
 
+        Args:
+            city_name (str): Name of the city.
+            state_name (str): Name of the state.
+            start (int): Starting index for fetching attractions.
+            limit (int): Number of attractions to fetch.
+            attractions (dict): Pre-fetched attractions data (optional).
+        """
         self.city_name = city_name
         self.state_name = state_name
         self.id = self._generate_id()
@@ -25,6 +27,9 @@ class AttractionsView:
     def get_attractions(self):
         """
         Get the attractions data for the specified city and state.
+
+        Returns:
+            dict: The attractions data in JSON format.
         """
         with st.spinner("Buscando atrações..."):
             json_string = AttractionsData().get_attraction_data(self.id)
@@ -37,20 +42,27 @@ class AttractionsView:
                     data = json.loads(json_string)
                     AttractionsData().save(self.id, data)
                     return data
-                else:
-                    return {}
+                return {}
 
     def display_attractions(self, display_selector=False, selected_attractions=None, on_change=None):
         """
-        Display the attractions data.
+        Display the attractions data in a grid layout.
+
+        Args:
+            display_selector (bool): Whether to display a checkbox selector.
+            selected_attractions (list): List of selected attractions (optional).
+            on_change (function): Callback function to handle changes in selection (optional).
         """
-        if self.attractions and len(self.attractions) > 0:
+        if self.attractions:
             cols = st.columns(5)
             for idx, attraction in enumerate(self.attractions):
                 with cols[idx % 5]:
                     if display_selector:
                         self.display_attraction_selector(
-                            attraction, selected=selected_attractions and attraction['name'] in selected_attractions, on_change=on_change)
+                            attraction,
+                            selected=selected_attractions and attraction['name'] in selected_attractions,
+                            on_change=on_change
+                        )
                     else:
                         self.display_attraction_card(attraction)
         else:
@@ -58,41 +70,48 @@ class AttractionsView:
 
     def display_attraction_card(self, attraction):
         """
-        Display a single attraction card.
-        """
+        Display a single attraction card with image, name, and description.
 
+        Args:
+            attraction (dict): Dictionary containing attraction data.
+        """
         st.image(attraction['image'], use_column_width=True)
         st.markdown(f"##### {attraction['name']}")
-        if attraction['description']:
+        if attraction.get('description'):
             st.markdown(f"{attraction['description']}")
         st.markdown(f"[Mais informações]({attraction['url']})")
 
     def display_attraction_selector(self, attraction, on_change=None, selected=False):
         """
-        Display a single attraction card, with the option to select it with streamlit checkbox.
-        """
+        Display a single attraction card with a checkbox for selection.
 
+        Args:
+            attraction (dict): Dictionary containing attraction data.
+            on_change (function): Callback function to handle changes in selection (optional).
+            selected (bool): Whether the attraction is pre-selected (default: False).
+        """
         st.image(attraction['image'], use_column_width=True)
         st.markdown(f"##### {attraction['name']}")
-        if attraction['description']:
+        if attraction.get('description'):
             st.markdown(f"{attraction['description']}")
         st.markdown(f"[Mais informações]({attraction['url']})")
-        if st.checkbox(
-                "Selecionar", key=attraction['name'], value=selected):
+
+        if st.checkbox("Selecionar", key=attraction['name'], value=selected):
             if on_change:
                 on_change(attraction['name'])
-        else:
-            if on_change:
-                on_change(attraction['name'], remove=True)
+        elif on_change:
+            on_change(attraction['name'], remove=True)
 
     # --------------------------
     # Utils
     # --------------------------
     def _generate_id(self):
         """
-        Generate a unique ID hash for the attraction.
+        Generate a unique ID based on the city and state names.
+
+        Returns:
+            str: Generated ID.
         """
-        #
         city_name = Utils().slugify(self.city_name)
         state_name = Utils().slugify(self.state_name)
         return f"{city_name}_{state_name}"
