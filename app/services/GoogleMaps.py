@@ -31,12 +31,11 @@ class GoogleMaps:
         data = _self.fetch_json(url)
 
         # Check if the request was successful
-        if data.get('status') == 'OK' and len(data.get('results', [])) > 0:
-            location_data = data['results'][0]['geometry']['location']
-            return location_data['lat'], location_data['lng']
+        if data.get("status") == "OK" and len(data.get("results", [])) > 0:
+            location_data = data["results"][0]["geometry"]["location"]
+            return location_data["lat"], location_data["lng"]
         else:
-            raise ValueError(
-                f"Could not retrieve coordinates for location: {location}")
+            raise ValueError(f"Could not retrieve coordinates for location: {location}")
 
     def get_directions_url(self, origin: str, destination: str):
         """
@@ -50,12 +49,11 @@ class GoogleMaps:
         - str: URL for Google Maps directions.
         """
         base_url = "https://www.google.com/maps/dir/?api=1"
-        url = f"{base_url}&origin={self.url_encode(origin)}&destination={
-            self.url_encode(destination)}"
+        url = f"{base_url}&origin={self.url_encode(origin)}&destination={self.url_encode(destination)}"
         return url
 
     @st.cache_data(ttl=86400)
-    def get_directions(_self, origin: str, destination: str, mode: str = 'car'):
+    def get_directions(_self, origin: str, destination: str, mode: str = "car"):
         """
         Get directions from an origin to a destination using Google Maps API.
 
@@ -67,11 +65,12 @@ class GoogleMaps:
         Returns:
         - dict: The directions data.
         """
-        url = f"https://maps.googleapis.com/maps/api/directions/json?origin={_self.url_encode(
-            origin)}&destination={_self.url_encode(destination)}&mode={_self.url_encode(mode)}&key={_self.api_key}"
+        url = f"https://maps.googleapis.com/maps/api/directions/json?origin={_self.url_encode(origin)}&destination={_self.url_encode(destination)}&mode={_self.url_encode(mode)}&key={_self.api_key}"
         return _self.fetch_json(url)
 
-    def get_google_maps_directions_iframe_url(self, origin, destination, zoom: int | None = None):
+    def get_google_maps_directions_iframe_url(
+        self, origin, destination, zoom: int | None = None
+    ):
         """
         Generate URL code for an iframe that displays Google Maps directions.
 
@@ -84,8 +83,7 @@ class GoogleMaps:
         - str: URL for the embeddable iframe.
         """
         zoom_param = f"&zoom={int(zoom)}" if zoom is not None else ""
-        url = f"https://www.google.com/maps/embed/v1/directions?origin={self.url_encode(
-            origin)}&destination={self.url_encode(destination)}&key={self.api_key}{zoom_param}"
+        url = f"https://www.google.com/maps/embed/v1/directions?origin={self.url_encode(origin)}&destination={self.url_encode(destination)}&key={self.api_key}{zoom_param}"
         return url
 
     def fetch_json(self, url: str):
