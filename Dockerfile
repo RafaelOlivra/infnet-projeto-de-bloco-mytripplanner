@@ -26,4 +26,4 @@ COPY ./.env ./.env
 COPY ./data ./data
 
 # Set the command to run the application
-CMD ["python", "-m", "streamlit", "run", "./app/app.py"]
+CMD ["python", "-m", "streamlit", "run", "./app/0_🏠_Home.py"]
