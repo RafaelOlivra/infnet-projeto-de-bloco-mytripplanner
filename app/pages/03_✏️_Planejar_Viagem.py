@@ -105,7 +105,7 @@ def Cadastrar():
     origin = f"{origin_city}, {origin_state}"
     destination = f"{destination_city}, {destination_state}"
     iframe_url = google_maps.get_google_maps_directions_iframe_url(
-        origin, destination, zoom=7)
+        origin, destination)
 
     components.iframe(iframe_url, height=450)
 
