@@ -133,8 +133,8 @@ def Cadastrar():
             end_date = False
 
     with st.expander('🌤️ Clima e Tempo', expanded=True):
-        st.write(f"Aqui você pode consultar o clima e tempo para **{
-            destination}** nos próximos 5 dias.")
+        st.write(
+            f"Aqui você pode consultar o clima e tempo para **{destination}** nos próximos 5 dias.")
         weather_view = WeatherView(destination_city, destination_state)
         weather_view.display_forecast()
 
