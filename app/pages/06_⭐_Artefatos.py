@@ -7,20 +7,22 @@ def About():
     st.set_page_config(
         page_title="Artefatos",
         page_icon="⭐",
-        layout='wide',
+        layout="wide",
         initial_sidebar_state="collapsed",
     )
 
-    st.title('🗺️ MyTripPlanner')
+    st.title("🗺️ MyTripPlanner")
     st.write(
-        '''
+        """
         O MyTripPlanner é um aplicativo de planejamento de viagens, projetado para ajudar os usuários a organizarem suas jornadas de forma eficiente e personalizada. O app oferece previsões meteorológicas detalhadas e sugestões de roteiros para o destino escolhido, utilizando dados precisos de diversas APIs e integração com Inteligência Artificial. Com o MyTripPlanner, os viajantes podem desfrutar de uma experiência tranquila e agradável, sem surpresas indesejadas pelo caminho.
-        '''
+        
+        ---
+        """
     )
 
     # Useful links
     st.write(
-        '''
+        """
         ### Links Úteis
 
         ### Artefatos
@@ -41,8 +43,9 @@ def About():
         ### Inspirações
         - [Agenda 2030](https://brasil.un.org/pt-br/91863-agenda-2030-para-o-desenvolvimento-sustent%C3%A1vel)
         - [Streamlit Gallery](https://www.streamlit.io/gallery)
-        '''
+        """
     )
+
 
 # --------------------------
 # INIT
