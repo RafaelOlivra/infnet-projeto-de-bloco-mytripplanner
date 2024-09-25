@@ -27,8 +27,7 @@ class GoogleMaps:
         - ValueError: If the location cannot be geocoded.
         """
         # Encode the location
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={
-            _self.url_encode(location)}&key={_self.api_key}"
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={_self.url_encode(location)}&key={_self.api_key}"
         data = _self.fetch_json(url)
 
         # Check if the request was successful
