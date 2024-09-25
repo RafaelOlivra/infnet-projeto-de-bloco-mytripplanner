@@ -22,6 +22,7 @@ class Trip:
     destination_state: str
     destination_longitude: float
     destination_latitude: float
+    travel_by: str
     start_date: datetime
     end_date: datetime
     weather: dict
@@ -34,8 +35,7 @@ class Trip:
         if id:
             self.id = id
             if not self._load():
-                raise ValueError(
-                    f"Trip with ID {self.id} could not be loaded.")
+                raise ValueError(f"Trip with ID {self.id} could not be loaded.")
         elif trip_data:
             self.create(trip_data)
 
@@ -55,9 +55,12 @@ class Trip:
         self.destination_city = trip_data.get("destination_city", "")
         self.destination_state = trip_data.get("destination_state", "")
         self.start_date = trip_data.get(
-            "start_date", datetime.now().strftime(self._get_time_format()))
+            "start_date", datetime.now().strftime(self._get_time_format())
+        )
         self.end_date = trip_data.get(
-            "end_date", datetime.now().strftime(self._get_time_format()))
+            "end_date", datetime.now().strftime(self._get_time_format())
+        )
+        self.travel_by = trip_data.get("travel_by", "driving")
         self.weather = trip_data.get("weather", {})
         self.goals = trip_data.get("goals", "")
         self.activities = trip_data.get("activities", [])
@@ -65,12 +68,25 @@ class Trip:
         self.tags = trip_data.get("tags", [])
 
         self.origin_longitude, self.origin_latitude = self._get_or_fetch_coordinates(
-            trip_data, "origin_longitude", "origin_latitude", self.origin_city, self.origin_state)
-        self.destination_longitude, self.destination_latitude = self._get_or_fetch_coordinates(
-            trip_data, "destination_longitude", "destination_latitude", self.destination_city, self.destination_state)
+            trip_data,
+            "origin_longitude",
+            "origin_latitude",
+            self.origin_city,
+            self.origin_state,
+        )
+        self.destination_longitude, self.destination_latitude = (
+            self._get_or_fetch_coordinates(
+                trip_data,
+                "destination_longitude",
+                "destination_latitude",
+                self.destination_city,
+                self.destination_state,
+            )
+        )
 
         self.weather = OpenWeatherMap().get_forecast_for_next_5_days(
-            self.destination_city, self.destination_state)
+            self.destination_city, self.destination_state
+        )
 
         return self._save()
 
@@ -79,24 +95,31 @@ class Trip:
         self.slug = trip_data.get("slug", self.slug)
         self.origin_city = trip_data.get("origin_city", self.origin_city)
         self.origin_state = trip_data.get("origin_state", self.origin_state)
-        self.destination_city = trip_data.get(
-            "destination_city", self.destination_city)
+        self.destination_city = trip_data.get("destination_city", self.destination_city)
         self.destination_state = trip_data.get(
-            "destination_state", self.destination_state)
+            "destination_state", self.destination_state
+        )
         self.start_date = trip_data.get("start_date", self.start_date)
         self.end_date = trip_data.get("end_date", self.end_date)
+        self.travel_by = trip_data.get("travel_by", self.travel_by)
         self.weather = trip_data.get("weather", self.weather)
         self.goals = trip_data.get("goals", self.goals)
         self.activities = trip_data.get("activities", self.activities)
         self.notes = trip_data.get("notes", self.notes)
         self.tags = trip_data.get("tags", self.tags)
 
-        if trip_data.get("origin_city", self.origin_city) != self.origin_city or \
-                trip_data.get("origin_state", self.origin_state) != self.origin_state:
+        if (
+            trip_data.get("origin_city", self.origin_city) != self.origin_city
+            or trip_data.get("origin_state", self.origin_state) != self.origin_state
+        ):
             self._update_coordinates("origin")
 
-        if trip_data.get("destination_city", self.destination_city) != self.destination_city or \
-                trip_data.get("destination_state", self.destination_state) != self.destination_state:
+        if (
+            trip_data.get("destination_city", self.destination_city)
+            != self.destination_city
+            or trip_data.get("destination_state", self.destination_state)
+            != self.destination_state
+        ):
             self._update_coordinates("destination")
 
         return self
@@ -114,7 +137,8 @@ class Trip:
     def to_csv(self):
         data = json.loads(self.to_json())
         data["weather_base64"] = base64.b64encode(
-            json.dumps(data.pop("weather")).encode()).decode()
+            json.dumps(data.pop("weather")).encode()
+        ).decode()
         data["tags"] = ", ".join(data["tags"])
 
         for key, value in data.items():
@@ -136,22 +160,23 @@ class Trip:
             return Trip(trip_data=data)
         except Exception as e:
             raise ValueError(
-                "The JSON data is not in the correct format. Please check the data and try again.")
+                "The JSON data is not in the correct format. Please check the data and try again."
+            )
 
     def from_csv(self, csv_data):
         try:
             reader = csv.DictReader(StringIO(csv_data))
             data = next(reader)
 
-            weather_data = base64.b64decode(
-                data.pop("weather_base64")).decode()
+            weather_data = base64.b64decode(data.pop("weather_base64")).decode()
             data["weather"] = json.loads(weather_data)
             data["tags"] = [tag.strip() for tag in data["tags"].split(",")]
             data["trip_id"] = self._generate_id()
             return Trip(trip_data=data)
         except Exception as e:
             raise ValueError(
-                "The CSV data is not in the correct format. Please check the data and try again.")
+                "The CSV data is not in the correct format. Please check the data and try again."
+            )
 
     # --------------------------
     # Data Handling
@@ -184,11 +209,12 @@ class Trip:
             "destination_latitude": self.destination_latitude,
             "start_date": self.start_date,
             "end_date": self.end_date,
+            "travel_by": self.travel_by,
             "weather": self.weather,
             "goals": self.goals,
             "activities": self.activities,
             "notes": self.notes,
-            "tags": self.tags
+            "tags": self.tags,
         }
 
     def _assign_trip_data(self, trip_data):
@@ -200,6 +226,7 @@ class Trip:
         self.destination_state = trip_data["destination_state"]
         self.start_date = trip_data["start_date"]
         self.end_date = trip_data["end_date"]
+        self.travel_by = trip_data.get("travel_by", "driving")
         self.weather = trip_data.get("weather", {})
         self.goals = trip_data.get("goals", "")
         self.activities = trip_data.get("activities", [])
@@ -213,10 +240,12 @@ class Trip:
     def _update_coordinates(self, location_type):
         if location_type == "origin":
             self.origin_longitude, self.origin_latitude = self._get_coordinates(
-                self.origin_city, self.origin_state)
+                self.origin_city, self.origin_state
+            )
         elif location_type == "destination":
-            self.destination_longitude, self.destination_latitude = self._get_coordinates(
-                self.destination_city, self.destination_state)
+            self.destination_longitude, self.destination_latitude = (
+                self._get_coordinates(self.destination_city, self.destination_state)
+            )
 
         self._save()
 
@@ -225,8 +254,15 @@ class Trip:
     # --------------------------
 
     def _validate(self, trip_data):
-        required_fields = ["title", "origin_city", "origin_state",
-                           "destination_city", "destination_state", "start_date", "end_date"]
+        required_fields = [
+            "title",
+            "origin_city",
+            "origin_state",
+            "destination_city",
+            "destination_state",
+            "start_date",
+            "end_date",
+        ]
 
         for field in required_fields:
             if not trip_data.get(field):
@@ -242,16 +278,34 @@ class Trip:
     def _sanitize(self, trip_data):
         trip_data["title"] = trip_data["title"].strip()
         trip_data["start_date"] = datetime.strptime(
-            trip_data["start_date"], self._get_time_format()).strftime(self._get_time_format())
+            trip_data["start_date"], self._get_time_format()
+        ).strftime(self._get_time_format())
         trip_data["end_date"] = datetime.strptime(
-            trip_data["end_date"], self._get_time_format()).strftime(self._get_time_format())
+            trip_data["end_date"], self._get_time_format()
+        ).strftime(self._get_time_format())
         trip_data["weather"] = trip_data.get("weather", {})
         trip_data["activities"] = trip_data.get("activities", [])
         trip_data["tags"] = trip_data.get("tags", [])
         trip_data["goals"] = trip_data["goals"].strip()
         trip_data["notes"] = trip_data["notes"].strip()
 
+        # Travel by can only be one of the following options
+        travel_by_options = self._get_travel_by_options()
+        if trip_data.get("travel_by") not in travel_by_options:
+            trip_data["travel_by"] = "driving"
+
         return trip_data
+
+    def _get_travel_by_options(self):
+        options = {
+            "driving": "🚗 Dirigindo",
+            "walking": "🚶 Caminhando",
+            "bicycling": "🚴 Pedalando",
+            "transit": "🚇 Transporte Público",
+            "flying": "✈️ Voando",
+        }
+
+        return options
 
     # --------------------------
     # Utils
