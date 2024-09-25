@@ -252,6 +252,7 @@ def Cadastrar():
             "origin_state": origin_state,
             "destination_city": destination_city,
             "destination_state": destination_state,
+            "travel_by": travel_by,
             "start_date": start_date.strftime(time_format),
             "end_date": end_date.strftime(time_format),
             "goals": goals,
