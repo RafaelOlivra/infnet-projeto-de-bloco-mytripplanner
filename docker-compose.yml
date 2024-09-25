@@ -9,6 +9,7 @@ services:
         volumes:
             # For auto-reloading the streamlit app
             - ./app:/app
+            - ./data:/data
         networks:
             - mytripplanner
 
