@@ -63,9 +63,11 @@ class AppData:
         Returns:
             dict: A dictionary with storage directory mappings.
         """
-        storage_dir = self.get_config("storage_dir")
+        temp_storage_dir = self.get_config("temp_storage_dir")
+        permanent_storage_dir = self.get_config("permanent_storage_dir")
         return {
-            "trip": f"{storage_dir}/trip",
+            "trip": f"{temp_storage_dir}/trip",
+            "attractions": f"{permanent_storage_dir}/attractions",
         }
 
     # --------------------------

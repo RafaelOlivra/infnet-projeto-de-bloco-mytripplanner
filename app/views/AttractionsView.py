@@ -1,43 +1,52 @@
 import streamlit as st
 from services.YelpScrapper import YelpScrapper
+from services.AttractionsData import AttractionsData
+from services.Utils import Utils
 import json
 
 
 class AttractionsView:
+    id = ""
     city_name = ""
     state_name = ""
     start = 0
     limit = 12
-    attractions_data = {}
+    attractions = {}
 
-    def __init__(self, city_name: str = "", state_name: str = "", start: int = 0, limit: int = 12, attractions_data=None):
+    def __init__(self, city_name: str = "", state_name: str = "", start: int = 0, limit: int = 12, attractions=None):
 
         self.city_name = city_name
         self.state_name = state_name
+        self.id = self._generate_id()
         self.start = start
         self.limit = limit
-        self.attractions_data = attractions_data if attractions_data else self.get_attractions()
+        self.attractions = attractions if attractions else self.get_attractions()
 
     def get_attractions(self):
         """
         Get the attractions data for the specified city and state.
         """
         with st.spinner("Buscando atrações..."):
-            json_string = YelpScrapper().get_near_attractions_json(
-                self.city_name, self.state_name, self.start, self.limit)
-
+            json_string = AttractionsData().get_attraction_data(self.id)
             if json_string:
                 return json.loads(json_string)
             else:
-                return {}
+                json_string = YelpScrapper().get_near_attractions_json(
+                    self.city_name, self.state_name, self.start, self.limit)
+                if json_string:
+                    data = json.loads(json_string)
+                    AttractionsData().save(self.id, data)
+                    return data
+                else:
+                    return {}
 
     def display_attractions(self, display_selector=False, selected_attractions=None, on_change=None):
         """
         Display the attractions data.
         """
-        if self.attractions_data and len(self.attractions_data) > 0:
+        if self.attractions and len(self.attractions) > 0:
             cols = st.columns(5)
-            for idx, attraction in enumerate(self.attractions_data):
+            for idx, attraction in enumerate(self.attractions):
                 with cols[idx % 5]:
                     if display_selector:
                         self.display_attraction_selector(
@@ -75,3 +84,15 @@ class AttractionsView:
         else:
             if on_change:
                 on_change(attraction['name'], remove=True)
+
+    # --------------------------
+    # Utils
+    # --------------------------
+    def _generate_id(self):
+        """
+        Generate a unique ID hash for the attraction.
+        """
+        #
+        city_name = Utils().slugify(self.city_name)
+        state_name = Utils().slugify(self.state_name)
+        return f"{city_name}_{state_name}"

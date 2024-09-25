@@ -9,6 +9,15 @@ class Utils:
         # Convert to lowercase and replace spaces with hyphens
         slug = string.lower().replace(" ", "-")
 
+        # Replace special characters with their closest ASCII equivalent
+        slug = re.sub(r'[àáâãäå]', 'a', slug)
+        slug = re.sub(r'[èéêë]', 'e', slug)
+        slug = re.sub(r'[ìíîï]', 'i', slug)
+        slug = re.sub(r'[òóôõö]', 'o', slug)
+        slug = re.sub(r'[ùúûü]', 'u', slug)
+        slug = re.sub(r'[ñ]', 'n', slug)
+        slug = re.sub(r'[ç]', 'c', slug)
+
         # Remove any characters that are not alphanumeric or hyphens
         slug = re.sub(r'[^a-z0-9-]', '', slug)
 
