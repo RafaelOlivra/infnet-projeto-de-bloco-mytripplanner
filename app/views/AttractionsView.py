@@ -130,4 +130,4 @@ class AttractionsView:
         """
         city_name = Utils().slugify(self.city_name)
         state_name = Utils().slugify(self.state_name)
-        return f"{city_name}_{state_name}"
+        return f"{state_name}_{city_name}"
