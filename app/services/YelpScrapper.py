@@ -1,8 +1,8 @@
 import requests
-import os
 import bs4
 import json
 import streamlit as st
+from services.AppData import AppData
 
 
 class YelpScrapper:
@@ -82,7 +82,8 @@ class YelpScrapper:
         """
         # Apply hardcoded proxy for now
         # TODO: Implement a better way to handle proxies
-        proxy_prefix = "http://api.scraperapi.com?api_key=ce1e058f17f38e5a9e49a9ee467375fd&&premium=true&url="
+        api_key = AppData().get_api_key("scraperapi")
+        proxy_prefix = f"http://api.scraperapi.com?api_key={api_key}&&premium=true&url="
         url = proxy_prefix + url
 
         response = requests.get(url)

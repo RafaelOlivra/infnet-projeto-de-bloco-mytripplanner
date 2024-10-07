@@ -51,8 +51,7 @@ class AppData:
         key_map = {
             "openweathermap": "OPENWEATHERMAP_API_KEY",
             "googlemaps": "GOOGLEMAPS_API_KEY",
-            "yelp": "YELP_API_KEY",
-            "opencagedata": "OPENCAGEDATA_API_KEY",
+            "scraperapi": "SCRAPER_API_KEY",
         }
         return os.getenv(key_map.get(key))
 
