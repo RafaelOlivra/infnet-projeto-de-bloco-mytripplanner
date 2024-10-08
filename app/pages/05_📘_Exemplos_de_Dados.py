@@ -2,9 +2,12 @@ from io import StringIO
 import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
+
 from services.OpenWeatherMap import OpenWeatherMap
 from services.GoogleMaps import GoogleMaps
 from services.YelpScrapper import YelpScrapper
+
+from models.AttractionModel import AttractionModel
 
 st.set_page_config(
     page_title="Exemplo: OpenWeatherMap",
@@ -104,9 +107,12 @@ def yelp_example():
         city_name="Sorocaba", state_name="São Paulo"
     )
 
+    # Convert the Attraction objects to JSON
+    attractions = [attraction.__dict__ for attraction in attractions]
+    attractions = pd.json_normalize(attractions)
+
     # Show JSON data with Pandas
-    df = pd.read_json(StringIO(attractions))
-    st.write(df)
+    st.write(attractions)
 
 
 openweathermap_example()
