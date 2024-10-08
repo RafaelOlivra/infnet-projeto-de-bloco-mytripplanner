@@ -1,7 +1,12 @@
 import os
 import json
 import streamlit as st
+
 from services.AppData import AppData
+from services.Utils import Utils
+
+from models.Attraction import Attraction
+from typing import List, Optional
 
 
 class AttractionsData:
@@ -11,79 +16,79 @@ class AttractionsData:
         """
         self.app_data = AppData()
 
-    def save(self, id="", data=""):
+    def save(self, attractions: List[Attraction], slug: str = "") -> bool:
         """
         Save or update attraction data to a JSON file.
 
         Args:
-            id (str): Attraction ID.
-            data (any): The value to store in the attraction data.
+            slug (str): Attraction slug.
+            attractions (list[Attraction]): List of Attraction objects.
 
         Returns:
             bool: True if the data was saved successfully, False otherwise.
         """
-        print("Saving or updating attraction data")
         folder_map = self.app_data._get_storage_map()
         save_path = folder_map.get("attractions")
-        file_path = f"{save_path}/{id}.json"
+        file_path = f"{save_path}/{slug}.json"
+
+        # Prepare a json including all the attractions
+        data = [attraction.__dict__ for attraction in attractions]
 
         # Save the data
         return self.app_data._save_to_file(file_path, data)
 
-    def delete(self, id):
+    @st.cache_data(ttl=10)
+    def get(_self, slug: str) -> Optional[List[Attraction]]:
+        """
+        Retrieve attractions data for the specified ID.
+
+        Args:
+            slug (str): The Attraction slug.
+
+        Returns:
+            Attraction or None: The attraction data as an Attraction object.
+        """
+        folder_map = _self.app_data._get_storage_map()
+        save_path = folder_map.get("attractions")
+        file_path = f"{save_path}/{slug}.json"
+
+        if os.path.exists(file_path):
+            with open(file_path, "r") as f:
+                data = json.load(f)
+
+                # Convert the JSON data to Attraction objects
+                return [Attraction(**item) for item in data]
+        return None
+
+    def delete(self, slug: str) -> bool:
         """
         Delete the Attraction ID data.
 
         Args:
-            id (str): The Attraction ID to delete.
+            slug (str): The Attraction slug to delete.
 
         Returns:
             bool: True if the file was deleted, False otherwise.
         """
-        id = self.app_data.sanitize_id(id)
-        save_path = self.app_data._get_storage_map().get("attractions")
-        file_path = f"{save_path}/{id}.json"
+        folder_map = self.app_data._get_storage_map()
+        save_path = folder_map.get("attractions")
+        file_path = f"{save_path}/{slug}.json"
 
         if os.path.exists(file_path):
             os.remove(file_path)
             return True
         return False
 
-    @st.cache_data(ttl=10)
-    def get_attraction_data(_self, id):
+    # --------------------------
+    # Utils
+    # --------------------------
+    def slugify(self, city_name: str, state_name: str) -> str:
         """
-        Retrieve attractions data for the specified ID.
-
-        Args:
-            id (str): The Attraction ID.
+        Generate a unique ID based on the city and state names.
 
         Returns:
-            dict or None: The attraction data.
+            str: Generated ID.
         """
-        data = _self.get_attraction_json(id)
-        return data
-
-    @st.cache_data(ttl=10)
-    def get_attraction_json(_self, id):
-        """
-        Retrieve the JSON data for the specified Attraction ID.
-
-        Args:
-            id (str): The Attraction ID.
-
-        Returns:
-            dict or None: The JSON data for the attraction, or None if not found.
-        """
-        id = _self.app_data.sanitize_id(id)
-        save_path = _self.app_data._get_storage_map().get("attraction")
-        file_path = f"{save_path}/{id}.json"
-
-        if os.path.exists(file_path):
-            with open(file_path, "r", encoding="utf-8") as f:
-                try:
-                    data = json.loads(json.load(f))
-                    return data
-                except json.JSONDecodeError as e:
-                    print(f"Error loading attraction JSON: {e}")
-                    return None
-        return None
+        city_name = Utils().slugify(city_name)
+        state_name = Utils().slugify(state_name)
+        return f"{state_name}_{city_name}"

@@ -100,7 +100,7 @@ def yelp_example():
 
     # Get Attractions JSON
     st.write("### Atrações Perto de Sorocaba-SP")
-    attractions = yelp.get_near_attractions_json(
+    attractions = yelp.get_near_attractions(
         city_name="Sorocaba", state_name="São Paulo"
     )
 

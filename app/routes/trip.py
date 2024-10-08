@@ -5,3 +5,4 @@ from pydantic import BaseModel
 from models.Trip import Trip
 from services.TripData import TripData
 
+app = fastapi.FastAPI()

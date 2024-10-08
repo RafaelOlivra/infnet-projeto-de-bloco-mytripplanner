@@ -1,8 +1,11 @@
 import streamlit as st
+
 from services.YelpScrapper import YelpScrapper
 from services.AttractionsData import AttractionsData
 from services.Utils import Utils
-import json
+
+from models.Attraction import Attraction
+from typing import List
 
 
 class AttractionsView:
@@ -12,7 +15,7 @@ class AttractionsView:
         state_name: str = "",
         start: int = 0,
         limit: int = 50,
-        attractions=None,
+        attractions: List[Attraction] = None,
     ):
         """
         Initialize the AttractionsView class.
@@ -22,35 +25,38 @@ class AttractionsView:
             state_name (str): Name of the state.
             start (int): Starting index for fetching attractions.
             limit (int): Number of attractions to fetch.
-            attractions (dict): Pre-fetched attractions data (optional).
+            attractions (list[Attraction]): Pre-fetched attractions data (optional).
         """
         self.city_name = city_name
         self.state_name = state_name
-        self.id = self._generate_id()
+        self.slug = AttractionsData().slugify(city_name, state_name)
         self.start = start
         self.limit = limit
         self.attractions = attractions if attractions else self.get_attractions()
 
-    def get_attractions(self):
+    def get_attractions(self) -> List[Attraction]:
         """
         Get the attractions data for the specified city and state.
 
         Returns:
-            dict: The attractions data in JSON format.
+            list[Attraction]: List of validated Attraction objects.
         """
         with st.spinner("Buscando atrações..."):
-            json_string = AttractionsData().get_attraction_data(self.id)
-            if json_string:
-                return json.loads(json_string)
+            attractions = AttractionsData().get(self.slug)
+            if attractions:
+                return attractions
             else:
-                json_string = YelpScrapper().get_near_attractions_json(
+                attractions = YelpScrapper().get_near_attractions(
                     self.city_name, self.state_name, self.start, self.limit
                 )
-                if json_string:
-                    data = json.loads(json_string)
-                    AttractionsData().save(self.id, data)
-                    return data
-                return {}
+
+                if attractions:
+
+                    # Save the attractions data
+                    AttractionsData().save(slug=self.slug, attractions=attractions)
+
+                    return attractions
+                return []
 
     def display_attractions(
         self, display_selector=False, selected_attractions=None, on_change=None
@@ -71,7 +77,7 @@ class AttractionsView:
                         self.display_attraction_selector(
                             attraction,
                             selected=selected_attractions
-                            and attraction["name"] in selected_attractions,
+                            and attraction.name in selected_attractions,
                             on_change=on_change,
                         )
                     else:
@@ -79,68 +85,50 @@ class AttractionsView:
         else:
             st.warning("Nenhuma sugestão de atração encontrada para o destino.")
 
-    def display_attraction_card(self, attraction):
+    def display_attraction_card(self, attraction: Attraction):
         """
         Display a single attraction card with image, name, and description.
 
         Args:
-            attraction (dict): Dictionary containing attraction data.
+            attraction (Attraction): Attraction object.
         """
-        st.image(attraction["image"], use_column_width=True)
-        st.markdown(f"##### {attraction['name']}")
-        if attraction.get("description"):
-            st.markdown(f"{attraction['description']}")
-        st.markdown(f"[Mais informações]({attraction['url']})")
+        st.image(attraction.image, use_column_width=True)
+        st.markdown(f"##### {attraction.name}")
+        if attraction.description:
+            st.markdown(attraction.description)
+        st.markdown(f"[Mais informações]({attraction.url})")
 
-    def display_attraction_selector(self, attraction, on_change=None, selected=False):
+    def display_attraction_selector(
+        self, attraction: Attraction, on_change=None, selected=False
+    ):
         """
         Display a single attraction card with a checkbox for selection.
 
         Args:
-            attraction (dict): Dictionary containing attraction data.
+            attraction (Attraction): Attraction object.
             on_change (function): Callback function to handle changes in selection (optional).
             selected (bool): Whether the attraction is pre-selected (default: False).
         """
-        st.image(attraction["image"], use_column_width=True)
+        st.image(attraction.image, use_column_width=True)
 
         # Display a star for review_stars
-        stars = ""
-        for _ in range(int(attraction["review_stars"])):
-            stars += "⭐"
-
-        review_count = attraction.get("review_count")
-        review_count = f"({review_count} reviews)" if review_count else ""
-        title = attraction["name"]
-        description = attraction.get("description") or ""
-        url = attraction.get("url")
-        url = f"[Mais informações]({url}) ⧉" if url else ""
+        stars = "⭐" * int(attraction.review_stars)
+        review_count = (
+            f"({attraction.review_count} reviews)" if attraction.review_count else ""
+        )
 
         st.write(
             f"""
-                    **{title}**  \
+            **{attraction.name}**  \
 
-                    {stars} {review_count}  \
+            {stars} {review_count}  \
 
-                    {url}
-                    """
+            [Mais informações]({attraction.url}) ⧉
+            """
         )
 
-        if st.checkbox("Selecionar", key=url, value=selected):
+        if st.checkbox("Selecionar", key=attraction.url, value=selected):
             if on_change:
-                on_change(attraction["name"])
+                on_change(attraction.name)
         elif on_change:
-            on_change(attraction["name"], remove=True)
-
-    # --------------------------
-    # Utils
-    # --------------------------
-    def _generate_id(self):
-        """
-        Generate a unique ID based on the city and state names.
-
-        Returns:
-            str: Generated ID.
-        """
-        city_name = Utils().slugify(self.city_name)
-        state_name = Utils().slugify(self.state_name)
-        return f"{state_name}_{city_name}"
+            on_change(attraction.name, remove=True)

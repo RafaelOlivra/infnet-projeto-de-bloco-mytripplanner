@@ -1,8 +1,8 @@
 import requests
 import bs4
-import json
 import streamlit as st
 from services.AppData import AppData
+from models.Attraction import Attraction
 
 
 class YelpScrapper:
@@ -10,9 +10,9 @@ class YelpScrapper:
         return None
 
     @st.cache_data(ttl=86400)
-    def get_near_attractions_json(
+    def get_near_attractions(
         _self, city_name: str, state_name: str, start: int = 0, limit: int = 10
-    ):
+    ) -> list[Attraction]:
         """
         Retrieves a JSON representation of nearby attractions in a given city and state.
 
@@ -23,7 +23,7 @@ class YelpScrapper:
             limit (int, optional): The maximum number of attractions to retrieve. Defaults to 10.
 
         Returns:
-            str: A JSON string representing the nearby attractions. If no attractions are found, an empty JSON object is returned.
+            list[Attraction]: A list of Attraction objects.
         """
         search_query = _self._url_encode(f"{city_name}, {state_name}")
         url = f"https://www.yelp.com.br/search?hl=pt_BR&find_desc=&find_loc={search_query}&start={start}&limit={limit}"
@@ -51,20 +51,27 @@ class YelpScrapper:
                     if review_stars > 5 or review_stars < 0:
                         review_stars = -1
 
-            card = {
-                "name": anchor.select_one("img")["alt"],
-                "url": f"https://www.yelp.com{anchor['href']}",
-                "review_count": review_text,
-                "review_stars": review_stars,
-                "description": "",
-                "image": anchor.select_one("img")["src"],
-            }
+            # Create an Attraction object
+            card = Attraction(
+                **{
+                    "name": anchor.select_one("img")["alt"],
+                    "city_name": city_name,
+                    "state_name": state_name,
+                    "url": f"https://www.yelp.com{anchor['href']}",
+                    "review_count": review_text,
+                    "review_stars": review_stars,
+                    "description": "",
+                    "image": anchor.select_one("img")["src"],
+                }
+            )
+
             cards.append(card)
+
             if len(cards) >= limit:
                 break
 
-        # Return the JSON data
-        return json.dumps(cards)
+        # Return the cards
+        return cards
 
     @st.cache_data(ttl=86400)
     def _fetch_html(_self, url: str) -> str:
