@@ -4,7 +4,7 @@ from services.YelpScrapper import YelpScrapper
 from services.AttractionsData import AttractionsData
 from services.Utils import Utils
 
-from models.Attraction import Attraction
+from models.AttractionModel import AttractionModel
 from typing import List
 
 
@@ -15,7 +15,7 @@ class AttractionsView:
         state_name: str = "",
         start: int = 0,
         limit: int = 50,
-        attractions: List[Attraction] = None,
+        attractions: List[AttractionModel] = None,
     ):
         """
         Initialize the AttractionsView class.
@@ -34,7 +34,7 @@ class AttractionsView:
         self.limit = limit
         self.attractions = attractions if attractions else self.get_attractions()
 
-    def get_attractions(self) -> List[Attraction]:
+    def get_attractions(self) -> List[AttractionModel]:
         """
         Get the attractions data for the specified city and state.
 
@@ -85,7 +85,7 @@ class AttractionsView:
         else:
             st.warning("Nenhuma sugestão de atração encontrada para o destino.")
 
-    def display_attraction_card(self, attraction: Attraction):
+    def display_attraction_card(self, attraction: AttractionModel):
         """
         Display a single attraction card with image, name, and description.
 
@@ -99,7 +99,7 @@ class AttractionsView:
         st.markdown(f"[Mais informações]({attraction.url})")
 
     def display_attraction_selector(
-        self, attraction: Attraction, on_change=None, selected=False
+        self, attraction: AttractionModel, on_change=None, selected=False
     ):
         """
         Display a single attraction card with a checkbox for selection.

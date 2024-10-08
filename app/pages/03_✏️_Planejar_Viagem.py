@@ -245,7 +245,6 @@ def Cadastrar():
     if st.button(
         "Cadastrar", key="cadastrar", type="primary", use_container_width=True
     ):
-        time_format = Trip()._get_time_format()
         trip_data = {
             "title": title,
             "origin_city": origin_city,
@@ -253,8 +252,8 @@ def Cadastrar():
             "destination_city": destination_city,
             "destination_state": destination_state,
             "travel_by": travel_by,
-            "start_date": start_date.strftime(time_format),
-            "end_date": end_date.strftime(time_format),
+            "start_date": start_date,
+            "end_date": end_date,
             "goals": goals,
             "tags": tags,
             "notes": notes,

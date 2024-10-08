@@ -5,7 +5,7 @@ import streamlit as st
 from services.AppData import AppData
 from services.Utils import Utils
 
-from models.Attraction import Attraction
+from models.AttractionModel import AttractionModel
 from typing import List, Optional
 
 
@@ -16,7 +16,11 @@ class AttractionsData:
         """
         self.app_data = AppData()
 
-    def save(self, attractions: List[Attraction], slug: str = "") -> bool:
+    # --------------------------
+    # CRUD Operations
+    # --------------------------
+
+    def save(self, attractions: List[AttractionModel], slug: str = "") -> bool:
         """
         Save or update attraction data to a JSON file.
 
@@ -38,7 +42,7 @@ class AttractionsData:
         return self.app_data._save_to_file(file_path, data)
 
     @st.cache_data(ttl=10)
-    def get(_self, slug: str) -> Optional[List[Attraction]]:
+    def get(_self, slug: str) -> Optional[List[AttractionModel]]:
         """
         Retrieve attractions data for the specified ID.
 
@@ -57,7 +61,7 @@ class AttractionsData:
                 data = json.load(f)
 
                 # Convert the JSON data to Attraction objects
-                return [Attraction(**item) for item in data]
+                return [AttractionModel(**item) for item in data]
         return None
 
     def delete(self, slug: str) -> bool:

@@ -1,7 +1,12 @@
 import os
 import json
 import streamlit as st
+from datetime import datetime
+from pydantic import ValidationError
+
 from services.AppData import AppData
+
+from models.TripModel import TripModel
 
 
 class TripData:
@@ -11,7 +16,10 @@ class TripData:
         """
         self.app_data = AppData()
 
-    def save(self, id="", key="", value=""):
+    # --------------------------
+    # File Operations
+    # --------------------------
+    def save(self, id, key="", value=""):
         """
         Save or update trip data to a JSON file.
 
@@ -33,21 +41,73 @@ class TripData:
             try:
                 with open(file_path, "r") as f:
                     data = json.load(f)
-            except Exception as e:
-                print(f"Error reading existing trip data: {e}")
+                # Load into TripModel for validation
+                trip_data = TripModel(**data)
+            except (Exception, ValidationError) as e:
+                print(f"Error reading or validating existing trip data: {e}")
                 return False
 
             # Update the specific key if provided
             if key:
-                data[key] = value
+                setattr(trip_data, key, value)
             else:
-                data = value  # Overwrite with new data if no key is specified
+                trip_data = value  # Overwrite with new data if no key is specified
         else:
-            # Create new data if file doesn't exist
-            data = {key: value} if key else value
+            # Create new trip data if file doesn't exist
+            try:
+                # Check if value is a TripModel object
+                if isinstance(value, TripModel):
+                    trip_data = value
+                else:
+                    trip_data = TripModel(**value)
+            except ValidationError as e:
+                print(f"Error validating new trip data: {e}")
+                return False
+
+        # Convert dates to string format
+        trip_data.start_date = trip_data.start_date.strftime(self._get_time_format())
+        trip_data.end_date = trip_data.end_date.strftime(self._get_time_format())
 
         # Save the updated or new data
-        return self.app_data._save_to_file(file_path, data)
+        return self.app_data._save_to_file(file_path, trip_data.json())
+
+    @st.cache_data(ttl=10)
+    def get(_self, id) -> TripModel:
+        """
+        Retrieve trip data for the specified ID.
+
+        Args:
+            id (str): The trip ID.
+
+        Returns:
+            TripModel or None: The trip data as a TripModel object.
+        """
+        folder_map = _self.app_data._get_storage_map()
+        save_path = folder_map.get("trip")
+        file_path = f"{save_path}/{id}.json"
+
+        if os.path.exists(file_path):
+            with open(file_path, "r") as f:
+                data = json.load(f)
+
+                # If data is a string, convert to JSON
+                if isinstance(data, str):
+                    data = json.loads(data)
+
+                # Convert date strings to datetime objects
+                data["start_date"] = datetime.strptime(
+                    data["start_date"], _self._get_time_format()
+                )
+                data["end_date"] = datetime.strptime(
+                    data["end_date"], _self._get_time_format()
+                )
+
+                # Convert the JSON data to a TripModel object
+                try:
+                    return TripModel(**data)
+                except ValidationError as e:
+                    print(f"Error validating trip data: {e}")
+        return None
 
     def delete(self, id):
         """
@@ -68,48 +128,9 @@ class TripData:
             return True
         return False
 
-    @st.cache_data(ttl=10)
-    def get_trip_data(_self, id, key=""):
-        """
-        Retrieve trip data for the specified trip ID. Optionally, return a specific key.
-
-        Args:
-            id (str): The trip ID.
-            key (str): Specific key to return from the trip data.
-
-        Returns:
-            dict or None: The trip data or the specific key value if found.
-        """
-        data = _self.get_trip_json(id)
-        if data and key:
-            return data.get(key)
-        return data
-
-    @st.cache_data(ttl=10)
-    def get_trip_json(_self, id):
-        """
-        Retrieve the JSON data for the specified trip ID.
-
-        Args:
-            id (str): The trip ID.
-
-        Returns:
-            dict or None: The JSON data for the trip, or None if not found.
-        """
-        id = _self.app_data.sanitize_id(id)
-        save_path = _self.app_data._get_storage_map().get("trip")
-        file_path = f"{save_path}/{id}.json"
-
-        if os.path.exists(file_path):
-            with open(file_path, "r", encoding="utf-8") as f:
-                try:
-                    data = json.loads(json.load(f))
-                    return data
-                except json.JSONDecodeError as e:
-                    print(f"Error loading trip JSON: {e}")
-                    return None
-        return None
-
+    # --------------------------
+    # Data Operations
+    # --------------------------
     def get_available_trip_ids(self):
         """
         Retrieve a list of available trip IDs.
@@ -133,6 +154,12 @@ class TripData:
         """
         available_trips = []
         for trip_id in self.get_available_trip_ids():
-            trip_title = self.get_trip_data(trip_id, "title")
+            trip_title = self.get(trip_id).title
             available_trips.append({"id": trip_id, "title": trip_title})
         return available_trips
+
+    # --------------------------
+    # Utils
+    # --------------------------
+    def _get_time_format(self):
+        return self.app_data.get_config("time_format")

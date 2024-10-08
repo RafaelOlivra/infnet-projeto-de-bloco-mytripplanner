@@ -2,7 +2,7 @@ import requests
 import bs4
 import streamlit as st
 from services.AppData import AppData
-from models.Attraction import Attraction
+from models.AttractionModel import AttractionModel
 
 
 class YelpScrapper:
@@ -12,7 +12,7 @@ class YelpScrapper:
     @st.cache_data(ttl=86400)
     def get_near_attractions(
         _self, city_name: str, state_name: str, start: int = 0, limit: int = 10
-    ) -> list[Attraction]:
+    ) -> list[AttractionModel]:
         """
         Retrieves a JSON representation of nearby attractions in a given city and state.
 
@@ -52,7 +52,7 @@ class YelpScrapper:
                         review_stars = -1
 
             # Create an Attraction object
-            card = Attraction(
+            card = AttractionModel(
                 **{
                     "name": anchor.select_one("img")["alt"],
                     "city_name": city_name,
