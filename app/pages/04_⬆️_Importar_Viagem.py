@@ -1,5 +1,5 @@
 import streamlit as st
-from model.Trip import Trip
+from models.Trip import Trip
 import time
 
 # --------------------------

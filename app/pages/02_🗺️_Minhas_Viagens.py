@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from services.TripData import TripData
-from model.Trip import Trip
+from models.Trip import Trip
 from io import StringIO
 import time
 

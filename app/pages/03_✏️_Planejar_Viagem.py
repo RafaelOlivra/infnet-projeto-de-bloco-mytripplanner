@@ -2,7 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 import streamlit_tags as st_tags
 import datetime
-from model.Trip import Trip
+from models.Trip import Trip
 from services.TripData import TripData
 from services.CityStateData import CityStateData
 from services.GoogleMaps import GoogleMaps
