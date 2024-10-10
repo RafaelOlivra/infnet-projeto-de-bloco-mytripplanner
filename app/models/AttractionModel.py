@@ -9,6 +9,6 @@ class AttractionModel(BaseModel):
     name: str
     url: HttpUrl
     review_count: conint(ge=0) = Field(default=0)  # type: ignore
-    review_stars: confloat(ge=0, le=5) = Field(default=0)  # type: ignore
+    review_stars: confloat(ge=-1, le=5) = Field(default=0)  # type: ignore
     description: str
     image: HttpUrl

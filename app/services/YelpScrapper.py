@@ -46,6 +46,7 @@ class YelpScrapper:
             for review in reviews:
                 if " reviews)" in review.text:
                     review_text = review.text.replace(" reviews)", "").replace("(", "")
+                    review_count = int(review_text)
                     review_stars = 0
                     review_stars = float(review.previous_sibling.text)
                     if review_stars > 5 or review_stars < 0:
@@ -58,7 +59,7 @@ class YelpScrapper:
                     "city_name": city_name,
                     "state_name": state_name,
                     "url": f"https://www.yelp.com{anchor['href']}",
-                    "review_count": review_text,
+                    "review_count": review_count,
                     "review_stars": review_stars,
                     "description": "",
                     "image": anchor.select_one("img")["src"],

@@ -31,12 +31,21 @@ class TripData:
         Returns:
             bool: True if the data was saved successfully, False otherwise.
         """
-        # Get the trip data
-        trip_data = self.get(id)
 
-        # If the trip data does not exist, create a new one
-        if not trip_data:
-            trip_data = TripModel(id=id)
+        # Check if the trip ID is provided
+        if not id:
+            raise ValueError("Trip ID is required to save/update trip data.")
+
+        # Try to get the trip data if it already exists
+        # If not we assume we are creating a new trip
+        if key:
+            trip_data = self.get(id)
+        else:
+            trip_data = value
+
+        # Check if we have a valid TripModel object
+        if type(trip_data) != TripModel:
+            raise ValueError("Trip data is not a valid TripModel object.")
 
         # Update the trip data with the new key-value pair
         if key and value:
