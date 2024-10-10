@@ -208,7 +208,7 @@ class AppData:
     # Utils
     # --------------------------
 
-    def _save_file(self, file_path, json):
+    def _save_file(self, file_path, json) -> bool:
         """
         Save data to a file.
 
@@ -236,7 +236,7 @@ class AppData:
             print(f"Error saving data to file: {e}")
             return False
 
-    def _delete_file(self, file_path):
+    def _delete_file(self, file_path) -> bool:
         """
         Delete a file.
 
@@ -251,7 +251,7 @@ class AppData:
             return True
         return False
 
-    def _get_storage_map(self):
+    def _get_storage_map(self) -> dict:
         """
         Define the storage map based on configuration.
 
@@ -265,7 +265,7 @@ class AppData:
             "attractions": f"{permanent_storage_dir}/attractions",
         }
 
-    def sanitize_id(self, id):
+    def sanitize_id(self, id) -> str:
         """
         Sanitize the trip ID. For now, it ensures the ID is valid (e.g., UUID).
 
@@ -275,6 +275,23 @@ class AppData:
         Returns:
             str: The sanitized ID.
         """
-        if len(id) == 36:
+        try:
+            # Do some basic validation
+            if not id:
+                raise ValueError("ID is empty.")
+            if not isinstance(id, str):
+                raise ValueError("ID is not a string.")
+            if len(id) < 5:
+                raise ValueError("ID is too short.")
+            if len(id) > 50:
+                raise ValueError("ID is too long.")
+
+            # Standardize the ID
+            id = id.lower().replace(" ", "_")
+            # Allow only alphanumeric characters and underscores
+            id = "".join(c for c in id if c.isalnum() or c == "_")
+
             return id
-        return None
+
+        except ValueError as e:
+            raise ValueError(f"Invalid ID: {e}")

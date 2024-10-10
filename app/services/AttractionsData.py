@@ -31,18 +31,22 @@ class AttractionsData:
         Returns:
             bool: True if the data was saved successfully, False otherwise.
         """
-        folder_map = self.app_data._get_storage_map()
-        save_path = folder_map.get("attractions")
-        file_path = f"{save_path}/{slug}.json"
+        # If the slug is empty, generate a new one
+        if not slug:
+            city_name = attractions[0].city_name
+            state_name = attractions[0].state_name
+            slug = self.slugify(city_name, state_name)
 
-        # Prepare a json including all the attractions
-        data = [attraction.__dict__ for attraction in attractions]
+        # Convert the Attraction objects to JSON
+        json = "["
+        for attraction in attractions:
+            json += attraction.json() + ","
+        json = json[:-1] + "]"
 
-        # Save the data
-        return self.app_data._save_file(file_path, data)
+        # Save the updated or new data
+        return self.app_data.save("attractions", slug, json, replace=True)
 
-    @st.cache_data(ttl=10)
-    def get(_self, slug: str) -> Optional[List[AttractionModel]]:
+    def get(_self, slug: str) -> List[AttractionModel]:
         """
         Retrieve attractions data for the specified ID.
 
@@ -52,16 +56,10 @@ class AttractionsData:
         Returns:
             Attraction or None: The attraction data as an Attraction object.
         """
-        folder_map = _self.app_data._get_storage_map()
-        save_path = folder_map.get("attractions")
-        file_path = f"{save_path}/{slug}.json"
-
-        if os.path.exists(file_path):
-            with open(file_path, "r") as f:
-                data = json.load(f)
-
-                # Convert the JSON data to Attraction objects
-                return [AttractionModel(**item) for item in data]
+        attraction_data = _self.app_data.get("attractions", slug)
+        if attraction_data:
+            # Convert the JSON data to Attraction objects
+            return [AttractionModel(**item) for item in attraction_data]
         return None
 
     def delete(self, slug: str) -> bool:
@@ -74,14 +72,7 @@ class AttractionsData:
         Returns:
             bool: True if the file was deleted, False otherwise.
         """
-        folder_map = self.app_data._get_storage_map()
-        save_path = folder_map.get("attractions")
-        file_path = f"{save_path}/{slug}.json"
-
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            return True
-        return False
+        return self.app_data.delete("attractions", slug)
 
     # --------------------------
     # Utils
