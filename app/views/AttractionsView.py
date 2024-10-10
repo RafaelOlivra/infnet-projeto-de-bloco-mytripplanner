@@ -32,9 +32,9 @@ class AttractionsView:
         self.slug = AttractionsData().slugify(city_name, state_name)
         self.start = start
         self.limit = limit
-        self.attractions = attractions if attractions else self.get_attractions()
+        self.attractions = attractions if attractions else self._get_attractions()
 
-    def get_attractions(self) -> List[AttractionModel]:
+    def _get_attractions(self) -> List[AttractionModel]:
         """
         Get the attractions data for the specified city and state.
 

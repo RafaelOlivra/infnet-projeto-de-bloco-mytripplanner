@@ -36,7 +36,7 @@ def View_Trip():
     available_trips = TripData().get_available_trips()
     selected_trip_id = st.session_state.selected_trip_id
 
-    if not available_trips and not selected_trip_id:
+    if not available_trips or not available_trips[0]:
         st.write("Você ainda não planejou nenhuma viagem.")
         return
 

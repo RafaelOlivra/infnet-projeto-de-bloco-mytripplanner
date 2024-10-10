@@ -24,9 +24,9 @@ class WeatherView:
         self.city_name = city_name
         self.state_name = state_name
         self.days = days
-        self.forecast = weather_data if weather_data else self.get_forecast()
+        self.forecast = weather_data if weather_data else self._get_forecast()
 
-    def get_forecast(self):
+    def _get_forecast(self):
         """
         Get the weather data for the specified city and state.
         """
@@ -35,7 +35,7 @@ class WeatherView:
         )
 
     # Function to map weather description to icon (you can customize this as needed)
-    def get_weather_icon(self, weather_desc):
+    def _get_weather_icon(self, weather_desc):
         """
         Maps the Portuguese weather descriptions from OpenWeatherMap to weather icons (emojis).
 
@@ -108,7 +108,7 @@ class WeatherView:
             if i < 5:  # Only show the first 5 days
                 with cols[i]:
                     # Display the weather icon
-                    weather_icon = self.get_weather_icon(forecast["weather"])
+                    weather_icon = self._get_weather_icon(forecast["weather"])
                     st.write(f"#### {weather_icon}")
 
                     # Format the date to DD-MM-YYYY

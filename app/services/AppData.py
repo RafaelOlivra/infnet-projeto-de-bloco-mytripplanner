@@ -288,8 +288,8 @@ class AppData:
 
             # Standardize the ID
             id = id.lower().replace(" ", "_")
-            # Allow only alphanumeric characters and underscores
-            id = "".join(c for c in id if c.isalnum() or c == "_")
+            # Allow only alphanumeric characters, dashes and underscores
+            id = "".join(c for c in id if c.isalnum() or c == "-" or c == "_")
 
             return id
 

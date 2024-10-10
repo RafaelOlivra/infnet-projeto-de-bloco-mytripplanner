@@ -6,7 +6,7 @@ from services.AppData import AppData
 from services.Utils import Utils
 
 from models.AttractionModel import AttractionModel
-from typing import List, Optional
+from typing import List
 
 
 class AttractionsData:
