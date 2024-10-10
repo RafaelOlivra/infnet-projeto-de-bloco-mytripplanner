@@ -123,6 +123,10 @@ class Trip:
     def from_json(cls, json_string) -> "Trip":
         try:
             data = json.loads(json_string)
+
+            # Remove the id field if it exists so a new ID is generated
+            data.pop("id", None)
+
             return cls(trip_data=data)
         except Exception as e:
             raise ValueError(
@@ -138,6 +142,9 @@ class Trip:
             weather_data = base64.b64decode(data.pop("weather_base64")).decode()
             data["weather"] = json.loads(weather_data)
             data["tags"] = [tag.strip() for tag in data["tags"].split(",")]
+
+            # Remove the id field if it exists so a new ID is generated
+            data.pop("id", None)
 
             return cls(trip_data=data)
         except Exception as e:
