@@ -105,6 +105,9 @@ class WeatherView:
         i = 0
         for forecast in self.forecast:
 
+            # Convert each Forecast object to dictionary
+            forecast = forecast.__dict__
+
             if i < 5:  # Only show the first 5 days
                 with cols[i]:
                     # Display the weather icon

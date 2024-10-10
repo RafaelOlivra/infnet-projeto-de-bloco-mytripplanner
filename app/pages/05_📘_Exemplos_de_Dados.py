@@ -38,8 +38,12 @@ def openweathermap_example():
     )
     st.write("### Dados do Tempo (Próximos 5 dias) (Sorocaba-SP)")
 
+    # Convert each Forecast object to JSON
+    data = [forecast.__dict__ for forecast in data]
+
     # Create DataFrame
     df = pd.DataFrame(data)
+
     df.drop(columns=["temperature"], inplace=True)
 
     # Correct formats for display
@@ -47,7 +51,17 @@ def openweathermap_example():
     df["date"] = pd.to_datetime(df["date"])
 
     # Show with Pandas
-    st.write(df)
+    st.dataframe(df, use_container_width=True)
+
+    st.write("### Dados do Tempo Detalhado (Atual) (Sorocaba-SP)")
+    data = owm.get_current_weather(city_name="Sorocaba", state_name="São Paulo")
+    data = data.__dict__
+    df = pd.DataFrame([data])
+
+    # Correct formats for display
+    df["timestamp_dt"] = df["timestamp_dt"].astype(str)
+
+    st.dataframe(df, use_container_width=True)
 
 
 # Google Maps Example
