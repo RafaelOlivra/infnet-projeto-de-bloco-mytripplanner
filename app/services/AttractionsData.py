@@ -39,7 +39,7 @@ class AttractionsData:
         data = [attraction.__dict__ for attraction in attractions]
 
         # Save the data
-        return self.app_data._save_to_file(file_path, data)
+        return self.app_data._save_file(file_path, data)
 
     @st.cache_data(ttl=10)
     def get(_self, slug: str) -> Optional[List[AttractionModel]]:
