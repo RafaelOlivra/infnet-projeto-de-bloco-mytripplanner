@@ -55,7 +55,6 @@ class Trip:
 
         # Convert the date strings to datetime objects if not already
         trip_data["start_date"] = Utils.to_datetime(trip_data["start_date"])
-        print(type(trip_data["start_date"]))
         trip_data["end_date"] = Utils.to_datetime(trip_data["end_date"])
 
         # Get weather forecast for the trip if not provided
@@ -75,9 +74,6 @@ class Trip:
                 # Convert the date string to a datetime object
                 if isinstance(forecast.date, str):
                     forecast.date = Utils.to_datetime(forecast.date)
-
-                print(type(forecast.date))
-                print(type(trip_data.get("start_date")))
 
                 # Check if the forecast date is within the trip dates
                 if (
@@ -151,12 +147,16 @@ class Trip:
             json.dumps(data.pop("attractions")).encode()
         ).decode()
 
-        data["tags"] = ", ".join(data["tags"])
+        # Convert tags to a string
+        if "tags" in data and isinstance(data["tags"], list):
+            data["tags"] = ",".join(data["tags"])
 
-        # Replace new lines with a placeholder
+        # Replace reserved characters with placeholders
         for key, value in data.items():
             if isinstance(value, str):
-                data[key] = value.replace("\n", "____NEW_LINE____")
+                data[key] = value.replace("\n", "____NEW_LINE____").replace(
+                    ",", "____COMMA____"
+                )
 
         csv_data = StringIO()
         writer = csv.DictWriter(csv_data, fieldnames=data.keys())
@@ -195,12 +195,19 @@ class Trip:
                 ).decode()
                 data["attractions"] = json.loads(attractions_data)
 
-            data["tags"] = [tag.strip() for tag in data["tags"].split(",")]
-
-            # Replace the placeholder with new lines
+            # Replace the placeholder with commas and new lines
             for key, value in data.items():
                 if isinstance(value, str):
-                    data[key] = value.replace("____NEW_LINE____", "\n")
+                    data[key] = value.replace("____NEW_LINE____", "\n").replace(
+                        "____COMMA____", ","
+                    )
+
+            # If tags is a string, convert it to a list
+            if "tags" in data and data["tags"] and isinstance(data["tags"], str):
+                data["tags"] = data["tags"].strip()
+                data["tags"] = [tag.strip() for tag in data["tags"].split(",")]
+            else:
+                data["tags"] = []
 
             # Remove the id field if it exists so a new ID is generated
             data.pop("id", None)
