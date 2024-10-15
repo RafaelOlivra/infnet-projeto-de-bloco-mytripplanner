@@ -6,7 +6,7 @@ import uuid
 
 class TripModel(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str = "__NOT_IMPLEMENTED__"  # For future use
+    user_id: int = 0  # For future use
     slug: str
     title: str
     origin_city: str
