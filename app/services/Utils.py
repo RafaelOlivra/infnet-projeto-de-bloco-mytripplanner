@@ -1,4 +1,5 @@
 import re
+import requests
 
 
 class Utils:
@@ -43,3 +44,21 @@ class Utils:
 
         # Strip hyphens from the beginning and end of the string
         return slug.strip("-")
+
+    @staticmethod
+    def url_encode(text: str) -> str:
+        """
+        Encode a text string for use in a URL.
+
+        Args:
+        - text (str): The text to encode.
+
+        Returns:
+        - str: The URL-encoded text.
+
+        Raises:
+        - ValueError: If the input is not a string.
+        """
+        if not isinstance(text, str):
+            raise ValueError("Input must be a string")
+        return requests.utils.quote(text)

@@ -1,7 +1,10 @@
 import requests
 import bs4
 import streamlit as st
+
 from services.AppData import AppData
+from services.Utils import Utils
+
 from models.AttractionModel import AttractionModel
 
 
@@ -25,7 +28,7 @@ class YelpScrapper:
         Returns:
             list[Attraction]: A list of Attraction objects.
         """
-        search_query = _self._url_encode(f"{city_name}, {state_name}")
+        search_query = Utils.url_encode(f"{city_name}, {state_name}")
         url = f"https://www.yelp.com.br/search?hl=pt_BR&find_desc=&find_loc={search_query}&start={start}&limit={limit}"
         html = _self._fetch_html(url)
 
@@ -74,6 +77,9 @@ class YelpScrapper:
         # Return the cards
         return cards
 
+    # --------------------------
+    # Utils
+    # --------------------------
     @st.cache_data(ttl=86400)
     def _fetch_html(_self, url: str) -> str:
         """
@@ -98,15 +104,3 @@ class YelpScrapper:
         response.raise_for_status()
 
         return response.text
-
-    def _url_encode(self, text):
-        """
-        Encode a text string for use in a URL.
-
-        Args:
-        - text (str): The text to encode.
-
-        Returns:
-        - str: The URL-encoded text.
-        """
-        return requests.utils.quote(text)

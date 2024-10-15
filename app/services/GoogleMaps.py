@@ -1,7 +1,10 @@
 import requests
+import streamlit as st
+
 from datetime import datetime, timedelta
 from services.AppData import AppData
-import streamlit as st
+
+from services.Utils import Utils
 
 
 class GoogleMaps:
@@ -33,7 +36,7 @@ class GoogleMaps:
         Raises:
         - ValueError: If the location cannot be geocoded.
         """
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={self._url_encode(location)}&key={self.api_key}"
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={Utils().url_encode(location)}&key={self.api_key}"
         data = self._fetch_json(url)
 
         # Check if the request was successful
@@ -63,8 +66,8 @@ class GoogleMaps:
             origin = f"{origin_lat_long[0]}, {origin_lat_long[1]}"
             destination = f"{destination_lat_long[0]}, {destination_lat_long[1]}"
         else:
-            origin = self._url_encode(origin)
-            destination = self._url_encode(destination)
+            origin = Utils().url_encode(origin)
+            destination = Utils().url_encode(destination)
 
         base_url = "https://www.google.com/maps/dir/?api=1"
         url = f"{base_url}&origin={origin}&destination={destination}"
@@ -94,8 +97,8 @@ class GoogleMaps:
             origin = f"{origin_lat_long[0]}, {origin_lat_long[1]}"
             destination = f"{destination_lat_long[0]}, {destination_lat_long[1]}"
         else:
-            origin = self._url_encode(origin)
-            destination = self._url_encode(destination)
+            origin = Utils().url_encode(origin)
+            destination = Utils().url_encode(destination)
 
         mode_param = f"&mode={mode}" if mode else ""
         url = f"https://maps.googleapis.com/maps/api/directions/json?key={self.api_key}&origin={origin}&destination={destination}{mode_param}"
@@ -127,14 +130,17 @@ class GoogleMaps:
             origin = f"{origin_lat_long[0]}, {origin_lat_long[1]}"
             destination = f"{destination_lat_long[0]}, {destination_lat_long[1]}"
         else:
-            origin = self._url_encode(origin)
-            destination = self._url_encode(destination)
+            origin = Utils().url_encode(origin)
+            destination = Utils().url_encode(destination)
 
         zoom_param = f"&zoom={zoom}" if zoom is not None else ""
         mode_param = f"&mode={mode}" if mode else ""
         url = f"https://www.google.com/maps/embed/v1/directions?key={self.api_key}&origin={origin}&destination={destination}&units=metric{zoom_param}{mode_param}"
         return url
 
+    # --------------------------
+    # Utils
+    # --------------------------
     @st.cache_data(ttl=86400)
     def _fetch_json(_self, url: str) -> dict:
         """
@@ -155,20 +161,3 @@ class GoogleMaps:
             return response.json()
         except requests.exceptions.RequestException as e:
             raise ValueError(f"Error fetching data from {url}: {str(e)}")
-
-    def _url_encode(self, text: str) -> str:
-        """
-        Encode a text string for use in a URL.
-
-        Args:
-        - text (str): The text to encode.
-
-        Returns:
-        - str: The URL-encoded text.
-
-        Raises:
-        - ValueError: If the input is not a string.
-        """
-        if not isinstance(text, str):
-            raise ValueError("Input must be a string")
-        return requests.utils.quote(text)

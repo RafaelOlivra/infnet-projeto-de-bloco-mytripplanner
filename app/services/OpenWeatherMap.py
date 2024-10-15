@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 from services.AppData import AppData
 from services.LatLong import LatLong
+from services.Utils import Utils
 
 from models.WeatherModel import ForecastModel, WeatherModel
 from typing import List
@@ -44,7 +45,7 @@ class OpenWeatherMap:
             tuple: A tuple containing the latitude and longitude coordinates of the city.
         """
         data = _self._fetch_json(
-            url=f"http://api.openweathermap.org/geo/1.0/direct?q={_self._url_encode(city_name)},{_self._url_encode(state_name)},Brazil&lang=pt_br&appid={_self.api_key}"
+            url=f"http://api.openweathermap.org/geo/1.0/direct?q={Utils.url_encode(city_name)},{Utils.url_encode(state_name)},Brazil&lang=pt_br&appid={_self.api_key}"
         )
         return data[0]["lat"], data[0]["lon"]
 
@@ -389,15 +390,3 @@ class OpenWeatherMap:
             str: The formatted date and time string.
         """
         return datetime.fromtimestamp(timestamp).strftime("%Y-%m-%dT%H:%M:%S")
-
-    def _url_encode(self, text):
-        """
-        Encode a text string for use in a URL.
-
-        Args:
-        - text (str): The text to encode.
-
-        Returns:
-        - str: The URL-encoded text.
-        """
-        return requests.utils.quote(text)
