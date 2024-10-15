@@ -125,7 +125,7 @@ class TripView:
         # Display objectives
         if self.trip.goals:
             with st.container(border=True):
-                st.write(self.trip.goals)
+                st.text(f"{self.trip.goals}")
 
     def render_schedule(self):
         """

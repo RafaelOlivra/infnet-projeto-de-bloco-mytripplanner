@@ -4,7 +4,7 @@ import streamlit_tags as st_tags
 import datetime
 
 from models.Trip import Trip
-from services.TripData import TripData
+
 from services.CityStateData import CityStateData
 from services.GoogleMaps import GoogleMaps
 
