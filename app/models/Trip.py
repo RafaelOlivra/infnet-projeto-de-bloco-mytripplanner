@@ -144,9 +144,10 @@ class Trip:
 
         data["tags"] = ", ".join(data["tags"])
 
+        # Replace new lines with a placeholder
         for key, value in data.items():
             if isinstance(value, str):
-                data[key] = value.replace("\n", " ")
+                data[key] = value.replace("\n", "____NEW_LINE____")
 
         csv_data = StringIO()
         writer = csv.DictWriter(csv_data, fieldnames=data.keys())
@@ -186,6 +187,11 @@ class Trip:
                 data["attractions"] = json.loads(attractions_data)
 
             data["tags"] = [tag.strip() for tag in data["tags"].split(",")]
+
+            # Replace the placeholder with new lines
+            for key, value in data.items():
+                if isinstance(value, str):
+                    data[key] = value.replace("____NEW_LINE____", "\n")
 
             # Remove the id field if it exists so a new ID is generated
             data.pop("id", None)
