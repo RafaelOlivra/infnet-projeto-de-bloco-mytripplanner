@@ -42,14 +42,21 @@ class TripView:
         self.render_tags()
         self.render_directions_iframe()
         self.render_origin_destination()
-        st.write("#### 🌤️ Previsão do Tempo")
-        self.render_forecast()
+
+        if self.trip.weather:
+            st.write("#### 🌤️ Previsão do Tempo")
+            self.render_forecast()
+
         st.write("#### 🏕️ Objetivos")
         self.render_goals()
-        st.write("##### Atrações para visitar")
-        self.render_attractions()
+
+        if self.trip.attractions:
+            st.write("##### Atrações para visitar")
+            self.render_attractions()
+
         st.write("#### 🤖 Roteiro")
         self.render_schedule()
+
         st.write("#### 📝 Notas")
         self.render_notes()
 
