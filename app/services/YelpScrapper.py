@@ -97,7 +97,7 @@ class YelpScrapper:
         # Apply hardcoded proxy for now
         # TODO: Implement a better way to handle proxies
         api_key = AppData().get_api_key("scraperapi")
-        proxy_prefix = f"http://api.scraperapi.com?api_key={api_key}&&premium=true&url="
+        proxy_prefix = f"http://api.scraperapi.com?api_key={api_key}&premium=true&url="
         url = proxy_prefix + url
 
         response = requests.get(url)
