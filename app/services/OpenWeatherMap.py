@@ -53,7 +53,7 @@ class OpenWeatherMap:
     # Forecast Operations
     # --------------------------
     def get_hourly_forecast(
-        _self, city_name: str, state_name: str, days: int = 5
+        _self, city_name: str, state_name: str, days: int = 10
     ) -> List[ForecastModel]:
         """
         Retrieves the weather forecast for a given city and state.
@@ -118,9 +118,7 @@ class OpenWeatherMap:
             List[ForecastModel]: A list of forecast data for each day.
         """
         # Reuse the hourly forecast function to get all the hourly data
-        hourly_forecast = _self.get_hourly_forecast(
-            city_name, state_name, days=5
-        )  # Fetching for the next 5 days
+        hourly_forecast = _self.get_hourly_forecast(city_name, state_name)
 
         # Dictionary to hold the aggregated daily data
         daily_forecast = {}
@@ -196,9 +194,7 @@ class OpenWeatherMap:
                 between the specified dates.
         """
         # Fetch hourly forecast data
-        hourly_forecast = _self.get_hourly_forecast(
-            city_name, state_name, days=5
-        )  # Fetching for the next 5 days
+        hourly_forecast = _self.get_hourly_forecast(city_name, state_name)
 
         # Dictionary to hold the aggregated daily data
         daily_forecast = {}

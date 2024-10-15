@@ -175,4 +175,4 @@ class TripView:
         # Display notes
         if self.trip.notes:
             with st.container(border=True):
-                st.write(self.trip.notes)
+                st.text(f"{self.trip.notes}")

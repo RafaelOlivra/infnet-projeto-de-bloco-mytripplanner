@@ -179,7 +179,7 @@ def Cadastrar():
 
     weather = None
     with st.expander(
-        f"🌤️ Clima e tempo para **{destination_city}, {destination_state}** para os próximos 5 dias.",
+        f"🌤️ Clima e tempo para **{destination_city}, {destination_state}** para os próximos dias.",
         expanded=True,
     ):
         weather_view = WeatherView(destination_city, destination_state)

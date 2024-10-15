@@ -11,6 +11,7 @@ from services.OpenWeatherMap import OpenWeatherMap
 from services.Utils import Utils
 
 from models.TripModel import TripModel
+from models.WeatherModel import ForecastModel
 
 
 class Trip:
@@ -54,6 +55,7 @@ class Trip:
 
         # Convert the date strings to datetime objects if not already
         trip_data["start_date"] = Utils.to_datetime(trip_data["start_date"])
+        print(type(trip_data["start_date"]))
         trip_data["end_date"] = Utils.to_datetime(trip_data["end_date"])
 
         # Get weather forecast for the trip if not provided
@@ -66,18 +68,25 @@ class Trip:
         if "weather" in trip_data:
             weather = []
             for forecast in trip_data["weather"]:
+                # Convert to ForecastModel object if not already
+                if type(forecast) != ForecastModel:
+                    forecast = ForecastModel(**forecast)
+
                 # Convert the date string to a datetime object
-                if isinstance(forecast["date"], str):
-                    forecast["date"] = Utils.to_datetime(forecast["date"])
+                if isinstance(forecast.date, str):
+                    forecast.date = Utils.to_datetime(forecast.date)
+
+                print(type(forecast.date))
+                print(type(trip_data.get("start_date")))
 
                 # Check if the forecast date is within the trip dates
                 if (
                     trip_data.get("start_date")
-                    <= forecast["date"]
+                    <= forecast.date
                     <= trip_data.get("end_date")
                 ):
                     # Convert the date back to a string
-                    forecast["date"] = str(forecast["date"])
+                    forecast.date = str(forecast.date)
                     weather.append(forecast)
             trip_data["weather"] = weather
 

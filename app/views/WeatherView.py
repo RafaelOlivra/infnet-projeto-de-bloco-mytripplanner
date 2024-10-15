@@ -21,7 +21,7 @@ class WeatherView:
         self,
         city_name="",
         state_name="",
-        days=5,
+        days=6,
         weather_data: List[ForecastModel] = None,
     ):
         """

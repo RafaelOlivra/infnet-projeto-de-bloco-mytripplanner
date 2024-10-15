@@ -1,7 +1,7 @@
 import re
 import requests
 
-from datetime import datetime
+from datetime import datetime, date
 
 from services.AppData import AppData
 
@@ -80,17 +80,24 @@ class Utils:
             return date.isoformat()
 
     @staticmethod
-    def to_datetime(date: str) -> datetime:
+    def to_datetime(_date) -> datetime:
         """
         Convert a date string to a datetime object.
         """
         # Attempt to convert from isoformat
         try:
-            date = datetime.fromisoformat(date)
+            # If we have a string we convert it to a datetime object
+            if isinstance(_date, str):
+                _date = datetime.fromisoformat(_date)
+
+            # If we have a date object we convert it to a datetime object
+            if isinstance(_date, date):
+                _date = datetime.combine(_date, datetime.min.time())
+
+        # Attempt to convert from display format
         except ValueError:
-            # Attempt to convert from display format
-            date = datetime.strptime(
-                date, AppData().get_config(f"datetime_display_format")
+            _date = datetime.strptime(
+                _date, AppData().get_config(f"datetime_display_format")
             )
 
-        return date
+        return _date
