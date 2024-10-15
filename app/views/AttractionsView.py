@@ -64,7 +64,7 @@ class AttractionsView:
                     else:
                         self.render_attraction_card(attraction)
         else:
-            st.warning("Nenhuma sugestão de atração encontrada para o destino.")
+            st.info("Nenhuma sugestão de atração encontrada para o destino.")
 
     def render_attraction_card(self, attraction: AttractionModel):
         """

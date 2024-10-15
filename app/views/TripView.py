@@ -40,15 +40,17 @@ class TripView:
         self.render_directions_iframe()
         self.render_origin_destination()
 
+        st.write("#### 🌤️ Previsão do Tempo")
         if self.trip.weather:
-            st.write("#### 🌤️ Previsão do Tempo")
             self.render_forecast()
+        else:
+            st.info("Não há dados disponíveis para esta viagem.")
 
         st.write("#### 🏕️ Objetivos")
         self.render_goals()
 
         if self.trip.attractions:
-            st.write("##### Atrações para visitar")
+            st.write("##### Atrações para conhecer")
             self.render_attractions()
 
         st.write("#### 🤖 Roteiro")

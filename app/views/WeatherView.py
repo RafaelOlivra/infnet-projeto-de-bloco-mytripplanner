@@ -67,7 +67,7 @@ class WeatherView:
                 if not forecast or not forecast["weather"]:
                     weather_icon = self._get_weather_icon("desconhecido")
                     st.write(f"#### {weather_icon}")
-                    st.write("Não há dados de tempo para o período.")
+                    st.write("Não há dados meteorológicos para o período.")
                     i += 1
                     break
 
