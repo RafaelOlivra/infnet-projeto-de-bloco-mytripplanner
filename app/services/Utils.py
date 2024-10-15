@@ -1,6 +1,10 @@
 import re
 import requests
 
+from datetime import datetime
+
+from services.AppData import AppData
+
 
 class Utils:
     @staticmethod
@@ -62,3 +66,14 @@ class Utils:
         if not isinstance(text, str):
             raise ValueError("Input must be a string")
         return requests.utils.quote(text)
+
+    @staticmethod
+    def format_date(date: datetime | str) -> str:
+
+        # Convert string to datetime object
+        if isinstance(date, str):
+            date = datetime.strptime(
+                date, AppData().get_config("datetime_storage_format")
+            )
+
+        return date.strftime(AppData().get_config("datetime_display_format"))

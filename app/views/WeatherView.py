@@ -1,17 +1,29 @@
 import pandas as pd
-from datetime import datetime
-from services.OpenWeatherMap import OpenWeatherMap
 import streamlit as st
+
+from datetime import datetime
+
+from services.OpenWeatherMap import OpenWeatherMap
+from services.Utils import Utils
+
+from models.WeatherModel import ForecastModel
+from typing import List
 
 
 class WeatherView:
     city_name = ""
     state_name = ""
     days = 5
-    forecast = {}
-    weather_data = {}
+    forecast = None
+    weather_data = None
 
-    def __init__(self, city_name="", state_name="", days=5, weather_data=None):
+    def __init__(
+        self,
+        city_name="",
+        state_name="",
+        days=5,
+        weather_data: List[ForecastModel] = None,
+    ):
         """
         Initialize the WeatherView class.
 
@@ -26,6 +38,44 @@ class WeatherView:
         self.days = days
         self.forecast = weather_data if weather_data else self._get_forecast()
 
+    def render_forecast(self):
+        """
+        Display the weather forecast for the specified city and state.
+        """
+
+        # Check if the forecast data is available
+        # Currently, the forecast data is only available for the next 5 days
+        if not self.forecast:
+            st.info("Ainda não temos previsão do tempo para a data selecionada.")
+            return
+
+        # Display temperatures in 5 columns
+        cols = st.columns(5)
+        i = 0
+        for forecast in self.forecast:
+
+            # Convert each Forecast object to dictionary
+            forecast = forecast.__dict__
+
+            if i < 5:  # Only show the first 5 days
+                with cols[i]:
+                    # Display the weather icon
+                    weather_icon = self._get_weather_icon(forecast["weather"])
+                    st.write(f"#### {weather_icon}")
+
+                    # Format date
+                    forecast_timestamp = forecast["timestamp"]
+                    forecast_date = datetime.fromtimestamp(forecast_timestamp)
+                    forecast_date = Utils.format_date(forecast_date)
+
+                    # Display the weather and temperature using st.metric
+                    st.metric(
+                        label=f"{forecast_date}",
+                        value=f"{int(forecast['temperature_max'])}°C",
+                        delta=f"Min: {int(forecast['temperature_min'])}°C",
+                    )
+                    i += 1
+
     def _get_forecast(self):
         """
         Get the weather data for the specified city and state.
@@ -34,7 +84,6 @@ class WeatherView:
             self.city_name, self.state_name
         )
 
-    # Function to map weather description to icon (you can customize this as needed)
     def _get_weather_icon(self, weather_desc):
         """
         Maps the Portuguese weather descriptions from OpenWeatherMap to weather icons (emojis).
@@ -88,42 +137,3 @@ class WeatherView:
         }
         # Default to thermometer emoji
         return weather_icons.get(weather_desc, "🌡️")
-
-    def display_forecast(self):
-        """
-        Display the weather forecast for the specified city and state.
-        """
-
-        # Check if the forecast data is available
-        # Currently, the forecast data is only available for the next 5 days
-        if not self.forecast:
-            st.info("Ainda não temos previsão do tempo para a data selecionada.")
-            return
-
-        # Display temperatures in 5 columns
-        cols = st.columns(5)
-        i = 0
-        for forecast in self.forecast:
-
-            # Convert each Forecast object to dictionary
-            forecast = forecast.__dict__
-
-            if i < 5:  # Only show the first 5 days
-                with cols[i]:
-                    # Display the weather icon
-                    weather_icon = self._get_weather_icon(forecast["weather"])
-                    st.write(f"#### {weather_icon}")
-
-                    # Format the date to DD-MM-YYYY
-                    forecast_timestamp = forecast["timestamp"]
-                    forecast_date = datetime.fromtimestamp(forecast_timestamp).strftime(
-                        "%d-%m-%Y"
-                    )
-
-                    # Display the weather and temperature using st.metric
-                    st.metric(
-                        label=f"{forecast_date}",
-                        value=f"{int(forecast['temperature_max'])}°C",
-                        delta=f"Min: {int(forecast['temperature_min'])}°C",
-                    )
-                    i += 1

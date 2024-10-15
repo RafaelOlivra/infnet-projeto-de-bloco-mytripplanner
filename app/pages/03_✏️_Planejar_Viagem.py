@@ -2,14 +2,14 @@ import streamlit as st
 import streamlit.components.v1 as components
 import streamlit_tags as st_tags
 import datetime
+
 from models.Trip import Trip
 from services.TripData import TripData
 from services.CityStateData import CityStateData
 from services.GoogleMaps import GoogleMaps
+
 from views.WeatherView import WeatherView
 from views.AttractionsView import AttractionsView
-import time
-
 
 # --------------------------
 # Session State
@@ -103,7 +103,7 @@ def Cadastrar():
 
     # City and State
     st.write("---")
-    st.write("### 🛫 2. Para Onde?")
+    st.write("### 📍 2. Para Onde?")
 
     ufs = CityStateData().get_ufs()
 
@@ -116,13 +116,13 @@ def Cadastrar():
         with sub_col2:
             origin_city = st.selectbox(
                 "Origem (Cidade)",
-                ["Selecione uma cidade..."]
-                + CityStateData().get_cities_by_uf(origin_state),
-                index=0,
+                CityStateData().get_cities_by_uf(origin_state),
+                index=None,
+                placeholder="Selecione uma cidade...",
             )
 
     # Clear destination city if the state is not selected
-    if origin_city == "Selecione uma cidade...":
+    if not origin_city:
         return
 
     with col3:
@@ -133,16 +133,16 @@ def Cadastrar():
         with sub_col2:
             destination_city = st.selectbox(
                 "Destino (Cidade)",
-                ["Selecione uma cidade..."]
-                + CityStateData().get_cities_by_uf(destination_state),
-                index=0,
+                CityStateData().get_cities_by_uf(destination_state),
+                index=None,
+                placeholder="Selecione uma cidade...",
             )
 
     # Clear destination city if the state is not selected
-    if destination_city == "Selecione uma cidade...":
+    if not destination_city:
         return
 
-    # Mostra um mapa com a origem e destino
+    # Display Google Maps directions iframe
     google_maps = GoogleMaps()
     origin = f"{origin_city}, {CityStateData().uf_to_state(origin_state)}"
     destination = (
@@ -177,12 +177,14 @@ def Cadastrar():
             start_date = date[0]
             end_date = False
 
+    weather = None
     with st.expander(
         f"🌤️ Clima e tempo para **{destination_city}, {destination_state}** para os próximos 5 dias.",
         expanded=True,
     ):
         weather_view = WeatherView(destination_city, destination_state)
-        weather_view.display_forecast()
+        weather_view.render_forecast()
+        weather = weather_view.forecast
 
     # Goals
     st.write("---")
@@ -206,6 +208,7 @@ def Cadastrar():
         "Você pode selecionar algumas das sugestões de atrações que para conhecer durante a viagem."
     )
 
+    attractions = []
     with st.expander(
         f"💡 Sugestões de Atrações em {destination_city}, {destination_state}",
         expanded=True,
@@ -213,11 +216,19 @@ def Cadastrar():
         attractions_ideas = AttractionsView(
             city_name=destination_city, state_name=destination_state
         )
-        attractions_ideas.display_attractions(
+        attractions_ideas.render_attractions(
             display_selector=True,
             selected_attractions=get_selected_attractions(),
             on_change=update_selected_attractions,
         )
+
+        # Filter selected attractions
+        for attraction in attractions_ideas.attractions:
+            if attraction.name in get_selected_attractions():
+                attractions.append(attraction)
+
+    if attractions.__len__() == 0:
+        attractions = None
 
     # Trip AI generation
     st.write("---")
@@ -228,7 +239,7 @@ def Cadastrar():
     st.write("Em breve...")
 
     st.write("---")
-    st.write("### ✏️ 6. Sobre a Viagem")
+    st.write("### 📝 6. Sobre a Viagem")
     notes = st.text_area(
         "Observações", "", placeholder="Ex: Levar roupas de banho, Protetor solar, etc."
     )
@@ -254,6 +265,8 @@ def Cadastrar():
             "travel_by": travel_by,
             "start_date": start_date,
             "end_date": end_date,
+            "weather": weather,
+            "attractions": attractions,
             "goals": goals,
             "tags": tags,
             "notes": notes,

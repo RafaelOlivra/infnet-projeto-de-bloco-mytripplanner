@@ -1,7 +1,12 @@
 from pydantic import BaseModel, Field, validator
 from datetime import datetime, date
-from typing import List, Dict, Optional
 import uuid
+
+
+from models.WeatherModel import ForecastModel
+from models.AttractionModel import AttractionModel
+
+from typing import List, Dict, Optional
 
 
 class TripModel(BaseModel):
@@ -20,9 +25,9 @@ class TripModel(BaseModel):
     travel_by: str = "driving"
     start_date: datetime
     end_date: datetime
-    weather: Optional[List[Dict[str, str | None]]] = Field(default_factory=list)
+    weather: Optional[List[ForecastModel]] = None
+    attractions: Optional[List[AttractionModel]] = None
     goals: str = ""
-    activities: str = ""
     notes: str = ""
     tags: List[str] = Field(default_factory=list)
 

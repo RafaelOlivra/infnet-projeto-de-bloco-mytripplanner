@@ -1,9 +1,11 @@
 import streamlit as st
 import pandas as pd
-from services.TripData import TripData
-from models.Trip import Trip
 from io import StringIO
 import time
+
+from services.TripData import TripData
+from models.Trip import Trip
+from views.TripView import TripView
 
 # --------------------------
 # Session State
@@ -50,24 +52,26 @@ def View_Trip():
     options = [f"{trip['title']} ({trip['id']})" for trip in available_trips]
 
     # Check selected_trip_id is contained in the options and set the selected index
-    selected_index = 0
-    for option in options:
-        # Check if the string contains the selected_trip_id
-        if selected_trip_id in option:
-            selected_index = options.index(option)
-            break
+    selected_index = None
 
     selected_trip_id = st.selectbox(
-        "Selecione uma viagem:",
+        label="Selecione uma viagem",
         options=options,
         index=selected_index,
         key="select_trip",
+        placeholder="Selecione uma viagem",
     )
+
+    if not selected_trip_id:
+        return
+
     selected_trip_id = selected_trip_id.split("(")[-1].split(")")[0]
 
+    # Get the selected trip
     trip = Trip(id=selected_trip_id)
-    df = pd.read_csv(StringIO(trip.to_csv()))
-    st.dataframe(df)
+
+    # Render the selected trip
+    TripView(trip).render_trip()
 
     # Allow users to export the trip data
     st.write("---")
@@ -115,6 +119,7 @@ def View_Trip():
         st.success("Viagem deletada com sucesso!")
         with st.spinner("Atualizando..."):
             time.sleep(2)
+            selected_trip_id = None
             st.switch_page("pages/02_🗺️_Minhas_Viagens.py")
 
 

@@ -50,10 +50,11 @@ class Trip:
             dest_coords
         )
 
-        # Get weather forecast for the trip
-        trip_data["weather"] = OpenWeatherMap().get_forecast_for_next_5_days(
-            trip_data.get("destination_city"), trip_data.get("destination_state")
-        )
+        # Get weather forecast for the trip if not provided
+        if "weather" not in trip_data:
+            trip_data["weather"] = OpenWeatherMap().get_forecast_for_next_5_days(
+                trip_data.get("destination_city"), trip_data.get("destination_state")
+            )
 
         self.model = TripModel(**trip_data)
         self.id = self.model.id
@@ -103,9 +104,15 @@ class Trip:
 
     def to_csv(self):
         data = self.model.dict()
+
         data["weather_base64"] = base64.b64encode(
             json.dumps(data.pop("weather")).encode()
         ).decode()
+
+        data["attractions_base64"] = base64.b64encode(
+            json.dumps(data.pop("attractions")).encode()
+        ).decode()
+
         data["tags"] = ", ".join(data["tags"])
 
         for key, value in data.items():
@@ -139,8 +146,16 @@ class Trip:
             reader = csv.DictReader(StringIO(csv_data))
             data = next(reader)
 
-            weather_data = base64.b64decode(data.pop("weather_base64")).decode()
-            data["weather"] = json.loads(weather_data)
+            if "weather_base64" in data:
+                weather_data = base64.b64decode(data.pop("weather_base64")).decode()
+                data["weather"] = json.loads(weather_data)
+
+            if "attractions_base64" in data:
+                attractions_data = base64.b64decode(
+                    data.pop("attractions_base64")
+                ).decode()
+                data["attractions"] = json.loads(attractions_data)
+
             data["tags"] = [tag.strip() for tag in data["tags"].split(",")]
 
             # Remove the id field if it exists so a new ID is generated
@@ -190,3 +205,8 @@ class Trip:
             "transit": "🚇 Transporte Público",
             "flying": "✈️ Avião",
         }
+
+    @staticmethod
+    def get_travel_by_icon(travel_by) -> str:
+        icon = Trip._get_travel_by_options().get(travel_by, "🚗 Carro")
+        return icon.split(" ")[0]

@@ -1,8 +1,8 @@
-import requests
 import os
 import json
-from datetime import datetime, timedelta
 import streamlit as st
+
+from datetime import datetime, timedelta
 
 
 class AppData:

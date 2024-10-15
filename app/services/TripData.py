@@ -52,8 +52,10 @@ class TripData:
             setattr(trip_data, key, value)
 
         # Convert dates to string format
-        trip_data.start_date = trip_data.start_date.strftime(self._get_time_format())
-        trip_data.end_date = trip_data.end_date.strftime(self._get_time_format())
+        trip_data.start_date = trip_data.start_date.strftime(
+            self._get_datetime_format()
+        )
+        trip_data.end_date = trip_data.end_date.strftime(self._get_datetime_format())
 
         # Save the updated or new data
         return self.app_data.save("trip", id, trip_data.json(), replace=True)
@@ -74,10 +76,10 @@ class TripData:
 
             # Convert date strings to datetime objects
             trip_data["start_date"] = datetime.strptime(
-                trip_data["start_date"], _self._get_time_format()
+                trip_data["start_date"], _self._get_datetime_format()
             )
             trip_data["end_date"] = datetime.strptime(
-                trip_data["end_date"], _self._get_time_format()
+                trip_data["end_date"], _self._get_datetime_format()
             )
 
             # Convert the JSON data to a TripModel object
@@ -123,5 +125,5 @@ class TripData:
     # --------------------------
     # Utils
     # --------------------------
-    def _get_time_format(self):
-        return self.app_data.get_config("time_format")
+    def _get_datetime_format(self):
+        return self.app_data.get_config("datetime_storage_format")

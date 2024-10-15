@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
 
-
 class ForecastModel(BaseModel):
     timestamp: int
     date: str

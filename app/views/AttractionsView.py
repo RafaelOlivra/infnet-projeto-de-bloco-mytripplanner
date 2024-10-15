@@ -34,32 +34,13 @@ class AttractionsView:
         self.limit = limit
         self.attractions = attractions if attractions else self._get_attractions()
 
-    def _get_attractions(self) -> List[AttractionModel]:
-        """
-        Get the attractions data for the specified city and state.
-
-        Returns:
-            list[Attraction]: List of validated Attraction objects.
-        """
-        with st.spinner("Buscando atrações..."):
-            attractions = AttractionsData().get(self.slug)
-            if attractions:
-                return attractions
-            else:
-                attractions = YelpScrapper().get_near_attractions(
-                    self.city_name, self.state_name, self.start, self.limit
-                )
-
-                if attractions:
-
-                    # Save the attractions data
-                    AttractionsData().save(slug=self.slug, attractions=attractions)
-
-                    return attractions
-                return []
-
-    def display_attractions(
-        self, display_selector=False, selected_attractions=None, on_change=None
+    def render_attractions(
+        self,
+        display_selector=False,
+        selected_attractions=None,
+        on_change=None,
+        st=st,
+        columns=6,
     ):
         """
         Display the attractions data in a grid layout.
@@ -70,22 +51,22 @@ class AttractionsView:
             on_change (function): Callback function to handle changes in selection (optional).
         """
         if self.attractions:
-            cols = st.columns(5)
+            cols = st.columns(columns)
             for idx, attraction in enumerate(self.attractions):
-                with cols[idx % 5]:
+                with cols[idx % columns]:
                     if display_selector:
-                        self.display_attraction_selector(
+                        self.render_attraction_selector(
                             attraction,
                             selected=selected_attractions
                             and attraction.name in selected_attractions,
                             on_change=on_change,
                         )
                     else:
-                        self.display_attraction_card(attraction)
+                        self.render_attraction_card(attraction)
         else:
             st.warning("Nenhuma sugestão de atração encontrada para o destino.")
 
-    def display_attraction_card(self, attraction: AttractionModel):
+    def render_attraction_card(self, attraction: AttractionModel):
         """
         Display a single attraction card with image, name, and description.
 
@@ -93,12 +74,24 @@ class AttractionsView:
             attraction (Attraction): Attraction object.
         """
         st.image(attraction.image, use_column_width=True)
-        st.markdown(f"##### {attraction.name}")
-        if attraction.description:
-            st.markdown(attraction.description)
-        st.markdown(f"[Mais informações]({attraction.url})")
 
-    def display_attraction_selector(
+        # Display a star for review_stars
+        stars = "⭐" * int(attraction.review_stars)
+        review_count = (
+            f"({attraction.review_count} reviews)" if attraction.review_count else ""
+        )
+
+        st.write(
+            f"""
+            **{attraction.name}**  \
+
+            {stars} {review_count}  \
+
+            [Mais informações]({attraction.url}) ⧉
+            """
+        )
+
+    def render_attraction_selector(
         self, attraction: AttractionModel, on_change=None, selected=False
     ):
         """
@@ -132,3 +125,27 @@ class AttractionsView:
                 on_change(attraction.name)
         elif on_change:
             on_change(attraction.name, remove=True)
+
+    def _get_attractions(self) -> List[AttractionModel]:
+        """
+        Get the attractions data for the specified city and state.
+
+        Returns:
+            list[Attraction]: List of validated Attraction objects.
+        """
+        with st.spinner("Buscando atrações..."):
+            attractions = AttractionsData().get(self.slug)
+            if attractions:
+                return attractions
+            else:
+                attractions = YelpScrapper().get_near_attractions(
+                    self.city_name, self.state_name, self.start, self.limit
+                )
+
+                if attractions:
+
+                    # Save the attractions data
+                    AttractionsData().save(slug=self.slug, attractions=attractions)
+
+                    return attractions
+                return []

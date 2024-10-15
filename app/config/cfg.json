@@ -3,5 +3,6 @@
     "permanent_storage_dir": "./data/02_processed/",
     "log_dir": "./data/.log",
     "city_state_json": "./data/02_processed/estados-cidades.json",
-    "time_format": "%Y-%m-%d %H:%M"
+    "datetime_storage_format": "%Y-%m-%d %H:%M",
+    "datetime_display_format": "%d/%m/%Y"
 }
