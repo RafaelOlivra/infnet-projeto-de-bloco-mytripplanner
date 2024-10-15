@@ -5,6 +5,7 @@ from datetime import datetime
 from pydantic import ValidationError
 
 from services.AppData import AppData
+from services.Utils import Utils
 
 from models.TripModel import TripModel
 
@@ -52,10 +53,8 @@ class TripData:
             setattr(trip_data, key, value)
 
         # Convert dates to string format
-        trip_data.start_date = trip_data.start_date.strftime(
-            self._get_datetime_format()
-        )
-        trip_data.end_date = trip_data.end_date.strftime(self._get_datetime_format())
+        trip_data.start_date = Utils().format_date_str(trip_data.start_date)
+        trip_data.end_date = Utils().format_date_str(trip_data.end_date)
 
         # Save the updated or new data
         return self.app_data.save("trip", id, trip_data.json(), replace=True)
@@ -75,12 +74,8 @@ class TripData:
         if trip_data:
 
             # Convert date strings to datetime objects
-            trip_data["start_date"] = datetime.strptime(
-                trip_data["start_date"], _self._get_datetime_format()
-            )
-            trip_data["end_date"] = datetime.strptime(
-                trip_data["end_date"], _self._get_datetime_format()
-            )
+            trip_data["start_date"] = Utils.to_datetime(trip_data["start_date"])
+            trip_data["end_date"] = Utils.to_datetime(trip_data["end_date"])
 
             # Convert the JSON data to a TripModel object
             try:
@@ -121,9 +116,3 @@ class TripData:
             list: A list of dictionaries containing trip ID and title.
         """
         return self.app_data.get_all("trip")
-
-    # --------------------------
-    # Utils
-    # --------------------------
-    def _get_datetime_format(self):
-        return self.app_data.get_config("datetime_storage_format")

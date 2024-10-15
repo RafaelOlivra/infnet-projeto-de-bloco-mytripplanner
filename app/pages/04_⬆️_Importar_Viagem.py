@@ -1,6 +1,7 @@
 import streamlit as st
-from models.Trip import Trip
 import time
+
+from models.Trip import Trip
 
 # --------------------------
 # Session State

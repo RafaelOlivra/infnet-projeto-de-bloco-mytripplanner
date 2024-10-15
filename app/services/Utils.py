@@ -68,12 +68,29 @@ class Utils:
         return requests.utils.quote(text)
 
     @staticmethod
-    def format_date(date: datetime | str) -> str:
-
-        # Convert string to datetime object
+    def format_date_str(date: datetime | str, format="") -> str:
+        # Convert string to datetime object from isoformat
         if isinstance(date, str):
+            date = datetime.fromisoformat(date)
+
+        if format == "display":
+            return str(date.strftime(AppData().get_config("datetime_display_format")))
+        else:
+            # Return isoformat by default
+            return date.isoformat()
+
+    @staticmethod
+    def to_datetime(date: str) -> datetime:
+        """
+        Convert a date string to a datetime object.
+        """
+        # Attempt to convert from isoformat
+        try:
+            date = datetime.fromisoformat(date)
+        except ValueError:
+            # Attempt to convert from display format
             date = datetime.strptime(
-                date, AppData().get_config("datetime_storage_format")
+                date, AppData().get_config(f"datetime_display_format")
             )
 
-        return date.strftime(AppData().get_config("datetime_display_format"))
+        return date

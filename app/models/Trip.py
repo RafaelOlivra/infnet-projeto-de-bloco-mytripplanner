@@ -52,6 +52,10 @@ class Trip:
             dest_coords
         )
 
+        # Convert the date strings to datetime objects if not already
+        trip_data["start_date"] = Utils.to_datetime(trip_data["start_date"])
+        trip_data["end_date"] = Utils.to_datetime(trip_data["end_date"])
+
         # Get weather forecast for the trip if not provided
         if "weather" not in trip_data:
             trip_data["weather"] = OpenWeatherMap().get_forecast_for_next_5_days(
@@ -62,15 +66,18 @@ class Trip:
         if "weather" in trip_data:
             weather = []
             for forecast in trip_data["weather"]:
-                # Convert the date string to a datetime object if not already
-                if isinstance(forecast.date, str):
-                    forecast.date = datetime.strptime(forecast.date, "%Y-%m-%d").date()
+                # Convert the date string to a datetime object
+                if isinstance(forecast["date"], str):
+                    forecast["date"] = Utils.to_datetime(forecast["date"])
+
                 # Check if the forecast date is within the trip dates
                 if (
                     trip_data.get("start_date")
-                    <= forecast.date
+                    <= forecast["date"]
                     <= trip_data.get("end_date")
                 ):
+                    # Convert the date back to a string
+                    forecast["date"] = str(forecast["date"])
                     weather.append(forecast)
             trip_data["weather"] = weather
 
@@ -122,6 +129,10 @@ class Trip:
 
     def to_csv(self):
         data = self.model.dict()
+
+        # Convert dates to strings
+        data["start_date"] = Utils.format_date_str(data["start_date"])
+        data["end_date"] = Utils.format_date_str(data["end_date"])
 
         data["weather_base64"] = base64.b64encode(
             json.dumps(data.pop("weather")).encode()
@@ -182,7 +193,7 @@ class Trip:
             return cls(trip_data=data)
         except Exception as e:
             raise ValueError(
-                "The CSV data is not in the correct format. Please check the data and try again."
+                f"The CSV data is not in the correct format. Please check the data and try again. {e}"
             )
 
     # --------------------------

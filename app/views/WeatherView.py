@@ -78,7 +78,7 @@ class WeatherView:
                 # Format date
                 forecast_timestamp = forecast["timestamp"]
                 forecast_date = datetime.fromtimestamp(forecast_timestamp)
-                forecast_date = Utils.format_date(forecast_date)
+                forecast_date = Utils.format_date_str(forecast_date, format="display")
 
                 # Display the weather and temperature using st.metric
                 st.metric(
