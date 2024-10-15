@@ -42,10 +42,6 @@ def View_Trip():
         st.write("Você ainda não planejou nenhuma viagem.")
         return
 
-    if not selected_trip_id:
-        selected_trip_id = available_trips[0].get("id")
-        st.session_state.selected_trip_id = selected_trip_id
-
     # Display a select box for the available trips, if the selected trip is not in the available trips
     # the first trip in the list will be selected by default.
     # Options can have the same name, but the id is unique. So we add a prefix to the title to make it unique.
@@ -53,6 +49,11 @@ def View_Trip():
 
     # Check selected_trip_id is contained in the options and set the selected index
     selected_index = None
+    for option in options:
+        # Check if the string contains the selected_trip_id
+        if selected_trip_id and selected_trip_id in option:
+            selected_index = options.index(option)
+            break
 
     selected_trip_id = st.selectbox(
         label="Selecione uma viagem",

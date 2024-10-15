@@ -2,12 +2,9 @@ import pandas as pd
 import streamlit as st
 
 import streamlit.components.v1 as components
-from datetime import datetime
 
-from services.OpenWeatherMap import OpenWeatherMap
 from services.GoogleMaps import GoogleMaps
 from services.CityStateData import CityStateData
-from services.AppData import AppData
 from services.Utils import Utils
 
 from views.WeatherView import WeatherView
@@ -57,21 +54,23 @@ class TripView:
         st.write("#### 🤖 Roteiro")
         self.render_schedule()
 
-        st.write("#### 📝 Notas")
-        self.render_notes()
+        if self.trip.notes:
+            st.write("#### 📝 Notas")
+            self.render_notes()
 
     def render_origin_destination(self):
-        # Display origin and destination date
         col1, col2 = st.columns(2)
         with col1.container(border=True):
-            st.write(f"##### Origem: {self.trip.origin_city}, {self.trip.origin_state}")
-            st.write(f"###### 📆 Partida: {Utils.format_date(self.trip.start_date)}")
+            st.write(
+                f"##### 🏠 Origem: {self.trip.origin_city}, {self.trip.origin_state}"
+            )
+            st.write(f"📆 Partida: {Utils.format_date(self.trip.start_date)}")
 
         with col2.container(border=True):
             st.write(
-                f"##### Destino: {self.trip.destination_city}, {self.trip.destination_state}"
+                f"##### 📍 Destino: {self.trip.destination_city}, {self.trip.destination_state}"
             )
-            st.write(f"###### 📆 Retorno: {Utils.format_date(self.trip.end_date)}")
+            st.write(f"📆 Retorno: {Utils.format_date(self.trip.end_date)}")
 
     def render_title(self):
         """
