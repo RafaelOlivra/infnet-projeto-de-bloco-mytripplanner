@@ -50,31 +50,43 @@ class WeatherView:
             return
 
         # Display temperatures in 5 columns
-        cols = st.columns(5)
+        columns = 6
+        cols = st.columns(columns)
         i = 0
-        for forecast in self.forecast:
+        for d in range(self.days):
 
-            # Convert each Forecast object to dictionary
-            forecast = forecast.__dict__
+            if d >= len(self.forecast):
+                forecast = None
+            else:
+                forecast = self.forecast[d]
+                forecast = forecast.__dict__
 
-            if i < 5:  # Only show the first 5 days
-                with cols[i]:
-                    # Display the weather icon
-                    weather_icon = self._get_weather_icon(forecast["weather"])
+            with cols[i % columns]:
+
+                # Skip if no forecast data is available
+                if not forecast or not forecast["weather"]:
+                    weather_icon = self._get_weather_icon("desconhecido")
                     st.write(f"#### {weather_icon}")
-
-                    # Format date
-                    forecast_timestamp = forecast["timestamp"]
-                    forecast_date = datetime.fromtimestamp(forecast_timestamp)
-                    forecast_date = Utils.format_date(forecast_date)
-
-                    # Display the weather and temperature using st.metric
-                    st.metric(
-                        label=f"{forecast_date}",
-                        value=f"{int(forecast['temperature_max'])}°C",
-                        delta=f"Min: {int(forecast['temperature_min'])}°C",
-                    )
+                    st.write("Não há dados de tempo para o período.")
                     i += 1
+                    break
+
+                # Display the weather icon
+                weather_icon = self._get_weather_icon(forecast["weather"])
+                st.write(f"#### {weather_icon}")
+
+                # Format date
+                forecast_timestamp = forecast["timestamp"]
+                forecast_date = datetime.fromtimestamp(forecast_timestamp)
+                forecast_date = Utils.format_date(forecast_date)
+
+                # Display the weather and temperature using st.metric
+                st.metric(
+                    label=f"{forecast_date}",
+                    value=f"{int(forecast['temperature_max'])}°C",
+                    delta=f"Min: {int(forecast['temperature_min'])}°C",
+                )
+                i += 1
 
     def _get_forecast(self):
         """

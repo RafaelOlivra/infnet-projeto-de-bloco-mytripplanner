@@ -81,7 +81,7 @@ class TripView:
 
         # Display trip title centered
         icon = Trip.get_travel_by_icon(self.trip.travel_by)
-        st.title(f"{icon} {self.trip.title}")
+        st.write(f"## {icon} {self.trip.title}")
 
     def render_tags(self):
         """
@@ -140,11 +140,15 @@ class TripView:
             st.write("Em breve...")
 
     def render_forecast(self):
+        trip_length = Trip._calculate_trip_length(
+            self.trip.start_date, self.trip.end_date
+        )
         with st.container(border=True):
             WeatherView(
                 city_name=self.trip.destination_city,
                 state_name=self.trip.destination_state,
                 weather_data=self.trip.weather,
+                days=trip_length,
             ).render_forecast()
 
     def render_attractions(self):

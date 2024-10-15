@@ -1,7 +1,9 @@
 import json
 import csv
 import base64
+
 from io import StringIO
+from datetime import datetime
 
 from services.TripData import TripData
 from services.LatLong import LatLong
@@ -55,6 +57,22 @@ class Trip:
             trip_data["weather"] = OpenWeatherMap().get_forecast_for_next_5_days(
                 trip_data.get("destination_city"), trip_data.get("destination_state")
             )
+
+        # Store weather that are within the trip dates
+        if "weather" in trip_data:
+            weather = []
+            for forecast in trip_data["weather"]:
+                # Convert the date string to a datetime object if not already
+                if isinstance(forecast.date, str):
+                    forecast.date = datetime.strptime(forecast.date, "%Y-%m-%d").date()
+                # Check if the forecast date is within the trip dates
+                if (
+                    trip_data.get("start_date")
+                    <= forecast.date
+                    <= trip_data.get("end_date")
+                ):
+                    weather.append(forecast)
+            trip_data["weather"] = weather
 
         self.model = TripModel(**trip_data)
         self.id = self.model.id
@@ -186,6 +204,16 @@ class Trip:
     # --------------------------
     # Utils
     # --------------------------
+
+    @staticmethod
+    def _calculate_trip_length(start_date: datetime = None, end_date: datetime = None):
+        if not start_date or not end_date:
+            return 0
+
+        try:
+            return (end_date - start_date).days + 1
+        except Exception as e:
+            return 0
 
     @staticmethod
     def _get_coordinates(city, state):
