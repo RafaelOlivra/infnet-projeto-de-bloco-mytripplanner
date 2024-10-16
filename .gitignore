@@ -1,7 +1,6 @@
 # General
 .venv
 .env
-.vscode
 .caddy-config
 .ipynb_checkpoints
 *Zone.Identifier
