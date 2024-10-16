@@ -280,7 +280,7 @@ def Cadastrar():
             del st.session_state.add_new_trip_form
 
             # Change to the trip view
-            st.session_state.selected_trip_id = trip.id
+            st.session_state.selected_trip_id = trip.get("id")
             with st.spinner("Redirecionando..."):
                 st.switch_page("pages/02_🗺️_Minhas_Viagens.py")
 

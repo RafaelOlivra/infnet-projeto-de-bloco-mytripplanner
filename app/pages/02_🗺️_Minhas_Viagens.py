@@ -114,7 +114,7 @@ def View_Trip():
         )
         and confirm_delete
     ):
-        TripData().delete(trip.id)
+        TripData().delete(trip.get("id"))
         st.session_state.selected_trip_id = None
         st.success("Viagem deletada com sucesso!")
         with st.spinner("Atualizando..."):
