@@ -23,15 +23,20 @@ def mock_json_data():
     }
 
 
-@patch("services.AppData.get_config")
-@patch("builtins.open", new_callable=mock_open, read_data=json.dumps(mock_json_data()))
-def test_init(mock_open, mock_get_config):
+@patch("services.AppData")
+@patch("builtins.open", new_callable=mock_open)
+def test_init(mock_open, mock_get_config, mock_json_data):
     # Mocking AppData to return a fake JSON file path
     mock_get_config.return_value = "fake_path.json"
 
+    # Mock the file read to return the mock JSON data
+    mock_open.return_value.__enter__.return_value.read.return_value = json.dumps(
+        mock_json_data
+    )
+
     city_state_data = CityStateData()
 
-    assert city_state_data.city_state_data == mock_json_data()
+    assert city_state_data.city_state_data == mock_json_data
 
 
 def test_get_states(mock_json_data):
