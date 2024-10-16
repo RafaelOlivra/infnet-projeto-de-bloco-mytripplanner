@@ -83,7 +83,7 @@ def View_Trip():
         st.download_button(
             label="Exportar Dados da Viagem (CSV)",
             data=csv_data,
-            file_name=f"{trip.model.slug}.csv",
+            file_name=f"{trip.get("slug")}.csv",
             mime="text/csv",
             use_container_width=True,
         )
@@ -92,7 +92,7 @@ def View_Trip():
         st.download_button(
             label="Exportar Dados da Viagem (JSON)",
             data=json_data,
-            file_name=f"{trip.model.slug}.json",
+            file_name=f"{trip.get("slug")}.json",
             mime="application/json",
             use_container_width=True,
         )

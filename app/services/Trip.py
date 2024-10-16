@@ -90,6 +90,11 @@ class Trip:
         self.model = TripModel(**trip_data)
         return self._save()
 
+    def get(self, id):
+        if not self.model:
+            return None
+        return self.model.__getattribute__(id)
+
     def update(self, trip_data: dict) -> bool:
         updated_data = self.model.dict()
         updated_data.update(trip_data)
