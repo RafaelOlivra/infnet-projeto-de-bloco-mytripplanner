@@ -13,6 +13,7 @@ Caddyfile
 .run.powershell
 /data/.storage/
 *.storage
+/app/__app__.py
 
 # Compiled Python bytecode
 *.py[cod]
