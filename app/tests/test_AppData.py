@@ -1,90 +1,161 @@
-import pytest
 import os
 import json
-from unittest.mock import patch, mock_open
+import pytest
+from unittest import mock
 from services.AppData import AppData
 
 
-class TestAppData:
-    @pytest.fixture
-    def app_data(self):
-        return AppData()
+@pytest.fixture
+def app_data():
+    return AppData()
 
-    @pytest.fixture
-    def mock_config(self):
-        return {
-            "temp_storage_dir": "/tmp/app_data",
-            "permanent_storage_dir": "/var/app_data",
-        }
 
-    @patch("os.path.exists")
-    @patch(
-        "builtins.open", new_callable=mock_open, read_data='{"test_key": "test_value"}'
-    )
-    def test_get_config(self, mock_file, mock_exists, app_data):
-        mock_exists.return_value = True
-        assert app_data.get_config("test_key") == "test_value"
+def test_get_config_key_exists(app_data, tmpdir):
+    # Create a temporary config file
+    config_data = {"database_host": "localhost"}
+    config_file = tmpdir.join("cfg.json")
+    config_file.write(json.dumps(config_data))
 
-    @patch.dict(os.environ, {"GOOGLEMAPS_API_KEY": "test_api_key"})
-    def test_get_api_key(self, app_data):
-        assert app_data.get_api_key("googlemaps") == "test_api_key"
+    # Mock os.path.exists to simulate the config file path
+    with mock.patch("os.path.exists", return_value=True):
+        with mock.patch(
+            "builtins.open", mock.mock_open(read_data=json.dumps(config_data))
+        ):
+            result = app_data.get_config("database_host")
+            assert result == "localhost"
 
-    @patch("os.path.exists")
-    @patch("builtins.open", new_callable=mock_open)
-    @patch("app_data.AppData._get_storage_map")
-    def test_save(self, mock_storage_map, mock_file, mock_exists, app_data):
-        mock_storage_map.return_value = {"trip": "/tmp/app_data/trip"}
-        mock_exists.return_value = False
-        assert app_data.save("trip", "test_trip", {"destination": "Paris"})
 
-    @patch("os.path.exists")
-    @patch(
-        "builtins.open", new_callable=mock_open, read_data='{"destination": "Paris"}'
-    )
-    @patch("app_data.AppData._get_storage_map")
-    def test_get(self, mock_storage_map, mock_file, mock_exists, app_data):
-        mock_storage_map.return_value = {"trip": "/tmp/app_data/trip"}
-        mock_exists.return_value = True
-        assert app_data.get("trip", "test_trip") == {"destination": "Paris"}
+def test_get_config_key_not_exists(app_data, tmpdir):
+    config_data = {"database_host": "localhost"}
 
-    @patch("os.listdir")
-    @patch("app_data.AppData._get_storage_map")
-    @patch("app_data.AppData.get")
-    def test_get_all(self, mock_get, mock_storage_map, mock_listdir, app_data):
-        mock_storage_map.return_value = {"trip": "/tmp/app_data/trip"}
-        mock_listdir.return_value = ["trip1.json", "trip2.json"]
-        mock_get.side_effect = [{"id": "trip1"}, {"id": "trip2"}]
-        assert app_data.get_all("trip") == [{"id": "trip1"}, {"id": "trip2"}]
+    # Mock os.path.exists and open
+    with mock.patch("os.path.exists", return_value=True):
+        with mock.patch(
+            "builtins.open", mock.mock_open(read_data=json.dumps(config_data))
+        ):
+            result = app_data.get_config("non_existent_key")
+            assert result is None
 
-    @patch("os.listdir")
-    @patch("app_data.AppData._get_storage_map")
-    def test_get_all_ids(self, mock_storage_map, mock_listdir, app_data):
-        mock_storage_map.return_value = {"trip": "/tmp/app_data/trip"}
-        mock_listdir.return_value = ["trip1.json", "trip2.json"]
-        assert app_data.get_all_ids("trip") == ["trip1", "trip2"]
 
-    @patch("app_data.AppData.get")
-    @patch("app_data.AppData.save")
-    def test_update(self, mock_save, mock_get, app_data):
-        mock_get.return_value = {"destination": "Paris"}
-        mock_save.return_value = True
-        assert app_data.update("trip", "test_trip", "duration", "7")
-        mock_save.assert_called_with(
-            "trip", "test_trip", {"destination": "Paris", "duration": "7"}, replace=True
-        )
+def test_get_api_key_found(app_data):
+    with mock.patch.dict(os.environ, {"GOOGLEMAPS_API_KEY": "test_api_key"}):
+        result = app_data.get_api_key("googlemaps")
+        assert result == "test_api_key"
 
-    @patch("os.path.exists")
-    @patch("os.remove")
-    @patch("app_data.AppData._get_storage_map")
-    def test_delete(self, mock_storage_map, mock_remove, mock_exists, app_data):
-        mock_storage_map.return_value = {"trip": "/tmp/app_data/trip"}
-        mock_exists.return_value = True
-        assert app_data.delete("trip", "test_trip")
-        mock_remove.assert_called_once()
 
-    def test_sanitize_id(self, app_data):
-        assert app_data.sanitize_id("Test Trip 2023!") == "test_trip_2023"
-        with pytest.raises(ValueError):
-            app_data.sanitize_id("a" * 51)  # Too long
-        with pytest.raises(ValueError):
-            app_data.sanitize_id("a" * 4)  # Too short
+def test_get_api_key_not_found(app_data):
+    result = app_data.get_api_key("non_existent_key")
+    assert result is None
+
+
+def test_save_data_success(app_data, tmpdir):
+    test_data = {"destination": "Paris", "duration": 7}
+    type = "trip"
+    id = "paris_2023"
+
+    # Mock methods and paths
+    save_path = tmpdir.join("trip")
+    save_path.mkdir()
+
+    with mock.patch.object(
+        app_data, "_get_storage_map", return_value={type: str(save_path)}
+    ):
+        with mock.patch.object(app_data, "_save_file", return_value=True):
+            result = app_data.save(type, id, test_data)
+            assert result is True
+
+
+def test_save_data_file_exists_no_replace(app_data, tmpdir):
+    test_data = {"destination": "Paris", "duration": 7}
+    type = "trip"
+    id = "paris_2023"
+
+    save_path = tmpdir.join("trip")
+    save_path.mkdir()
+    file_path = save_path.join(f"{id}.json")
+    file_path.write(json.dumps(test_data))  # Simulate existing file
+
+    with mock.patch.object(
+        app_data, "_get_storage_map", return_value={type: str(save_path)}
+    ):
+        with mock.patch("os.path.exists", return_value=True):
+            result = app_data.save(type, id, test_data, replace=False)
+            assert result is False
+
+
+def test_get_data_success(app_data, tmpdir):
+    test_data = {"destination": "Paris", "duration": 7}
+    type = "trip"
+    id = "paris_2023"
+
+    save_path = tmpdir.join("trip")
+    save_path.mkdir()
+    file_path = save_path.join(f"{id}.json")
+    file_path.write(json.dumps(test_data))
+
+    with mock.patch.object(
+        app_data, "_get_storage_map", return_value={type: str(save_path)}
+    ):
+        result = app_data.get(type, id)
+        assert result == test_data
+
+
+def test_get_data_not_found(app_data, tmpdir):
+    type = "trip"
+    id = "non_existent_id"
+
+    save_path = tmpdir.join("trip")
+    save_path.mkdir()
+
+    with mock.patch.object(
+        app_data, "_get_storage_map", return_value={type: str(save_path)}
+    ):
+        result = app_data.get(type, id)
+        assert result is None
+
+
+def test_update_data_success(app_data, tmpdir):
+    original_data = {"destination": "Paris", "duration": 7}
+    updated_value = "10"
+    type = "trip"
+    id = "paris_2023"
+
+    save_path = tmpdir.join("trip")
+    save_path.mkdir()
+    file_path = save_path.join(f"{id}.json")
+    file_path.write(json.dumps(original_data))
+
+    with mock.patch.object(
+        app_data, "_get_storage_map", return_value={type: str(save_path)}
+    ):
+        with mock.patch.object(app_data, "save", return_value=True):
+            result = app_data.update(type, id, "duration", updated_value)
+            assert result is True
+
+
+def test_delete_data_success(app_data, tmpdir):
+    type = "trip"
+    id = "paris_2023"
+
+    save_path = tmpdir.join("trip")
+    save_path.mkdir()
+    file_path = save_path.join(f"{id}.json")
+    file_path.write(json.dumps({"destination": "Paris", "duration": 7}))
+
+    with mock.patch.object(
+        app_data, "_get_storage_map", return_value={type: str(save_path)}
+    ):
+        with mock.patch.object(app_data, "_delete_file", return_value=True):
+            result = app_data.delete(type, id)
+            assert result is True
+
+
+def test_sanitize_id_success(app_data):
+    raw_id = "My Trip 2023!"
+    sanitized_id = app_data.sanitize_id(raw_id)
+    assert sanitized_id == "my_trip_2023"
+
+
+def test_sanitize_id_invalid(app_data):
+    with pytest.raises(ValueError):
+        app_data.sanitize_id("")

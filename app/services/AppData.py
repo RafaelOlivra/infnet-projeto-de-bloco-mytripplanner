@@ -58,7 +58,7 @@ class AppData:
                 return data.get(key)
         return None
 
-    def get_api_key(self, key: str) -> str:
+    def get_api_key(self, key: str) -> None:
         """
         Retrieve an API key from environment variables.
 
@@ -83,6 +83,14 @@ class AppData:
             "googlemaps": "GOOGLEMAPS_API_KEY",
             "scraperapi": "SCRAPER_API_KEY",
         }
+
+        try:
+            if not key_map.get(key):
+                raise ValueError("API key not found.")
+        except ValueError as e:
+            print(f"Error retrieving API key: {e}")
+            return None
+
         return os.getenv(key_map.get(key))
 
     def save(
