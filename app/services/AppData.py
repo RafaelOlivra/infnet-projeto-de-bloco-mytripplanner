@@ -1,7 +1,8 @@
 import os
 import json
 import streamlit as st
-from datetime import datetime, timedelta
+
+from typing import Any, Union
 
 
 class AppData:
@@ -137,7 +138,7 @@ class AppData:
             id (str): The unique identifier for the data.
 
         Returns:
-            dict: The retrieved data as a dictionary, or None if not found.
+            dict: The retrieved JSON data as a dictionary, or None if not found.
 
         Raises:
             ValueError: If the id is invalid.
