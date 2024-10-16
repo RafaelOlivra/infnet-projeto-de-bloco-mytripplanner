@@ -1,15 +1,16 @@
 import json
 import pytest
-from unittest.mock import patch, Mock
+import time
+
+from unittest.mock import patch
 from services.Trip import Trip
-from services.AppData import AppData
 
 
 @pytest.fixture
 def mock_trip_data():
     # Sample JSON data for testing
     return {
-        "id": "7d007d1c-0000-48c2-814d-c7d0e78a44cd",
+        "id": "00000000-0000-0000-0000-000000000000",
         "user_id": 0,
         "slug": "teste",
         "title": "Teste",
@@ -35,17 +36,6 @@ def mock_trip_data():
                 "temperature_max": 23.92,
                 "weather": "nuvens dispersas",
                 "wind_speed": 9.41,
-            },
-            {
-                "timestamp": 1729047600,
-                "date": "2024-10-16 00:00:00",
-                "city_name": "Arraial do Cabo",
-                "state_name": "RJ",
-                "temperature": None,
-                "temperature_min": 21.07,
-                "temperature_max": 22.76,
-                "weather": "nublado",
-                "wind_speed": 8.62625,
             },
         ],
         "attractions": [
@@ -99,11 +89,7 @@ def test_update_trip(app_data_mock, mock_trip_data):
 
 
 # Test deleting a trip
-@patch("services.TripData.AppData.delete")
-def test_delete_trip(app_data_mock, mock_trip_data):
-
-    # Create a mock instance of AppData
-    app_data_mock.return_value.return_value = True
+def test_delete_trip(mock_trip_data):
 
     # Create a new trip
     trip = Trip(trip_data=mock_trip_data)
