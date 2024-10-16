@@ -26,6 +26,7 @@ Esse é um projeto criado para o curso de Ciência de Dados da faculdade Infnet.
 -   [Dados de Turismo Gov.br](https://www.mapa.turismo.gov.br/mapa/init.html#/home)
 
 ## Changelog
+-   16/Oct/2024 \* Preparação para implementação do FastAPI
 -   02/Oct/2024 \* Atualizado Business Docs
 -   23/Sep/2024 \* Dev Protótipo Inicial Streamlit
 -   23/Aug/2024 \* Atualizado Página Streamlit
