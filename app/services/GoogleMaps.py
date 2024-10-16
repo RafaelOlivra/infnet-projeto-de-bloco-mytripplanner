@@ -4,7 +4,7 @@ import streamlit as st
 from datetime import datetime, timedelta
 
 from services.AppData import AppData
-from services.Utils import Utils
+from lib.Utils import Utils
 
 
 class GoogleMaps:

@@ -3,8 +3,8 @@ import streamlit as st
 from datetime import datetime, timedelta
 
 from services.AppData import AppData
-from services.LatLong import LatLong
-from services.Utils import Utils
+from lib.LatLong import LatLong
+from lib.Utils import Utils
 from typing import List
 
 from models.Weather import ForecastModel, WeatherModel

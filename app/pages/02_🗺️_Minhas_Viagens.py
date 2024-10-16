@@ -1,10 +1,9 @@
 import streamlit as st
-import pandas as pd
-from io import StringIO
 import time
 
 from services.TripData import TripData
-from models.Trip import Trip
+from services.Trip import Trip
+
 from views.TripView import TripView
 
 # --------------------------

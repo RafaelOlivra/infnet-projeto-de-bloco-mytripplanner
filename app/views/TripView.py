@@ -4,13 +4,13 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from services.GoogleMaps import GoogleMaps
-from services.CityStateData import CityStateData
-from services.Utils import Utils
+from services.CityState import CityStateData
+from lib.Utils import Utils
 
 from views.WeatherView import WeatherView
 from views.AttractionsView import AttractionsView
 
-from models.Trip import Trip
+from services.Trip import Trip
 
 
 class TripView:

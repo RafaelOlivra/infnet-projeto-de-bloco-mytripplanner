@@ -3,9 +3,9 @@ import streamlit.components.v1 as components
 import streamlit_tags as st_tags
 import datetime
 
-from models.Trip import Trip
+from services.Trip import Trip
 
-from services.CityStateData import CityStateData
+from services.CityState import CityStateData
 from services.GoogleMaps import GoogleMaps
 
 from views.WeatherView import WeatherView

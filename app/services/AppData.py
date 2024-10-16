@@ -127,7 +127,7 @@ class AppData:
         return self._save_file(file_path, json)
 
     @st.cache_data(ttl=10)
-    def get(self, type: str, id: str) -> dict:
+    def get(_self, type: str, id: str) -> dict:
         """
         Retrieve data from a file.
 
@@ -152,11 +152,11 @@ class AppData:
         if not type or not id:
             return None
 
-        id = self.sanitize_id(id)
+        id = _self.sanitize_id(id)
         if not id:
             return None
 
-        folder_map = self._get_storage_map()
+        folder_map = _self._get_storage_map()
         save_path = folder_map.get(type)
         file_path = f"{save_path}/{id}.json"
 
