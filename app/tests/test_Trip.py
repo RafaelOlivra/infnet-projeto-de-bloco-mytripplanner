@@ -4,6 +4,7 @@ import time
 
 from unittest.mock import patch
 from services.Trip import Trip
+from services.TripData import TripData
 
 
 @pytest.fixture
@@ -59,10 +60,9 @@ def mock_trip_data():
 
 # Test creating a new trip
 @patch("services.TripData.AppData.save")
-def test_create_trip(app_data_mock, mock_trip_data):
-
+def test_create_trip(app_data_save_mock, mock_trip_data):
     # Create a mock instance of AppData
-    app_data_mock.return_value.return_value = True
+    app_data_save_mock.return_value = True
 
     # Create a new trip
     trip = Trip(trip_data=mock_trip_data)
@@ -71,12 +71,23 @@ def test_create_trip(app_data_mock, mock_trip_data):
     assert trip.model.id == mock_trip_data["id"]
 
 
+# Test creating a duplicate trip
+@patch("services.TripData.AppData.get")
+def test_create_duplicate_trip(app_data_get_mock, mock_trip_data):
+    # Create a mock instance of AppData
+    app_data_get_mock.return_value = mock_trip_data
+
+    # We should raise an error if the trip already exists
+    with pytest.raises(ValueError):
+        Trip(trip_data=mock_trip_data)
+
+
 # Test updating a trip
 @patch("services.TripData.AppData.save")
-def test_update_trip(app_data_mock, mock_trip_data):
+def test_update_trip(app_data_save_mock, mock_trip_data):
 
     # Create a mock instance of AppData
-    app_data_mock.return_value.return_value = True
+    app_data_save_mock.return_value = True
 
     # Create a new trip
     trip = Trip(trip_data=mock_trip_data)

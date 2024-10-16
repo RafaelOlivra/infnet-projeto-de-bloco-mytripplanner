@@ -31,6 +31,10 @@ class Trip:
         if not trip_data:
             raise ValueError("Trip data is required to create a trip.")
 
+        # Check if the trip data has an ID and if it exists
+        if "id" in trip_data and TripData().get(trip_data["id"]):
+            raise ValueError("Trip with the same ID already exists.")
+
         trip_data["slug"] = Utils().slugify(trip_data.get("title", ""))
 
         # Get coordinates for origin and destination
@@ -235,7 +239,9 @@ class Trip:
         return True
 
     def _save(self) -> bool:
-        return TripData().save(value=self.model, id=self.model.id)
+        if not TripData().save(value=self.model, id=self.model.id):
+            self.model = None
+            return False
 
     # --------------------------
     # Utils
