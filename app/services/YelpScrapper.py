@@ -5,7 +5,7 @@ import streamlit as st
 from services.AppData import AppData
 from services.Utils import Utils
 
-from models.AttractionModel import AttractionModel
+from models.Attraction import AttractionModel
 
 
 class YelpScrapper:

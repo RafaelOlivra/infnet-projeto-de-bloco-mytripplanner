@@ -1,5 +1,6 @@
-from services.AppData import AppData
 import json
+
+from services.AppData import AppData
 
 
 class CityStateData:

@@ -6,7 +6,7 @@ from datetime import datetime
 from services.OpenWeatherMap import OpenWeatherMap
 from services.Utils import Utils
 
-from models.WeatherModel import ForecastModel
+from models.Weather import ForecastModel
 from typing import List
 
 

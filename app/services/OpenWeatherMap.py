@@ -5,9 +5,9 @@ from datetime import datetime, timedelta
 from services.AppData import AppData
 from services.LatLong import LatLong
 from services.Utils import Utils
-
-from models.WeatherModel import ForecastModel, WeatherModel
 from typing import List
+
+from models.Weather import ForecastModel, WeatherModel
 
 
 class OpenWeatherMap:

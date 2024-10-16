@@ -4,7 +4,7 @@ from services.YelpScrapper import YelpScrapper
 from services.AttractionsData import AttractionsData
 from services.Utils import Utils
 
-from models.AttractionModel import AttractionModel
+from models.Attraction import AttractionModel
 from typing import List
 
 

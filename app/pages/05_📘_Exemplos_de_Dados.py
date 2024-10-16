@@ -7,7 +7,7 @@ from services.OpenWeatherMap import OpenWeatherMap
 from services.GoogleMaps import GoogleMaps
 from services.YelpScrapper import YelpScrapper
 
-from models.AttractionModel import AttractionModel
+from models.Attraction import AttractionModel
 
 st.set_page_config(
     page_title="Exemplo: OpenWeatherMap",

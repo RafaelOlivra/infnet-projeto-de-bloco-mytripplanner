@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from services.AppData import AppData
 from services.Utils import Utils
 
-from models.TripModel import TripModel
+from models.Trip import TripModel
 
 
 class TripData:

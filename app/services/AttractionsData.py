@@ -1,12 +1,9 @@
-import os
-import json
-import streamlit as st
+from typing import List
 
 from services.AppData import AppData
 from services.Utils import Utils
 
-from models.AttractionModel import AttractionModel
-from typing import List
+from models.Attraction import AttractionModel
 
 
 class AttractionsData:
@@ -77,7 +74,9 @@ class AttractionsData:
     # --------------------------
     # Utils
     # --------------------------
-    def slugify(self, city_name: str, state_name: str) -> str:
+
+    @staticmethod
+    def slugify(city_name: str, state_name: str) -> str:
         """
         Generate a unique ID based on the city and state names.
 
