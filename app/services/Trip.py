@@ -13,21 +13,21 @@ from services.TripData import TripData
 from services.OpenWeatherMap import OpenWeatherMap
 
 from models.Weather import ForecastModel
+from models.Trip import TripModel
 
 
 class Trip:
     def __init__(self, id: str = None, trip_data: dict = None):
         if id:
-            self.id = id
-            if not self._load():
-                raise ValueError(f"Trip with ID {self.id} could not be loaded.")
+            if not self._load(id):
+                raise ValueError(f"Trip with ID {id} could not be loaded.")
         elif trip_data:
             self.create(trip_data)
 
     # --------------------------
     # CRUD Operations
     # --------------------------
-    def create(self, trip_data: dict):
+    def create(self, trip_data: dict) -> bool:
         if not trip_data:
             raise ValueError("Trip data is required to create a trip.")
 
@@ -88,11 +88,9 @@ class Trip:
             trip_data["weather"] = weather
 
         self.model = TripModel(**trip_data)
-        self.id = self.model.id
-        self.slug = self.model.slug
         return self._save()
 
-    def update(self, trip_data: dict):
+    def update(self, trip_data: dict) -> bool:
         updated_data = self.model.dict()
         updated_data.update(trip_data)
 
@@ -121,11 +119,12 @@ class Trip:
             )
 
         self.model = TripModel(**updated_data)
-        self._save()
-        return self
+        return self._save()
 
-    def delete(self):
-        return TripData().delete(self.model.id)
+    def delete(self) -> bool:
+        if TripData().delete(self.model.id):
+            self.model = None
+            return True
 
     # --------------------------
     # Export/Import
@@ -223,16 +222,14 @@ class Trip:
     # Data Operations
     # --------------------------
 
-    def _load(self):
-        trip = TripData().get(self.id)
+    def _load(self, trip_id: str) -> bool:
+        trip = TripData().get(trip_id)
         if not trip:
             return False
         self.model = trip
-        self.id = trip.id
-        self.slug = trip.slug
         return True
 
-    def _save(self):
+    def _save(self) -> bool:
         return TripData().save(value=self.model, id=self.model.id)
 
     # --------------------------

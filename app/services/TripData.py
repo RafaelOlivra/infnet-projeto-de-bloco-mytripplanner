@@ -16,7 +16,7 @@ class TripData:
     # --------------------------
     # File Operations
     # --------------------------
-    def save(self, id, key="", value=""):
+    def save(self, id, key="", value="") -> bool:
         """
         Save or update trip data to a JSON file.
 
@@ -80,7 +80,7 @@ class TripData:
                 print(f"Error validating trip data: {e}")
         return None
 
-    def delete(self, id):
+    def delete(self, id) -> bool:
         """
         Delete the trip data for the specified trip ID.
 
