@@ -47,7 +47,11 @@ class GoogleMaps:
             raise ValueError(f"Could not retrieve coordinates for location: {location}")
 
     def get_directions_url(
-        self, origin: str, destination: str, location_mode: str | None = "coordinates"
+        self,
+        origin: str,
+        destination: str,
+        location_mode: str | None = "coordinates",
+        mode: str | None = None,
     ) -> str:
         """
         Generate Google Maps directions URL.
@@ -63,22 +67,23 @@ class GoogleMaps:
         if location_mode == "coordinates":
             origin_lat_long = self.get_latitude_longitude(origin)
             destination_lat_long = self.get_latitude_longitude(destination)
-            origin = f"{origin_lat_long[0]}, {origin_lat_long[1]}"
-            destination = f"{destination_lat_long[0]}, {destination_lat_long[1]}"
+            origin = f"{origin_lat_long[0]},{origin_lat_long[1]}"
+            destination = f"{destination_lat_long[0]},{destination_lat_long[1]}"
         else:
             origin = Utils().url_encode(origin)
             destination = Utils().url_encode(destination)
 
+        mode_param = f"&travelmode={mode}" if mode else ""
         base_url = "https://www.google.com/maps/dir/?api=1"
-        url = f"{base_url}&origin={origin}&destination={destination}"
+        url = f"{base_url}&origin={origin}&destination={destination}&dir_action=navigate&{mode_param}"
         return url
 
     def get_directions(
         self,
         origin: str,
         destination: str,
-        mode: str | None = None,
         location_mode: str | None = "coordinates",
+        mode: str | None = None,
     ) -> dict:
         """
         Get directions from an origin to a destination using the Google Maps Directions API.
@@ -109,8 +114,8 @@ class GoogleMaps:
         origin: str,
         destination: str,
         zoom: int | None = None,
-        mode: str | None = None,
         location_mode: str | None = "coordinates",
+        mode: str | None = None,
     ) -> str:
         """
         Generate URL code for an iframe that displays Google Maps directions.

@@ -116,6 +116,16 @@ class TripView:
         )
         components.iframe(iframe_url, height=450)
 
+        directions_url = google_maps.get_directions_url(
+            origin=origin, destination=destination, mode=self.trip.travel_by
+        )
+        st.link_button(
+            label="Como Chegar ↗️",
+            url=directions_url,
+            use_container_width=True,
+            type="primary",
+        )
+
     def render_goals(self):
         """
         Render the trip objectives.
