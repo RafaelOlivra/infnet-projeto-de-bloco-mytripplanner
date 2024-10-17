@@ -11,12 +11,6 @@ from typing import List
 
 
 class WeatherView:
-    city_name = ""
-    state_name = ""
-    days = 5
-    forecast = None
-    weather_data = None
-
     def __init__(
         self,
         city_name="",
