@@ -7,7 +7,6 @@ from services.Trip import Trip
 from services.TripData import TripData
 
 
-@pytest.fixture
 def mock_trip_data():
     # Sample JSON data for testing
     return {
@@ -60,25 +59,25 @@ def mock_trip_data():
 
 # Test creating a new trip
 @patch("services.TripData.AppData.save")
-def test_create_trip(app_data_save_mock, mock_trip_data):
+def test_create_trip(app_data_save_mock):
     # Create a mock instance of AppData
     app_data_save_mock.return_value = True
 
     # Create a new trip
-    trip = Trip(trip_data=mock_trip_data)
+    trip = Trip(trip_data=mock_trip_data())
 
     # Check if the trip was created correctly
-    assert trip.model.id == mock_trip_data["id"]
+    assert trip.model.id == mock_trip_data()["id"]
 
 
 # Test getting a property from the trip
 @patch("services.TripData.AppData.save")
-def test_get_trip_property(app_data_save_mock, mock_trip_data):
+def test_get_trip_property(app_data_save_mock):
     # Create a mock instance of AppData
     app_data_save_mock.return_value = True
 
     # Create a new trip
-    trip = Trip(trip_data=mock_trip_data)
+    trip = Trip(trip_data=mock_trip_data())
 
     # Check if the property is correct
     assert trip.get("title") == "Teste"
@@ -86,24 +85,24 @@ def test_get_trip_property(app_data_save_mock, mock_trip_data):
 
 # Test creating a duplicate trip
 @patch("services.TripData.AppData.get")
-def test_create_duplicate_trip(app_data_get_mock, mock_trip_data):
+def test_create_duplicate_trip(app_data_get_mock):
     # Create a mock instance of AppData
-    app_data_get_mock.return_value = mock_trip_data
+    app_data_get_mock.return_value = mock_trip_data()
 
     # We should raise an error if the trip already exists
     with pytest.raises(ValueError):
-        Trip(trip_data=mock_trip_data)
+        Trip(trip_data=mock_trip_data())
 
 
 # Test updating a trip
 @patch("services.TripData.AppData.save")
-def test_update_trip(app_data_save_mock, mock_trip_data):
+def test_update_trip(app_data_save_mock):
 
     # Create a mock instance of AppData
     app_data_save_mock.return_value = True
 
     # Create a new trip
-    trip = Trip(trip_data=mock_trip_data)
+    trip = Trip(trip_data=mock_trip_data())
 
     # Update the trip
     trip.update({"title": "Updated title"})
@@ -113,10 +112,10 @@ def test_update_trip(app_data_save_mock, mock_trip_data):
 
 
 # Test deleting a trip
-def test_delete_trip(mock_trip_data):
+def test_delete_trip():
 
     # Create a new trip
-    trip = Trip(trip_data=mock_trip_data)
+    trip = Trip(trip_data=mock_trip_data())
 
     # Delete the trip
     trip.delete()
