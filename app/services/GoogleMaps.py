@@ -75,7 +75,7 @@ class GoogleMaps:
 
         mode_param = f"&travelmode={mode}" if mode else ""
         base_url = "https://www.google.com/maps/dir/?api=1"
-        url = f"{base_url}&origin={origin}&destination={destination}&dir_action=navigate&{mode_param}"
+        url = f"{base_url}&origin={origin}&destination={destination}&dir_action=navigate{mode_param}"
         return url
 
     def get_directions(
