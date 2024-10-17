@@ -14,10 +14,7 @@ from services.Trip import Trip
 
 
 class TripView:
-    trip = None
-
     def __init__(self, trip: str):
-
         # Check if got a trip object
         if isinstance(trip, Trip):
             self.trip = trip.model
