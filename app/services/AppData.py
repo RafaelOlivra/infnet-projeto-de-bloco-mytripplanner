@@ -82,6 +82,7 @@ class AppData:
             "openweathermap": "OPENWEATHERMAP_API_KEY",
             "googlemaps": "GOOGLEMAPS_API_KEY",
             "scraperapi": "SCRAPER_API_KEY",
+            "fastapi": "FASTAPI_KEYS",
         }
 
         try:

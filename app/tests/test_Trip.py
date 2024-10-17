@@ -71,6 +71,19 @@ def test_create_trip(app_data_save_mock, mock_trip_data):
     assert trip.model.id == mock_trip_data["id"]
 
 
+# Test getting a property from the trip
+@patch("services.TripData.AppData.save")
+def test_get_trip_property(app_data_save_mock, mock_trip_data):
+    # Create a mock instance of AppData
+    app_data_save_mock.return_value = True
+
+    # Create a new trip
+    trip = Trip(trip_data=mock_trip_data)
+
+    # Check if the property is correct
+    assert trip.get("title") == "Teste"
+
+
 # Test creating a duplicate trip
 @patch("services.TripData.AppData.get")
 def test_create_duplicate_trip(app_data_get_mock, mock_trip_data):

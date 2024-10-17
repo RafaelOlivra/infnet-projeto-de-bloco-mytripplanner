@@ -1,6 +1,6 @@
 import uuid
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from datetime import datetime, date
 from datetime import datetime
 from typing import List, Optional
@@ -32,7 +32,7 @@ class TripModel(BaseModel):
     notes: str = ""
     tags: List[str] = Field(default_factory=list)
 
-    @validator("start_date", "end_date", pre=True)
+    @field_validator("start_date", "end_date")
     def convert_to_datetime(cls, value):
         """
         Convert date to datetime if necessary.

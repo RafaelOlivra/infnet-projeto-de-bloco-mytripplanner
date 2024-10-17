@@ -65,20 +65,7 @@ class TripData:
         Returns:
             TripModel or None: The trip data as a TripModel object.
         """
-        trip_data = _self.app_data.get("trip", id)
-
-        if trip_data:
-
-            # Convert date strings to datetime objects
-            trip_data["start_date"] = Utils.to_datetime(trip_data["start_date"])
-            trip_data["end_date"] = Utils.to_datetime(trip_data["end_date"])
-
-            # Convert the JSON data to a TripModel object
-            try:
-                return TripModel(**trip_data)
-            except ValidationError as e:
-                print(f"Error validating trip data: {e}")
-        return None
+        return _self._to_trip_model(_self.app_data.get("trip", id))
 
     def delete(self, id) -> bool:
         """
@@ -95,20 +82,58 @@ class TripData:
     # --------------------------
     # Data Operations
     # --------------------------
-    def get_available_trip_ids(self):
+    def get_all_ids(self, user_id=0):
         """
         Retrieve a list of available trip IDs.
 
         Returns:
             list: A list of trip IDs.
         """
-        return self.app_data.get_all_ids("trip")
+        trips = self.get_all(user_id)
+        trips = [trip.id for trip in trips]
 
-    def get_available_trips(self):
+    def get_all(self, user_id=0) -> list[TripModel]:
         """
         Retrieve a list of available trips with their IDs and titles.
 
         Returns:
             list: A list of dictionaries containing trip ID and title.
         """
-        return self.app_data.get_all("trip")
+
+        # TODO: This is a temporary solution until we implement user authentication
+        # and a better way to query trips by user ID (Database, etc.)
+        trips = self.app_data.get_all("trip")
+
+        # Filter trips by user ID
+        if user_id:
+            trips = [self._to_trip_model(trip) for trip in trips]
+            trips = [trip for trip in trips if trip.user_id == user_id]
+
+        return trips
+
+    # --------------------------
+    # Utils
+    # --------------------------
+
+    def _to_trip_model(self, trip_data: dict) -> TripModel:
+        """
+        Convert a dictionary to a TripModel object.
+
+        Args:
+            trip_data (dict): The trip data as a dictionary.
+
+        Returns:
+            TripModel: The trip data as a TripModel object.
+        """
+        if not trip_data:
+            return None
+
+        try:
+            # Convert date strings to datetime objects
+            trip_data["start_date"] = Utils.to_datetime(trip_data["start_date"])
+            trip_data["end_date"] = Utils.to_datetime(trip_data["end_date"])
+
+            return TripModel(**trip_data)
+        except ValidationError as e:
+            print(f"Error validating trip data: {e}")
+            return None
