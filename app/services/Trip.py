@@ -104,7 +104,7 @@ class Trip:
         return self.get(attribute)
 
     def update(self, trip_data: dict) -> bool:
-        updated_data = self.model.dict()
+        updated_data = self.model.model_dump()
         updated_data.update(trip_data)
 
         # Get coordinates for origin and destination if they have changed

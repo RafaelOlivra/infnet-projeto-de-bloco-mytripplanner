@@ -12,7 +12,7 @@ from models.Attraction import AttractionModel
 class TripModel(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: int = 0  # For future use
-    created_at: datetime = Field(default_factory=datetime.now)
+    created_at: datetime | date | str = Field(default_factory=datetime.now)
     slug: str
     title: str
     origin_city: str
@@ -24,8 +24,8 @@ class TripModel(BaseModel):
     destination_longitude: float
     destination_latitude: float
     travel_by: str = "driving"
-    start_date: datetime
-    end_date: datetime
+    start_date: datetime | date | str
+    end_date: datetime | date | str
     weather: Optional[List[ForecastModel]] = None
     attractions: Optional[List[AttractionModel]] = None
     goals: str = ""
@@ -43,6 +43,3 @@ class TripModel(BaseModel):
 
     def __getitem__(self, attribute: str):
         return self.__getattribute__(attribute)
-
-    class Config:
-        arbitrary_types_allowed = True

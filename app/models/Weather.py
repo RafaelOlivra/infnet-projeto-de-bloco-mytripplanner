@@ -7,7 +7,7 @@ from lib.Utils import Utils
 
 class ForecastModel(BaseModel):
     timestamp: int
-    date: datetime
+    date: datetime | date | str
     city_name: str
     state_name: str
     temperature: Optional[float]
