@@ -68,7 +68,7 @@ class Utils:
         return requests.utils.quote(text)
 
     @staticmethod
-    def format_date_str(date: datetime | str, format="") -> str:
+    def to_date_string(date: datetime | str, format="") -> str:
         # Convert string to datetime object from isoformat
         if isinstance(date, str):
             date = datetime.fromisoformat(date)

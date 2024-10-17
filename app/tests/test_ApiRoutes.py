@@ -11,8 +11,9 @@ from tests.test_Trip import mock_trip_data
 # Create a test client for the FastAPI app
 client = TestClient(app)
 
-demo_key = "ABCDEFGHIJKLMNOPQRSTUVWXYZ012345:demo"
-headers = {"X-API-Key": "ABCDEFGHIJKLMNOPQRSTUVWXYZ012345"}
+demo_key = "ABCDEFGHIJKLMNOPQRSTUVWXYZ012345:0"
+headers = {"X-API-Key": demo_key}
+user_id = 0
 
 
 @patch("routes.api.ApiKeyHandler._get_raw_keys")
@@ -20,7 +21,7 @@ def test_get_api_keys(mock__get_raw_keys):
     mock__get_raw_keys.return_value = demo_key
 
     keys = ApiKeyHandler().get_available_keys()
-    assert keys == {"ABCDEFGHIJKLMNOPQRSTUVWXYZ012345": "demo"}
+    assert keys == [{"ABCDEFGHIJKLMNOPQRSTUVWXYZ012345": 0}]
 
 
 @patch("services.TripData.TripData.get_all")
@@ -31,6 +32,6 @@ def test_get_all_trips(mock__get_raw_keys, mock_trip_data_get_all):
         TripData()._to_trip_model(trip_data=mock_trip_data())
     ]
 
-    response = client.get("/trips", headers=headers)
+    response = client.get(f"/trips?user_id={0}", headers=headers)
     assert response.json() == [mock_trip_data()]
     assert response.status_code == status.HTTP_200_OK

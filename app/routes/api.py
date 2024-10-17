@@ -30,45 +30,57 @@ api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 
 class ApiKeyHandler:
-    # Parse API keys formatted as ABCDEFGHIJKLMNOPQRSTUVWXYZ012345:label
-    def parse_keys(self, keys: str) -> Dict[str, str]:
+    def parse_keys(self, keys: str) -> list[Dict[str, int]]:
         keys = keys.split(",")
-        keys_dict = {}
+        keys_list = []
         for key in keys:
-            key_parts = key.split(":")
-            if len(key_parts) != 2:
-                continue  # Skip if the format is invalid (missing label)
+            key = self.parse_key(key)
+            if key:
+                keys_list.append(key)
+        return keys_list
 
-            token, label = key_parts
+    def parse_key(self, key: str) -> Dict[str, int]:
+        """
+        Parse API key formatted as ABCDEFGHIJKLMNOPQRSTUVWXYZ012345:user_id
+        """
+        key_parts = key.split(":")
 
-            # Clean invalid characters from token
-            _token = "".join(filter(str.isalnum, token))
+        if len(key_parts) != 2:
+            return None
 
-            # Ensure both token and label are alphanumeric and token is 32 characters
-            if _token and len(_token) == 32 and label.isalnum():
-                keys_dict[_token] = label
+        token, user_id = key_parts
 
-        return keys_dict
+        # Clean invalid characters from token
+        _token = "".join(filter(str.isalnum, token))
 
-    def get_available_keys(self) -> Dict[str, str]:
+        # Validate token and user_id
+        if _token and len(_token) == 32 and user_id.isnumeric():
+            return {_token: int(user_id)}
+
+    def get_available_keys(self) -> list[Dict[str, int]]:
         keys = self._get_raw_keys()
         if not keys:
             raise HTTPException(status_code=500, detail="No valid API keys available")
-        if not keys:
-            raise HTTPException(status_code=500, detail="No API keys available")
         keys = self.parse_keys(keys)
         return keys
 
-    # Validate API Key
     def validate_key(self, api_key: str = Security(api_key_header)) -> bool:
+        """
+        Validate API key
+        """
         keys = self.get_available_keys()
-        if not api_key or api_key not in keys:
-            # Print the api keys we have as error
-            raise HTTPException(status_code=403, detail=f"Invalid API key")
+        keys = self._join_keys(keys)
+        if not keys:
+            raise HTTPException(status_code=500, detail="No valid API keys available")
+        if api_key not in keys:
+            raise HTTPException(status_code=403, detail="Invalid API key")
         return True
 
     def _get_raw_keys(self):
         return AppData().get_api_key("fastapi")
+
+    def _join_keys(self, keys: list[Dict[str, int]]) -> list[str]:
+        return [":".join([k, str(v)]) for key in keys for k, v in key.items()]
 
 
 # --------------------------
@@ -80,6 +92,17 @@ api_key_handler = ApiKeyHandler()
 
 @app.get("/trips")
 @limiter.limit("40/minute")
-def get_trips(request: Request, api_key: str = Depends(api_key_handler.validate_key)):
-    trips = TripData().get_all()
+def get_user_trips(
+    request: Request,
+    api_key: str = Depends(api_key_handler.validate_key),
+    user_id: int = None,
+    limit: int = 10,
+):
+    if user_id is None:
+        raise HTTPException(status_code=400, detail="User ID is required")
+
+    if limit < 0:
+        limit = 0
+
+    trips = TripData().get_all(user_id=user_id, limit=limit)
     return trips

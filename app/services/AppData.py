@@ -177,7 +177,7 @@ class AppData:
             return data
         return None
 
-    def get_all(self, type: str) -> list:
+    def get_all(self, type: str, limit: int = 0) -> list:
         """
         Retrieve all data of a specific type.
 
@@ -206,6 +206,10 @@ class AppData:
         data = []
 
         for file in files:
+            # Limit the number of items to retrieve
+            if limit and len(data) >= limit:
+                break
+
             id = file.replace(".json", "")
             data.append(self.get(type, id))
 

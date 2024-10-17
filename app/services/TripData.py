@@ -49,11 +49,12 @@ class TripData:
             setattr(trip_data, key, value)
 
         # Convert dates to string format
-        trip_data.start_date = Utils().format_date_str(trip_data.start_date)
-        trip_data.end_date = Utils().format_date_str(trip_data.end_date)
+        trip_data.start_date = Utils().to_date_string(trip_data.start_date)
+        trip_data.end_date = Utils().to_date_string(trip_data.end_date)
+        trip_data.created_at = Utils().to_date_string(trip_data.created_at)
 
         # Save the updated or new data
-        return self.app_data.save("trip", id, trip_data.json(), replace=True)
+        return self.app_data.save("trip", id, trip_data.model_dump_json(), replace=True)
 
     def get(_self, id) -> TripModel:
         """
@@ -82,17 +83,19 @@ class TripData:
     # --------------------------
     # Data Operations
     # --------------------------
-    def get_all_ids(self, user_id=0):
+    def get_all_ids(self, user_id=0, limit: int = 0) -> list[str]:
         """
         Retrieve a list of available trip IDs.
 
         Returns:
             list: A list of trip IDs.
         """
-        trips = self.get_all(user_id)
+        trips = self.get_all(user_id=user_id, limit=limit)
         trips = [trip.id for trip in trips]
 
-    def get_all(self, user_id=0) -> list[TripModel]:
+    def get_all(
+        self, user_id=0, limit: int = 0, order_by: str = "created_at"
+    ) -> list[TripModel]:
         """
         Retrieve a list of available trips with their IDs and titles.
 
@@ -102,12 +105,17 @@ class TripData:
 
         # TODO: This is a temporary solution until we implement user authentication
         # and a better way to query trips by user ID (Database, etc.)
-        trips = self.app_data.get_all("trip")
+        trips = self.app_data.get_all("trip", limit=limit)
+        trips = [self._to_trip_model(trip) for trip in trips]
 
         # Filter trips by user ID
-        if user_id:
-            trips = [self._to_trip_model(trip) for trip in trips]
+        if user_id is not None:
             trips = [trip for trip in trips if trip.user_id == user_id]
+
+        # Sort the trips by the specified field
+        if order_by:
+            if order_by == "created_at":
+                trips = sorted(trips, key=lambda x: x.created_at, reverse=True)
 
         return trips
 
@@ -132,6 +140,14 @@ class TripData:
             # Convert date strings to datetime objects
             trip_data["start_date"] = Utils.to_datetime(trip_data["start_date"])
             trip_data["end_date"] = Utils.to_datetime(trip_data["end_date"])
+
+            # Date published was not required in the original model
+            # We need to check if it exists before converting it
+            if "created_at" in trip_data:
+                trip_data["created_at"] = Utils.to_datetime(trip_data["created_at"])
+            else:
+                # Update the model to include the created_at field
+                trip_data["created_at"] = trip_data["start_date"]
 
             return TripModel(**trip_data)
         except ValidationError as e:

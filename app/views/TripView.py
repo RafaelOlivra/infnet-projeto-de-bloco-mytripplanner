@@ -64,7 +64,7 @@ class TripView:
                 f"##### 🏠 Origem: {self.trip.origin_city}, {self.trip.origin_state}"
             )
             st.write(
-                f"📆 Partida: {Utils.format_date_str(self.trip.start_date, format='display')}"
+                f"📆 Partida: {Utils.to_date_string(self.trip.start_date, format='display')}"
             )
 
         with col2.container(border=True):
@@ -72,7 +72,7 @@ class TripView:
                 f"##### 📍 Destino: {self.trip.destination_city}, {self.trip.destination_state}"
             )
             st.write(
-                f"📆 Retorno: {Utils.format_date_str(self.trip.end_date, format='display')}"
+                f"📆 Retorno: {Utils.to_date_string(self.trip.end_date, format='display')}"
             )
 
     def render_title(self):

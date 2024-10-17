@@ -94,10 +94,14 @@ class Trip:
         self.model = TripModel(**trip_data)
         return self._save()
 
-    def get(self, id):
+    def get(self, attribute: str = None):
         if not self.model:
             return None
-        return self.model.__getattribute__(id)
+        return self.model.__getattribute__(attribute)
+
+    # Implement the __getitem__ method to allow getting attributes using the [] notation
+    def __getitem__(self, attribute: str = None):
+        return self.get(attribute)
 
     def update(self, trip_data: dict) -> bool:
         updated_data = self.model.dict()
@@ -139,18 +143,34 @@ class Trip:
     # Export/Import
     # --------------------------
     def to_json(self):
-        return self.model.json()
+        return self.model.model_dump_json()
 
     def to_csv(self):
-        data = self.model.dict()
+        data = self.model.model_dump(serialize_as_any=True)
 
         # Convert dates to strings
-        data["start_date"] = Utils.format_date_str(data["start_date"])
-        data["end_date"] = Utils.format_date_str(data["end_date"])
+        data["start_date"] = Utils.to_date_string(data["start_date"])
+        data["end_date"] = Utils.to_date_string(data["end_date"])
+        data["created_at"] = Utils.to_date_string(data["created_at"])
+
+        # Serialize datetime objects
+        if "weather" in data:
+            for forecast in data["weather"]:
+                forecast["date"] = Utils.to_date_string(forecast["date"])
 
         data["weather_base64"] = base64.b64encode(
             json.dumps(data.pop("weather")).encode()
         ).decode()
+
+        # Convert attractions fields to strings
+        if "attractions" in data:
+            for attraction in data["attractions"]:
+                if "url" in attraction:
+                    attraction["url"] = str(attraction["url"])
+                if "image" in attraction:
+                    attraction["image"] = str(attraction["image"])
+                if "date" in attraction:
+                    attraction["date"] = Utils.to_date_string(attraction["date"])
 
         data["attractions_base64"] = base64.b64encode(
             json.dumps(data.pop("attractions")).encode()

@@ -2,7 +2,6 @@ import uuid
 
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime, date
-from datetime import datetime
 from typing import List, Optional
 
 from models.Weather import ForecastModel
@@ -13,6 +12,7 @@ from models.Attraction import AttractionModel
 class TripModel(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: int = 0  # For future use
+    created_at: datetime = Field(default_factory=datetime.now)
     slug: str
     title: str
     origin_city: str
@@ -32,7 +32,7 @@ class TripModel(BaseModel):
     notes: str = ""
     tags: List[str] = Field(default_factory=list)
 
-    @field_validator("start_date", "end_date")
+    @field_validator("created_at", "start_date", "end_date")
     def convert_to_datetime(cls, value):
         """
         Convert date to datetime if necessary.
@@ -40,6 +40,9 @@ class TripModel(BaseModel):
         if isinstance(value, date) and not isinstance(value, datetime):
             return datetime(value.year, value.month, value.day)
         return value
+
+    def __getitem__(self, attribute: str):
+        return self.__getattribute__(attribute)
 
     class Config:
         arbitrary_types_allowed = True

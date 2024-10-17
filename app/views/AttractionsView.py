@@ -73,7 +73,7 @@ class AttractionsView:
         Args:
             attraction (Attraction): Attraction object.
         """
-        st.image(attraction.image, use_column_width=True)
+        st.image(str(attraction.image), use_column_width=True)
 
         # Display a star for review_stars
         stars = "⭐" * int(attraction.review_stars)

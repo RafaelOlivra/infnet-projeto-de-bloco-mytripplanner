@@ -1,10 +1,13 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
+from datetime import datetime, date
+
+from lib.Utils import Utils
 
 
 class ForecastModel(BaseModel):
     timestamp: int
-    date: str
+    date: datetime
     city_name: str
     state_name: str
     temperature: Optional[float]
@@ -12,6 +15,17 @@ class ForecastModel(BaseModel):
     temperature_max: Optional[float]
     weather: str
     wind_speed: float
+
+    @field_validator("date")
+    def convert_to_datetime(cls, value):
+        """
+        Convert date to datetime if necessary.
+        """
+        if isinstance(value, date) and not isinstance(value, datetime):
+            return datetime(value.year, value.month, value.day)
+        if isinstance(value, str):
+            return Utils.to_datetime(value)
+        return value
 
 
 class WeatherModel(BaseModel):
