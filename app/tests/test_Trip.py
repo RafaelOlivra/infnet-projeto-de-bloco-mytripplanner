@@ -7,7 +7,8 @@ from services.Trip import Trip
 from services.TripData import TripData
 
 
-def mock_trip_data():
+# Mock trip data for testing
+def mock_trip_data() -> dict:
     # Sample JSON data for testing
     return {
         "id": "00000000-0000-0000-0000-000000000000",
@@ -113,7 +114,6 @@ def test_update_trip(app_data_save_mock):
 
 # Test deleting a trip
 def test_delete_trip():
-
     # Create a new trip
     trip = Trip(trip_data=mock_trip_data())
 

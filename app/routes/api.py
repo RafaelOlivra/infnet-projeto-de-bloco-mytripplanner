@@ -64,7 +64,7 @@ class ApiKeyHandler:
         keys = self.get_available_keys()
         if not api_key or api_key not in keys:
             # Print the api keys we have as error
-            raise HTTPException(status_code=403, detail=f"Invalid API key {keys}")
+            raise HTTPException(status_code=403, detail=f"Invalid API key")
         return True
 
     def _get_raw_keys(self):
