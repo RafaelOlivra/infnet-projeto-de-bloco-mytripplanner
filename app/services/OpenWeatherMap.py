@@ -127,10 +127,12 @@ class OpenWeatherMap:
         for forecast in hourly_forecast:
 
             # Convert the forecast object to a dictionary
-            forecast = forecast.dict()
+            forecast = forecast.model_dump()
 
-            # Extract the date part from the "date" field (YYYY-MM-DD)
-            date_str = forecast["date"].split("T")[0]
+            # Extract the date part from the "date" field
+            # We expect isoformat dates in the format 'YYYY-MM-DDTHH:MM:SS'
+            forecast["date"] = Utils.to_date_string(str(forecast["date"]))
+            date_str = forecast["date"].split("T")[0]  # Ignore the time part
 
             # Initialize daily forecast data if this is the first entry for this day
             if date_str not in daily_forecast:
@@ -207,7 +209,7 @@ class OpenWeatherMap:
         for forecast in hourly_forecast:
 
             # Convert the forecast object to a dictionary
-            forecast = forecast.dict()
+            forecast = forecast.model_dump()
 
             # Extract the date part from the "date" field (YYYY-MM-DD)
             date_str = forecast["date"].split("T")[0]

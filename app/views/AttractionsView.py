@@ -102,7 +102,7 @@ class AttractionsView:
             on_change (function): Callback function to handle changes in selection (optional).
             selected (bool): Whether the attraction is pre-selected (default: False).
         """
-        st.image(attraction.image, use_column_width=True)
+        st.image(str(attraction.image), use_column_width=True)
 
         # Display a star for review_stars
         stars = "⭐" * int(attraction.review_stars)
