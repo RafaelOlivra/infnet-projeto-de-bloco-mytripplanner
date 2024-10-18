@@ -31,9 +31,9 @@ class Trip:
         if not trip_data:
             raise ValueError("Trip data is required to create a trip.")
 
-        # Check if the trip data has an ID and if it exists
-        if "id" in trip_data and TripData().get(trip_data["id"]):
-            raise ValueError("Trip with the same ID already exists.")
+        # Unset some fields that should not be set by the user
+        trip_data.pop("id", None)
+        trip_data.pop("created_at", None)
 
         trip_data["slug"] = Utils().slugify(trip_data.get("title", ""))
 
@@ -62,13 +62,21 @@ class Trip:
         trip_data["start_date"] = Utils.to_datetime(trip_data["start_date"])
         trip_data["end_date"] = Utils.to_datetime(trip_data["end_date"])
 
+        # Make sure the start date is not in the past
+        if trip_data["start_date"] < (datetime.now() - date.resolution):
+            raise ValueError("The start date must be in the future.")
+
+        # Make sure start date is before end date
+        if trip_data["start_date"] > trip_data["end_date"]:
+            raise ValueError("The start date must be before the end date.")
+
         # Get weather forecast for the trip if not provided
         if "weather" not in trip_data:
             trip_data["weather"] = OpenWeatherMap().get_forecast_for_next_5_days(
                 trip_data.get("destination_city"), trip_data.get("destination_state")
             )
 
-        # Store weather that are within the trip dates
+        # Only store weather that are within the trip dates
         if "weather" in trip_data:
             weather = []
             for forecast in trip_data["weather"]:
@@ -259,7 +267,7 @@ class Trip:
         return True
 
     def _save(self) -> bool:
-        if not TripData().save(value=self.model, id=self.model.id):
+        if not TripData().save(value=self.model, trip_id=self.model.id):
             self.model = None
             return False
 

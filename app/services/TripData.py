@@ -16,7 +16,7 @@ class TripData:
     # --------------------------
     # File Operations
     # --------------------------
-    def save(self, id, key="", value="") -> bool:
+    def save(self, trip_id, key="", value="") -> bool:
         """
         Save or update trip data to a JSON file.
 
@@ -30,13 +30,13 @@ class TripData:
         """
 
         # Check if the trip ID is provided
-        if not id:
+        if not trip_id:
             raise ValueError("Trip ID is required to save/update trip data.")
 
         # Try to get the trip data if it already exists
         # If not we assume we are creating a new trip
         if key:
-            trip_data = self.get(id)
+            trip_data = self.get(trip_id)
         else:
             trip_data = value
 
@@ -54,9 +54,11 @@ class TripData:
         trip_data.created_at = Utils().to_date_string(trip_data.created_at)
 
         # Save the updated or new data
-        return self.app_data.save("trip", id, trip_data.model_dump_json(), replace=True)
+        return self.app_data.save(
+            "trip", trip_id, trip_data.model_dump_json(), replace=True
+        )
 
-    def get(_self, id) -> TripModel:
+    def get(_self, trip_id: str) -> TripModel:
         """
         Retrieve trip data for the specified ID.
 
@@ -66,9 +68,9 @@ class TripData:
         Returns:
             TripModel or None: The trip data as a TripModel object.
         """
-        return _self._to_trip_model(_self.app_data.get("trip", id))
+        return _self._to_trip_model(_self.app_data.get("trip", trip_id))
 
-    def delete(self, id) -> bool:
+    def delete(self, trip_id) -> bool:
         """
         Delete the trip data for the specified trip ID.
 
@@ -78,23 +80,41 @@ class TripData:
         Returns:
             bool: True if the file was deleted, False otherwise.
         """
-        return self.app_data.delete("trip", id)
+        return self.app_data.delete("trip", trip_id)
 
     # --------------------------
-    # Data Operations
+    # User Operations
     # --------------------------
-    def get_all_ids(self, user_id=0, limit: int = 0) -> list[str]:
+    def get_user_trip_ids(self, user_id: int = 0, limit: int = 0) -> list[str]:
         """
         Retrieve a list of available trip IDs.
 
         Returns:
             list: A list of trip IDs.
         """
-        trips = self.get_all(user_id=user_id, limit=limit)
+        trips = self.get_user_trips(user_id=user_id, limit=limit)
         trips = [trip.id for trip in trips]
 
-    def get_all(
-        self, user_id=0, limit: int = 0, order_by: str = "created_at"
+    def get_user_trip(self, trip_id: str, user_id: int = 0) -> TripModel:
+        """
+        Retrieve a trip by ID.
+
+        Args:
+            user_id (int): The user ID.
+            trip_id (str): The trip ID.
+
+        Returns:
+            TripModel or None: The trip data as a TripModel object.
+        """
+        if not trip_id:
+            raise None
+
+        trips = self.get_user_trips(user_id=user_id)
+        trip = [trip for trip in trips if trip.id == trip_id]
+        return trip[0] if trip else None
+
+    def get_user_trips(
+        self, user_id: int = 0, limit: int = 0, order_by: str = "created_at"
     ) -> list[TripModel]:
         """
         Retrieve a list of available trips with their IDs and titles.
@@ -102,15 +122,15 @@ class TripData:
         Returns:
             list: A list of dictionaries containing trip ID and title.
         """
+        # Check if we have a valid user ID
+        if user_id is None or int(user_id) < 0:
+            return []
 
         # TODO: This is a temporary solution until we implement user authentication
         # and a better way to query trips by user ID (Database, etc.)
         trips = self.app_data.get_all("trip", limit=limit)
         trips = [self._to_trip_model(trip) for trip in trips]
-
-        # Filter trips by user ID
-        if user_id is not None:
-            trips = [trip for trip in trips if trip.user_id == user_id]
+        trips = [trip for trip in trips if trip.user_id == user_id]
 
         # Sort the trips by the specified field
         if order_by:
