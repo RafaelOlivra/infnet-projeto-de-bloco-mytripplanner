@@ -35,6 +35,10 @@ class AppData:
         """
         pass
 
+    # --------------------------
+    # System Utils
+    # --------------------------
+
     def get_config(self, key: str) -> Any:
         """
         Retrieve configuration data from the config JSON file.
@@ -93,6 +97,10 @@ class AppData:
             return None
 
         return os.getenv(key_map.get(key))
+
+    # --------------------------
+    # CRUD Operations
+    # --------------------------
 
     def save(
         self, type: str, id: str, json: Union[str, dict], replace: bool = False
@@ -308,6 +316,10 @@ class AppData:
 
         return self._delete_file(file_path)
 
+    # --------------------------
+    # File Operations
+    # --------------------------
+
     def _save_file(self, file_path: str, json: Union[str, dict]) -> bool:
         """
         Save data to a file.
@@ -348,6 +360,10 @@ class AppData:
             os.remove(file_path)
             return True
         return False
+
+    # --------------------------
+    # Utils
+    # --------------------------
 
     def _get_storage_map(self) -> dict:
         """

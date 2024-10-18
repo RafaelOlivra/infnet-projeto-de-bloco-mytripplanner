@@ -1,8 +1,6 @@
 import requests
 import streamlit as st
 
-from datetime import datetime, timedelta
-
 from services.AppData import AppData
 from lib.Utils import Utils
 

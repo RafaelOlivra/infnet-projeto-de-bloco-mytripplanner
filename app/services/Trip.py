@@ -38,7 +38,7 @@ class Trip:
         trip_data["slug"] = Utils().slugify(trip_data.get("title", ""))
 
         # Get coordinates for origin and destination
-        origin_coords = self._get_or_fetch_coordinates(
+        origin_coords = self._get_or_load_coordinates(
             trip_data,
             "origin_longitude",
             "origin_latitude",
@@ -47,7 +47,7 @@ class Trip:
         )
         trip_data["origin_longitude"], trip_data["origin_latitude"] = origin_coords
 
-        dest_coords = self._get_or_fetch_coordinates(
+        dest_coords = self._get_or_load_coordinates(
             trip_data,
             "destination_longitude",
             "destination_latitude",
@@ -281,7 +281,7 @@ class Trip:
     def _get_coordinates(city, state):
         return LatLong().get_coordinates(city, state)
 
-    def _get_or_fetch_coordinates(self, trip_data, lon_key, lat_key, city, state):
+    def _get_or_load_coordinates(self, trip_data, lon_key, lat_key, city, state):
         if lon_key in trip_data and lat_key in trip_data:
             return trip_data[lon_key], trip_data[lat_key]
         return self._get_coordinates(city, state)
