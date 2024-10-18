@@ -118,10 +118,11 @@ def test_delete_trip():
     trip = Trip(trip_data=mock_trip_data())
 
     # Delete the trip
+    trip_id = trip.get("id")
     trip.delete()
 
     # Check if the trip was deleted correctly
-    assert trip.model == None
+    assert TripData().get(trip_id=trip_id) is None
 
 
 @patch("services.TripData.AppData.save")

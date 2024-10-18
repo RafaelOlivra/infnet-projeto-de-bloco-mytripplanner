@@ -107,11 +107,13 @@ class TripData:
             TripModel or None: The trip data as a TripModel object.
         """
         if not trip_id:
-            raise None
+            return None
 
-        trips = self.get_user_trips(user_id=user_id)
-        trip = [trip for trip in trips if trip.id == trip_id]
-        return trip[0] if trip else None
+        trip = self.get(trip_id)
+
+        # Check if the trip belongs to the user
+        if trip and trip.user_id == user_id:
+            return trip
 
     def get_user_trips(
         self, user_id: int = 0, limit: int = 0, order_by: str = "created_at"

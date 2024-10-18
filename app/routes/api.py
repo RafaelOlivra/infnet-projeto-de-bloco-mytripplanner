@@ -118,11 +118,9 @@ api_key_handler = ApiKeyHandler()
 @limiter.limit("10/minute")
 def create_user_trip(
     request: Request,
+    trip_data: dict,
     api_key: str = Depends(api_key_handler.validate_key),
-    trip_data: dict = None,
 ):
-    if trip_data is None:
-        raise HTTPException(status_code=400, detail="Trip data is required")
 
     # Get user_id from API key
     user_id = api_key_handler.get_user_id(api_key)
@@ -144,7 +142,7 @@ def create_user_trip(
 @limiter.limit("20/minute")
 def get_user_trip(
     request: Request,
-    trip_id: str = None,
+    trip_id: str,
     api_key: str = Depends(api_key_handler.validate_key),
 ):
     # Get user_id from API key
@@ -163,8 +161,8 @@ def get_user_trip(
 @limiter.limit("40/minute")
 def get_user_trips(
     request: Request,
-    api_key: str = Depends(api_key_handler.validate_key),
     limit: int = 10,
+    api_key: str = Depends(api_key_handler.validate_key),
 ):
     # Get user_id from API key
     user_id = api_key_handler.get_user_id(api_key)
@@ -178,3 +176,27 @@ def get_user_trips(
         raise HTTPException(status_code=404, detail="No trips found")
 
     return trips
+
+
+# Delete a specific trip
+@app.delete("/trip/{trip_id}")
+@app.delete("/trip")
+@limiter.limit("10/minute")
+def delete_user_trip(
+    request: Request,
+    trip_id: str,
+    api_key: str = Depends(api_key_handler.validate_key),
+):
+    # Get user_id from API key
+    user_id = api_key_handler.get_user_id(api_key)
+
+    trip_model = TripData().get_user_trip(trip_id=trip_id, user_id=user_id)
+    trip = Trip().from_model(trip_model)
+
+    if not trip:
+        raise HTTPException(status_code=404, detail="Trip not found")
+
+    if trip.delete():
+        return {"detail": "Trip deleted successfully"}
+    else:
+        raise HTTPException(status_code=500, detail="Failed to delete trip")

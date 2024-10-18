@@ -68,7 +68,7 @@ def View_Trip():
     selected_trip_id = selected_trip_id.split("(")[-1].split(")")[0]
 
     # Get the selected trip
-    trip = Trip(id=selected_trip_id)
+    trip = Trip(trip_id=selected_trip_id)
 
     # Render the selected trip
     TripView(trip).render_trip()

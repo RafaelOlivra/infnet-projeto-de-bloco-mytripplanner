@@ -2,7 +2,7 @@ import json
 import csv
 import base64
 
-from datetime import datetime, date
+from datetime import datetime, timedelta
 from io import StringIO
 from datetime import datetime
 
@@ -17,10 +17,10 @@ from models.Trip import TripModel
 
 
 class Trip:
-    def __init__(self, id: str = None, trip_data: dict = None):
-        if id:
-            if not self._load(id):
-                raise ValueError(f"Trip with ID {id} could not be loaded.")
+    def __init__(self, trip_id: str = None, trip_data: dict = None):
+        if trip_id:
+            if not self._load(trip_id):
+                raise ValueError(f"Trip with ID {trip_id} could not be loaded.")
         elif trip_data:
             self.create(trip_data)
 
@@ -63,7 +63,7 @@ class Trip:
         trip_data["end_date"] = Utils.to_datetime(trip_data["end_date"])
 
         # Make sure the start date is not in the past
-        if trip_data["start_date"] < (datetime.now() - date.resolution):
+        if trip_data["start_date"] < (datetime.now() - timedelta(days=1)):
             raise ValueError("The start date must be in the future.")
 
         # Make sure start date is before end date
@@ -143,6 +143,8 @@ class Trip:
         return self._save()
 
     def delete(self) -> bool:
+        if not self.model:
+            return False
         if TripData().delete(self.model.id):
             self.model = None
             return True
@@ -254,6 +256,10 @@ class Trip:
             raise ValueError(
                 f"The CSV data is not in the correct format. Please check the data and try again. {e}"
             )
+
+    def from_model(self, trip_model: TripModel) -> "Trip":
+        self.model = trip_model
+        return self
 
     # --------------------------
     # Data Operations

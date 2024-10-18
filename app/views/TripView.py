@@ -20,7 +20,7 @@ class TripView:
             self.trip = trip.model
         else:
             try:
-                self.trip = Trip(id=trip).model
+                self.trip = Trip(trip_id=trip).model
             except ValueError as e:
                 st.error("A viagem especificada não pôde ser carregada.")
 
