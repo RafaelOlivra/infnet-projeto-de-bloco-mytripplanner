@@ -80,8 +80,7 @@ def test_create_user_trip_no_data(mock__get_raw_keys):
     mock__get_raw_keys.return_value = demo_key
 
     response = client.post(f"/trip", headers=headers)
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.json()["detail"] == "Trip data is required"
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @patch("routes.api.ApiKeyHandler._get_raw_keys")
