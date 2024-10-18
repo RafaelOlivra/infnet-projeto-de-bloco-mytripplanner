@@ -116,7 +116,7 @@ api_key_handler = ApiKeyHandler()
 # Create a new trip
 @app.post("/trip")
 @limiter.limit("10/minute")
-def create_user_trip(
+async def create_user_trip(
     request: Request,
     trip_data: dict,
     api_key: str = Depends(api_key_handler.validate_key),
@@ -140,7 +140,7 @@ def create_user_trip(
 @app.get("/trip/{trip_id}")
 @app.get("/trip")
 @limiter.limit("20/minute")
-def get_user_trip(
+async def get_user_trip(
     request: Request,
     trip_id: str,
     api_key: str = Depends(api_key_handler.validate_key),
@@ -159,7 +159,7 @@ def get_user_trip(
 # Get all user trips
 @app.get("/trips")
 @limiter.limit("40/minute")
-def get_user_trips(
+async def get_user_trips(
     request: Request,
     limit: int = 10,
     api_key: str = Depends(api_key_handler.validate_key),
@@ -182,7 +182,7 @@ def get_user_trips(
 @app.delete("/trip/{trip_id}")
 @app.delete("/trip")
 @limiter.limit("10/minute")
-def delete_user_trip(
+async def delete_user_trip(
     request: Request,
     trip_id: str,
     api_key: str = Depends(api_key_handler.validate_key),
