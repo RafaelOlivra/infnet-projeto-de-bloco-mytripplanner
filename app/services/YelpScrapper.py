@@ -34,8 +34,6 @@ class YelpScrapper:
 
         soup = bs4.BeautifulSoup(html, "html.parser")
         attractions = soup.select('li div[data-testid="serp-ia-card"]')
-        # attractions = soup.select('a[href^="/biz/"]:has(img)')
-
         if not attractions:
             return {}
 
