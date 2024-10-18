@@ -21,7 +21,7 @@ Esse é um projeto criado para o curso de Ciência de Dados da faculdade Infnet.
 
 ## Links Úteis
 
--   [Repositório Git](https://github.com/RafaelOlivra/python-llms-if-tp1)
+-   [Repositório Git](https://github.com/RafaelOlivra/infnet-projeto-de-bloco-mytripplanner)
 -   [Dados de Cidade e Estados](https://gist.github.com/letanure/3012978)
 -   [Dados de Turismo Gov.br](https://www.mapa.turismo.gov.br/mapa/init.html#/home)
 
