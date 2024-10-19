@@ -7,6 +7,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from uuid import uuid4
 
 from typing import Dict
+from models.Trip import TripModel
 
 from services.Trip import Trip
 from services.TripData import TripData
@@ -118,7 +119,7 @@ api_key_handler = ApiKeyHandler()
 @limiter.limit("10/minute")
 async def create_user_trip(
     request: Request,
-    trip_data: dict,
+    trip_data: TripModel,
     api_key: str = Depends(api_key_handler.validate_key),
 ):
 
