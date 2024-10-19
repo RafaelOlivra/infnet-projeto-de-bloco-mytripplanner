@@ -116,27 +116,25 @@ class Trip:
         updated_data.update(trip_data)
 
         # Get coordinates for origin and destination if they have changed
-        if (
-            trip_data.get("origin_city") != self.model.origin_city
-            or trip_data.get("origin_state") != self.model.origin_state
-        ):
+        if trip_data.get("origin_city") != self.get("origin_city") or trip_data.get(
+            "origin_state"
+        ) != self.get("origin_state"):
             updated_data["origin_longitude"], updated_data["origin_latitude"] = (
                 self._get_coordinates(
-                    trip_data.get("origin_city", self.model.origin_city),
-                    trip_data.get("origin_state", self.model.origin_state),
+                    trip_data.get("origin_city", self.get("origin_city")),
+                    trip_data.get("origin_state", self.get("origin_state")),
                 )
             )
 
-        if (
-            trip_data.get("destination_city") != self.model.destination_city
-            or trip_data.get("destination_state") != self.model.destination_state
-        ):
+        if trip_data.get("destination_city") != self.get(
+            "destination_city"
+        ) or trip_data.get("destination_state") != self.get("destination_state"):
             (
                 updated_data["destination_longitude"],
                 updated_data["destination_latitude"],
             ) = self._get_coordinates(
-                trip_data.get("destination_city", self.model.destination_city),
-                trip_data.get("destination_state", self.model.destination_state),
+                trip_data.get("destination_city", self.get("destination_city")),
+                trip_data.get("destination_state", self.get("destination_state")),
             )
 
         self.model = TripModel(**updated_data)
@@ -145,7 +143,7 @@ class Trip:
     def delete(self) -> bool:
         if not self.model:
             return False
-        if TripData().delete(self.model.id):
+        if TripData().delete(self.get("id")):
             self.model = None
             return True
 
@@ -273,7 +271,7 @@ class Trip:
         return True
 
     def _save(self) -> bool:
-        if not TripData().save(value=self.model, trip_id=self.model.id):
+        if not TripData().save(trip_data=self.model, trip_id=self.get("id")):
             self.model = None
             return False
 

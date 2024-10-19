@@ -13,17 +13,13 @@ class TripData:
         """
         self.app_data = AppData()
 
-    # --------------------------
-    # File Operations
-    # --------------------------
-    def save(self, trip_id, key="", value="") -> bool:
+    def save(self, trip_id, trip_data: TripModel) -> bool:
         """
-        Save or update trip data to a JSON file.
+        Save a new trip or replace the entire trip data.
 
         Args:
-            id (str): Trip ID.
-            key (str): The key to update within the trip data. If empty, the entire trip dat is replaced.
-            value (any): The value to store in the trip data.
+            trip_id (str): Trip ID.
+            trip_data (TripModel): The trip data to save.
 
         Returns:
             bool: True if the data was saved successfully, False otherwise.
@@ -31,14 +27,41 @@ class TripData:
 
         # Check if the trip ID is provided
         if not trip_id:
-            raise ValueError("Trip ID is required to save/update trip data.")
+            raise ValueError("Trip ID is required to save trip data.")
 
-        # Try to get the trip data if it already exists
-        # If not we assume we are creating a new trip
-        if key:
-            trip_data = self.get(trip_id)
-        else:
-            trip_data = value
+        # Check if we have a valid TripModel object
+        if type(trip_data) != TripModel:
+            raise ValueError("Trip data is not a valid TripModel object.")
+
+        # Convert dates to string format
+        trip_data.start_date = Utils().to_date_string(trip_data.start_date)
+        trip_data.end_date = Utils().to_date_string(trip_data.end_date)
+        trip_data.created_at = Utils().to_date_string(trip_data.created_at)
+
+        # Save the new or entire trip data
+        return self.app_data.save(
+            "trip", trip_id, trip_data.model_dump_json(), replace=True
+        )
+
+    def update(self, trip_id, key="", value="") -> bool:
+        """
+        Update specific fields of an existing trip.
+
+        Args:
+            trip_id (str): Trip ID.
+            key (str): The key to update within the trip data.
+            value (any): The value to store in the trip data.
+
+        Returns:
+            bool: True if the data was updated successfully, False otherwise.
+        """
+
+        # Check if the trip ID is provided
+        if not trip_id:
+            raise ValueError("Trip ID is required to update trip data.")
+
+        # Get the existing trip data
+        trip_data = self.get(trip_id)
 
         # Check if we have a valid TripModel object
         if type(trip_data) != TripModel:
@@ -47,13 +70,15 @@ class TripData:
         # Update the trip data with the new key-value pair
         if key and value:
             setattr(trip_data, key, value)
+        else:
+            raise ValueError("Key and value are required to update the trip.")
 
         # Convert dates to string format
         trip_data.start_date = Utils().to_date_string(trip_data.start_date)
         trip_data.end_date = Utils().to_date_string(trip_data.end_date)
         trip_data.created_at = Utils().to_date_string(trip_data.created_at)
 
-        # Save the updated or new data
+        # Save the updated data
         return self.app_data.save(
             "trip", trip_id, trip_data.model_dump_json(), replace=True
         )
