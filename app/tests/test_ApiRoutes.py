@@ -18,7 +18,7 @@ headers = {"X-API-Key": demo_key}
 user_id = 0
 
 
-@patch("routes.api.ApiKeyHandler._get_raw_keys")
+@patch("routers.api.ApiKeyHandler._get_raw_keys")
 def test_get_api_keys(mock__get_raw_keys):
     mock__get_raw_keys.return_value = demo_key
 
@@ -32,7 +32,7 @@ def test_no_api_key():
 
 
 @patch("services.TripData.TripData.get_user_trips")
-@patch("routes.api.ApiKeyHandler._get_raw_keys")
+@patch("routers.api.ApiKeyHandler._get_raw_keys")
 def test_get_user_trips(mock__get_raw_keys, mock_trip_data_get_user_trips):
     mock__get_raw_keys.return_value = demo_key
     mock_trip_data_get_user_trips.return_value = [
@@ -45,7 +45,7 @@ def test_get_user_trips(mock__get_raw_keys, mock_trip_data_get_user_trips):
 
 
 @patch("services.TripData.TripData.get_user_trip")
-@patch("routes.api.ApiKeyHandler._get_raw_keys")
+@patch("routers.api.ApiKeyHandler._get_raw_keys")
 def test_get_user_trip(mock__get_raw_keys, mock_trip_data_get_user_trip):
     mock__get_raw_keys.return_value = demo_key
     mock_trip_data_get_user_trip.return_value = TripData()._to_trip_model(
@@ -53,14 +53,14 @@ def test_get_user_trip(mock__get_raw_keys, mock_trip_data_get_user_trip):
     )
 
     trip_id = mock_trip_data()["id"]
-    response = client.get(f"/trip/?trip_id={trip_id}", headers=headers)
+    response = client.get(f"/trip/{trip_id}", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["slug"] == mock_trip_data()["slug"]
 
 
 @patch("services.TripData.AppData.save")
 @patch("services.TripData.TripData.get_user_trip")
-@patch("routes.api.ApiKeyHandler._get_raw_keys")
+@patch("routers.api.ApiKeyHandler._get_raw_keys")
 def test_create_user_trip(
     mock__get_raw_keys, mock_trip_data_get_user_trip, mock_app_data_save
 ):
@@ -75,7 +75,7 @@ def test_create_user_trip(
     assert response.json()["slug"] == mock_trip_data()["slug"]
 
 
-@patch("routes.api.ApiKeyHandler._get_raw_keys")
+@patch("routers.api.ApiKeyHandler._get_raw_keys")
 def test_create_user_trip_no_data(mock__get_raw_keys):
     mock__get_raw_keys.return_value = demo_key
 
@@ -83,7 +83,7 @@ def test_create_user_trip_no_data(mock__get_raw_keys):
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@patch("routes.api.ApiKeyHandler._get_raw_keys")
+@patch("routers.api.ApiKeyHandler._get_raw_keys")
 def test_delete_user_trip(mock__get_raw_keys):
     mock__get_raw_keys.return_value = demo_key
 
@@ -91,7 +91,7 @@ def test_delete_user_trip(mock__get_raw_keys):
     trip = Trip(trip_data=mock_trip_data())
     trip_id = trip.get("id")
 
-    response = client.delete(f"/trip/?trip_id={trip_id}", headers=headers)
+    response = client.delete(f"/trip/{trip_id}", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["detail"] == "Trip deleted successfully"
 
