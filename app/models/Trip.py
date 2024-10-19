@@ -11,8 +11,8 @@ from models.Attraction import AttractionModel
 
 class TripModel(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: int = 0  # For future use
-    created_at: datetime | date | str = Field(default_factory=datetime.now)
+    user_id: Optional[int] = 0  # For future use
+    created_at: Optional[datetime | date | str] = Field(default_factory=datetime.now)
     slug: str
     title: str
     origin_city: str
