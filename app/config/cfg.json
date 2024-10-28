@@ -1,4 +1,5 @@
 {
+    "assets_dir": "./data/assets/",
     "temp_storage_dir": "./data/.storage",
     "permanent_storage_dir": "./data/02_processed/",
     "log_dir": "./data/.log",
