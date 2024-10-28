@@ -25,42 +25,51 @@ def View_Trip():
         initial_sidebar_state="expanded",
     )
 
-    st.title("🗺️ Minhas Viagens")
-    st.write(
-        """
-        Aqui estão as viagens que você planejou
+    col1, col2 = st.columns(2)
+    with col1:
+        st.title("🗺️ Minhas Viagens")
+        st.write(
+            """
+            Aqui estão as viagens que você planejou
+            """
+        )
 
-        ---
-        """
-    )
+    with col2:
+        st.write("   ")
+        with st.container(border=True):
+            available_trips = TripData().get_user_trips()
+            selected_trip_id = st.session_state.selected_trip_id
 
-    available_trips = TripData().get_user_trips()
-    selected_trip_id = st.session_state.selected_trip_id
+            if not available_trips or not available_trips[0]:
+                st.write("Você ainda não planejou nenhuma viagem.")
+                return
 
-    if not available_trips or not available_trips[0]:
-        st.write("Você ainda não planejou nenhuma viagem.")
-        return
+            # Display a select box for the available trips, if the selected trip is not in the available trips
+            # the first trip in the list will be selected by default.
+            # Options can have the same name, but the id is unique. So we add a prefix to the title to make it unique.
+            options = [f"{trip['title']} ({trip['id']})" for trip in available_trips]
 
-    # Display a select box for the available trips, if the selected trip is not in the available trips
-    # the first trip in the list will be selected by default.
-    # Options can have the same name, but the id is unique. So we add a prefix to the title to make it unique.
-    options = [f"{trip['title']} ({trip['id']})" for trip in available_trips]
+            # Check selected_trip_id is contained in the options and set the selected index
+            # The first trip in the list will be selected by default
+            selected_index = options.index(options[0])
+            for option in options:
+                # Check if the string contains the selected_trip_id
+                if selected_trip_id and selected_trip_id in option:
+                    selected_index = options.index(option)
+                    break
 
-    # Check selected_trip_id is contained in the options and set the selected index
-    selected_index = None
-    for option in options:
-        # Check if the string contains the selected_trip_id
-        if selected_trip_id and selected_trip_id in option:
-            selected_index = options.index(option)
-            break
+            selected_trip_id = st.selectbox(
+                label="Selecione uma viagem",
+                options=options,
+                index=selected_index,
+                key="select_trip",
+                placeholder="Selecione uma viagem",
+            )
 
-    selected_trip_id = st.selectbox(
-        label="Selecione uma viagem",
-        options=options,
-        index=selected_index,
-        key="select_trip",
-        placeholder="Selecione uma viagem",
-    )
+            # Set the selected trip id in the session state
+            st.session_state.selected_trip_id = selected_trip_id
+
+    st.write("---")
 
     if not selected_trip_id:
         return
