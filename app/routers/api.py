@@ -39,7 +39,7 @@ async def create_user_trip(
     request: Request,
     trip_data: TripModel,
     api_key: str = Depends(api_key_handler.validate_key),
-):
+) -> TripModel:
 
     # Get user_id from API key
     user_id = api_key_handler.get_user_id(api_key)
@@ -64,7 +64,7 @@ async def get_user_trip(
     request: Request,
     trip_id: str,
     api_key: str = Depends(api_key_handler.validate_key),
-):
+) -> TripModel:
     # Get user_id from API key
     user_id = api_key_handler.get_user_id(api_key)
 
@@ -83,7 +83,7 @@ async def get_user_trips(
     request: Request,
     limit: int = 10,
     api_key: str = Depends(api_key_handler.validate_key),
-):
+) -> list[TripModel]:
     # Get user_id from API key
     user_id = api_key_handler.get_user_id(api_key)
 
