@@ -1,5 +1,6 @@
 import streamlit as st
 import datetime
+import random
 
 from services.YelpScrapper import YelpScrapper
 from services.AttractionsData import AttractionsData
@@ -125,7 +126,7 @@ class AttractionsView:
             """
         )
 
-        if st.checkbox("Selecionar", key=attraction.url, value=selected):
+        if st.checkbox("Selecionar", key=attraction.id, value=selected):
             if on_change:
                 on_change(attraction.name)
         elif on_change:

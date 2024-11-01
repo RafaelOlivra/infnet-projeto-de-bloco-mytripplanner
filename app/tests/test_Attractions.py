@@ -1,13 +1,30 @@
 import datetime
+import json
+
+from unittest.mock import patch
 
 from lib.Utils import Utils
-
 from services.AttractionsData import AttractionsData
 from services.YelpScrapper import YelpScrapper
-
 from models.Attraction import AttractionModel
-
 from views.AttractionsView import AttractionsView
+
+
+# Mock data for testing
+def mock_attractions():
+    return [
+        AttractionModel(
+            name="Test",
+            city_name="São Paulo",
+            state_name="SP",
+            url="https://www.yelp.com/biz/test",
+            review_count=0,
+            review_stars=0,
+            description="",
+            image="https://www.yelp.com/biz/test",
+            created_at=(datetime.datetime.now() - datetime.timedelta(days=1)),
+        )
+    ]
 
 
 # Test slug generation
@@ -41,17 +58,32 @@ def test_YelpScrapper_get_near_attractions():
     assert type(results[0]) == AttractionModel
 
 
-# Test retrieving attractions from the cache
-def test_AttractionsData_get():
-    limit = 30
+# Test saving attractions to the cache
+@patch("services.AttractionsData.AppData.save")
+def test_AttractionsData_save(app_data_save_mock):
+    # Create a mock instance of AppData
+    app_data_save_mock.return_value = True
+
+    # Arrange
     slug = "sp_sao-paulo"
+    attractions = mock_attractions()
 
-    # Remove any existing data
-    AttractionsData().delete(slug)
-    assert AttractionsData().get(slug) == None
+    # Act
+    results = AttractionsData().save(attractions, slug)
 
-    # Retrieve new data
-    view = AttractionsView(city_name="São Paulo", state_name="SP")
+    # Assert
+    assert results is True
+
+
+# Test retrieving attractions from the cache
+@patch("services.AttractionsData.AppData.get")
+def test_AttractionsData_get(app_data_get_mock):
+    # Create a mock instance of AppData
+    json_data = "[" + mock_attractions()[0].model_dump_json() + "]"
+    app_data_get_mock.return_value = json.loads(json_data)
+
+    limit = 1
+    slug = "sp_sao-paulo"
 
     # Act
     results = AttractionsData().get(slug)
