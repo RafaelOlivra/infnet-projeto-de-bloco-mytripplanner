@@ -51,7 +51,7 @@ class AttractionsData:
             slug (str): The Attraction slug.
 
         Returns:
-            Attraction or None: The attraction data as an Attraction object.
+            list: A list of Attraction objects.
         """
         attraction_data = _self.app_data.get("attractions", slug)
         if attraction_data:

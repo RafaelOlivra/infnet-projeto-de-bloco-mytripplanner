@@ -14,7 +14,12 @@ class YelpScrapper:
 
     @st.cache_data(ttl=86400)
     def get_near_attractions(
-        _self, city_name: str, state_name: str, start: int = 0, limit: int = 50
+        _self,
+        city_name: str,
+        state_name: str,
+        start: int = 0,
+        limit: int = 30,
+        recursive: bool = True,
     ) -> list[AttractionModel]:
         """
         Retrieves a JSON representation of nearby attractions in a given city and state.
@@ -22,14 +27,14 @@ class YelpScrapper:
         Args:
             city_name (str): The name of the city.
             state_name (str): The name of the state.
-            start (int, optional): The starting index of the attractions to retrieve. Defaults to 0.
-            limit (int, optional): The maximum number of attractions to retrieve. Defaults to 10.
+            start (int, optional): The starting index of the attractions to retrieve. Defaults to 0 (Yelp outputs 10 cards for each page).
+            limit (int, optional): The maximum number of attractions to retrieve. Defaults to 50.
 
         Returns:
             list[Attraction]: A list of Attraction objects.
         """
         search_query = Utils.url_encode(f"{city_name}, {state_name}")
-        url = f"https://www.yelp.com.br/search?hl=pt_BR&find_desc=&find_loc={search_query}&start={start}&limit={limit}"
+        url = f"https://www.yelp.com.br/search?hl=pt_BR&find_desc=&find_loc={search_query}&start={start}"
         html = _self._fetch_html(url)
 
         soup = bs4.BeautifulSoup(html, "html.parser")
@@ -69,8 +74,23 @@ class YelpScrapper:
 
             cards.append(card)
 
+            # We used this in case the limit is less than what the page has
             if len(cards) >= limit:
                 break
+
+        # Handle limit, by calling the function recursively to get more cards
+        while recursive and len(cards) < limit:
+            _limit = limit - len(cards)
+            _start = start + 10
+            _cards = _self.get_near_attractions(
+                city_name=city_name,
+                state_name=state_name,
+                start=_start,
+                limit=_limit,
+                recursive=False,
+            )
+            if _cards:
+                cards.extend(_cards)
 
         # Return the cards
         return cards
@@ -92,6 +112,8 @@ class YelpScrapper:
         Raises:
             requests.HTTPError: If there is an HTTP error during the request.
         """
+        print(f"Fetching HTML content from: {url}")
+
         # Apply hardcoded proxy for now
         # TODO: Implement a better way to handle proxies
         api_key = AppData().get_api_key("scraperapi")
