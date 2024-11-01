@@ -18,7 +18,7 @@ class YelpScrapper:
         city_name: str,
         state_name: str,
         start: int = 0,
-        limit: int = 30,
+        limit: int = 18,
         recursive: bool = True,
     ) -> list[AttractionModel]:
         """

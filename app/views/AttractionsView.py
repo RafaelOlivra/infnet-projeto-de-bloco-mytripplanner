@@ -16,7 +16,7 @@ class AttractionsView:
         city_name: str = "",
         state_name: str = "",
         start: int = 0,
-        limit: int = 30,
+        limit: int = 18,
         attractions: List[AttractionModel] = None,
         expire_time: int = 864000,  # 10 days
     ):
