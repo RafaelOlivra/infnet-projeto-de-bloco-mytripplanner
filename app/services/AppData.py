@@ -316,6 +316,25 @@ class AppData:
 
         return self._delete_file(file_path)
 
+    @st.cache_data(ttl=600)
+    def count(_self, type: str) -> int:
+        """
+        Count the number of items of a specific type.
+
+        Args:
+            type (str): The type of data to count (e.g., 'trip', 'attractions').
+
+        Returns:
+            int: The number of items of the specified type.
+
+        Example:
+            >>> app_data = AppData()
+            >>> trip_count = app_data.count("trip")
+            >>> print(trip_count)
+            3
+        """
+        return len(_self.get_all_ids(type))
+
     # --------------------------
     # File Operations
     # --------------------------

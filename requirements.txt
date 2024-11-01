@@ -11,3 +11,5 @@ uvicorn==0.15.0
 slowapi
 limits
 httpx
+plotly
+pydeck

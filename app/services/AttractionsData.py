@@ -37,7 +37,7 @@ class AttractionsData:
         # Convert the Attraction objects to JSON
         json = "["
         for attraction in attractions:
-            json += attraction.json() + ","
+            json += attraction.model_dump_json() + ","
         json = json[:-1] + "]"
 
         # Save the updated or new data
@@ -70,6 +70,84 @@ class AttractionsData:
             bool: True if the file was deleted, False otherwise.
         """
         return self.app_data.delete("attractions", slug)
+
+    # --------------------------
+    # Overall Attractions Data
+    # --------------------------
+
+    def get_all_attractions(self) -> List[AttractionModel]:
+        """
+        Retrieve a list of all attractions data for all cities.
+
+        Returns:
+            list: A list of Attraction objects.
+        """
+        all_attractions = []
+        for city_attractions in self.app_data.get_all("attractions"):
+            for attraction in city_attractions:
+                all_attractions.append(AttractionModel(**attraction))
+        return all_attractions
+
+    def get_attractions_by_city(self) -> dict[str, List[AttractionModel]]:
+        """
+        Retrieve a dictionary with all attractions data grouped by city.
+
+        Returns:
+            dict: A dictionary with city names as keys and a list of Attraction objects as values.
+        """
+        attractions_by_city = {}
+        for city_attractions in self.app_data.get_all("attractions"):
+            city_name = (
+                city_attractions[0]["city_name"]
+                + ", "
+                + city_attractions[0]["state_name"]
+            )
+            attractions = []
+            for attraction in city_attractions:
+                attractions.append(AttractionModel(**attraction))
+            attractions_by_city[city_name] = attractions
+        return attractions_by_city
+
+    def get_cities(self) -> List[str]:
+        """
+        Retrieve a list of all cities with attractions.
+
+        Returns:
+            list: A list of city names.
+        """
+        cities = []
+        for city_attractions in self.app_data.get_all("attractions"):
+            city_name = (
+                city_attractions[0]["city_name"]
+                + ", "
+                + city_attractions[0]["state_name"]
+            )
+            cities.append(city_name)
+        # Order the cities alphabetically
+        cities.sort()
+
+        # Remove duplicates
+        cities = list(dict.fromkeys(cities))
+
+        return cities
+
+    def count_cities(self) -> int:
+        """
+        Count the total number of scanned cities.
+
+        Returns:
+            int: The total number of scanned cities.
+        """
+        return len(self.get_cities())
+
+    def count_attractions(self) -> int:
+        """
+        Count the total number of attractions.
+
+        Returns:
+            int: The total number of attractions.
+        """
+        return len(self.get_all_attractions())
 
     # --------------------------
     # Utils

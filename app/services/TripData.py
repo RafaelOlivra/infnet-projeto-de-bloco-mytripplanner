@@ -155,8 +155,7 @@ class TripData:
 
         # TODO: This is a temporary solution until we implement user authentication
         # and a better way to query trips by user ID (Database, etc.)
-        trips = self.app_data.get_all("trip", limit=limit)
-        trips = [self._to_trip_model(trip) for trip in trips]
+        trips = self.get_all_trips(limit=limit)
         trips = [trip for trip in trips if trip.user_id == user_id]
 
         # Sort the trips by the specified field
@@ -165,6 +164,38 @@ class TripData:
                 trips = sorted(trips, key=lambda x: x.created_at, reverse=True)
 
         return trips
+
+    # --------------------------
+    # Overall Trip Operations
+    # --------------------------
+
+    def get_all_trips(
+        self, limit: int = 0, order_by: str = "created_at"
+    ) -> list[TripModel]:
+        """
+        Retrieve a list of all available trips.
+
+        Returns:
+            list: A list of TripModel objects.
+        """
+        trips = self.app_data.get_all("trip", limit=limit)
+        trips = [self._to_trip_model(trip) for trip in trips]
+
+        # Sort the trips by the specified field
+        if order_by:
+            if order_by == "created_at":
+                trips = sorted(trips, key=lambda x: x.created_at, reverse=True)
+
+        return trips
+
+    def count_all(self) -> int:
+        """
+        Retrieve the total number of trips.
+
+        Returns:
+            int: The total number of trips.
+        """
+        return self.app_data.count("trip")
 
     # --------------------------
     # Utils

@@ -14,7 +14,7 @@ class YelpScrapper:
 
     @st.cache_data(ttl=86400)
     def get_near_attractions(
-        _self, city_name: str, state_name: str, start: int = 0, limit: int = 10
+        _self, city_name: str, state_name: str, start: int = 0, limit: int = 50
     ) -> list[AttractionModel]:
         """
         Retrieves a JSON representation of nearby attractions in a given city and state.

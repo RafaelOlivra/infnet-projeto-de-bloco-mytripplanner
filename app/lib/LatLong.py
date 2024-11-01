@@ -23,9 +23,9 @@ class LatLong:
         Raises:
             ValueError: If coordinates could not be retrieved.
         """
-        lat, lon = self.google_maps.get_latitude_longitude(city + "," + state)
+        lat, long = self.google_maps.get_latitude_longitude(city + "," + state)
 
-        if lat is None or lon is None:
+        if lat is None or long is None:
             raise ValueError(f"Could not find coordinates for {city}, {state}.")
 
-        return lat, lon
+        return lat, long
