@@ -177,8 +177,10 @@ class Trip:
                     attraction["url"] = str(attraction["url"])
                 if "image" in attraction:
                     attraction["image"] = str(attraction["image"])
-                if "date" in attraction:
-                    attraction["date"] = Utils.to_date_string(attraction["date"])
+                if "created_at" in attraction:
+                    attraction["created_at"] = Utils.to_date_string(
+                        attraction["created_at"]
+                    )
 
         data["attractions_base64"] = base64.b64encode(
             json.dumps(data.pop("attractions")).encode()
