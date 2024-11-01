@@ -1,4 +1,5 @@
 import streamlit as st
+import datetime
 
 from services.YelpScrapper import YelpScrapper
 from services.AttractionsData import AttractionsData
@@ -16,6 +17,7 @@ class AttractionsView:
         start: int = 0,
         limit: int = 50,
         attractions: List[AttractionModel] = None,
+        expire_time: int = 864000,  # 10 days
     ):
         """
         Initialize the AttractionsView class.
@@ -32,6 +34,9 @@ class AttractionsView:
         self.slug = AttractionsData().slugify(city_name, state_name)
         self.start = start
         self.limit = limit
+        self.expire_time = expire_time
+
+        # Should be last!
         self.attractions = attractions if attractions else self._get_attractions()
 
     def render_attractions(
@@ -135,17 +140,43 @@ class AttractionsView:
         """
         with st.spinner("Buscando atrações..."):
             attractions = AttractionsData().get(self.slug)
+
+            # Check if the data is expired
+            if attractions and self._attractions_expired(attractions[0].created_at):
+                attractions = None
+
             if attractions:
                 return attractions
-            else:
-                attractions = YelpScrapper().get_near_attractions(
-                    self.city_name, self.state_name, self.start, self.limit
-                )
 
-                if attractions:
+            # Fetch the attractions data
+            return self._fetch_attractions()
 
-                    # Save the attractions data
-                    AttractionsData().save(slug=self.slug, attractions=attractions)
+    def _fetch_attractions(self) -> List[AttractionModel]:
+        """
+        Fetch the attractions data from the Yelp API.
 
-                    return attractions
-                return []
+        Returns:
+            list[Attraction]: List of Attraction objects.
+        """
+        attractions = YelpScrapper().get_near_attractions(
+            self.city_name, self.state_name, self.start, self.limit
+        )
+
+        # Save the attractions data
+        AttractionsData().save(slug=self.slug, attractions=attractions)
+
+        return attractions
+
+    def _attractions_expired(self, created_at: datetime) -> bool:
+        """
+        Check if the attractions data is expired.
+
+        Args:
+            last_updated (datetime): The last updated timestamp.
+
+        Returns:
+            bool: True if the data is expired, False otherwise.
+        """
+        return (
+            datetime.datetime.now() - Utils.to_datetime(created_at)
+        ).total_seconds() > self.expire_time
