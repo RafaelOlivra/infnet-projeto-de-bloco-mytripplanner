@@ -133,14 +133,17 @@ def View_Stats():
     for city in attractions_by_city.keys():
         attractions_count[city] = len(attractions_by_city[city])
 
-    # Plot a bar chart with the number of attractions by city
-    fig = px.bar(
-        x=list(attractions_count.keys()),
-        y=list(attractions_count.values()),
-        labels={"x": "Cidade", "y": "Número de Atrações"},
-        title="Atrações por Cidade",
-    )
-    st.plotly_chart(fig)
+    try:
+        # Plot a bar chart with the number of attractions by city
+        fig = px.bar(
+            x=list(attractions_count.keys()),
+            y=list(attractions_count.values()),
+            labels={"x": "Cidade", "y": "Número de Atrações"},
+            title="Atrações por Cidade",
+        )
+        st.plotly_chart(fig)
+    except ValueError:
+        st.write("Nenhuma atração encontrada.")
 
 
 # --------------------------
