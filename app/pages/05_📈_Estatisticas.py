@@ -39,18 +39,25 @@ def View_Stats():
 
     # Total users
     with st.container(border=True):
-        cols = st.columns(4)
+        cols = st.columns(5)
         cols[0].metric("Total de Usuários", "1")
 
         # Total stored trips
         cols[1].metric("Total de Viagens", f"{TripData().count_all()}")
 
+        # Visited cities
+        visited_cities = TripData().get_all_trips()
+        cities = set()
+        for trip in visited_cities:
+            cities.add(trip.destination_city + ", " + trip.destination_state)
+        cols[2].metric("Cidades Visitadas", f"{len(cities)}")
+
         # Scraped cities
-        cols[2].metric("Cidades Visitadas", f"{AttractionsData().count_cities()}")
+        cols[3].metric("Cidades Scrapeadas", f"{AttractionsData().count_cities()}")
 
         # Scraped attractions
-        cols[3].metric(
-            "Total de Atrações Scrapeadas", f"{AttractionsData().count_attractions()}"
+        cols[4].metric(
+            "Atrações Scrapeadas", f"{AttractionsData().count_attractions()}"
         )
     st.write("")
 
