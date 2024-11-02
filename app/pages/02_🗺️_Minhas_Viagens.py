@@ -1,5 +1,6 @@
-import streamlit as st
 import time
+import streamlit as st
+from streamlit_js_eval import streamlit_js_eval
 
 from services.TripData import TripData
 from services.Trip import Trip
@@ -128,8 +129,10 @@ def View_Trip():
         st.success("Viagem deletada com sucesso!")
         with st.spinner("Atualizando..."):
             time.sleep(2)
+            st.session_state.selected_trip_id = None
             selected_trip_id = None
-            st.switch_page("pages/02_🗺️_Minhas_Viagens.py")
+            # st.switch_page("pages/02_🗺️_Minhas_Viagens.py")
+            streamlit_js_eval(js_expressions="parent.window.location.reload()")
 
 
 # --------------------------
