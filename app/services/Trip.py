@@ -17,17 +17,17 @@ from models.Trip import TripModel
 
 
 class Trip:
-    def __init__(self, trip_id: str = None, trip_data: dict = None):
+    def __init__(self, trip_id: str = None, trip_data: dict = None, date_verify=True):
         if trip_id:
             if not self._load(trip_id):
                 raise ValueError(f"Trip with ID {trip_id} could not be loaded.")
         elif trip_data:
-            self.create(trip_data)
+            self.create(trip_data, date_verify=date_verify)
 
     # --------------------------
     # CRUD Operations
     # --------------------------
-    def create(self, trip_data: dict) -> bool:
+    def create(self, trip_data: dict, date_verify=True) -> bool:
         if not trip_data:
             raise ValueError("Trip data is required to create a trip.")
 
@@ -63,7 +63,9 @@ class Trip:
         trip_data["end_date"] = Utils.to_datetime(trip_data["end_date"])
 
         # Make sure the start date is not in the past
-        if trip_data["start_date"] < (datetime.now() - timedelta(days=1)):
+        if date_verify and trip_data["start_date"] < (
+            datetime.now() - timedelta(days=1)
+        ):
             raise ValueError("The start date must be in the future.")
 
         # Make sure start date is before end date
@@ -204,22 +206,20 @@ class Trip:
 
         return csv_data.getvalue()
 
-    @classmethod
-    def from_json(cls, json_string) -> "Trip":
+    def from_json(self, json_string) -> "Trip":
         try:
             data = json.loads(json_string)
 
             # Remove the id field if it exists so a new ID is generated
             data.pop("id", None)
 
-            return cls(trip_data=data)
+            return Trip(trip_data=data, date_verify=False)
         except Exception as e:
             raise ValueError(
                 "The JSON data is not in the correct format. Please check the data and try again."
             )
 
-    @classmethod
-    def from_csv(cls, csv_data) -> "Trip":
+    def from_csv(self, csv_data) -> "Trip":
         try:
             reader = csv.DictReader(StringIO(csv_data))
             data = next(reader)
@@ -251,7 +251,7 @@ class Trip:
             # Remove the id field if it exists so a new ID is generated
             data.pop("id", None)
 
-            return cls(trip_data=data)
+            return Trip(trip_data=data, date_verify=False)
         except Exception as e:
             raise ValueError(
                 f"The CSV data is not in the correct format. Please check the data and try again. {e}"
