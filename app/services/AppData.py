@@ -190,9 +190,13 @@ class AppData:
 
         if os.path.exists(file_path):
             with open(file_path, "r") as f:
-                data = json.load(f)
-                if isinstance(data, str):
-                    data = json.loads(data)
+                try:
+                    data = json.load(f)
+                    if isinstance(data, str):
+                        data = json.loads(data)
+                except Exception as e:
+                    print(f"Error loading data from file: {e}")
+                    data = None
             return data
         return None
 

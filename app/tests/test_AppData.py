@@ -155,6 +155,22 @@ def test_get_data_not_found(app_data, tmpdir):
         assert result is None
 
 
+def test_get_data_invalid_json(app_data, tmpdir):
+    type = "trip"
+    id = "invalid_json"
+
+    save_path = tmpdir.join("trip")
+    save_path.mkdir()
+    file_path = save_path.join(f"{id}.json")
+    file_path.write("invalid_json")
+
+    with mock.patch.object(
+        app_data, "_get_storage_map", return_value={type: str(save_path)}
+    ):
+        result = app_data.get(type, id)
+        assert result is None
+
+
 def test_update_data_success(app_data, tmpdir):
     original_data = {"destination": "Paris", "duration": 7}
     updated_value = "10"
