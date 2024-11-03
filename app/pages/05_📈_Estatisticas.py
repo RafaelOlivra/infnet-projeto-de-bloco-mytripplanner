@@ -132,21 +132,25 @@ def View_Stats():
 
     st.pydeck_chart(r)
 
-    ##### Plot a bar chart with the number of attractions by city
+    ##### Plot a bar chart with the number of attractions by state
     attractions_by_city = AttractionsData().get_attractions_by_city()
+    attractions_count_by_state = {}
+    for city_state in attractions_by_city.keys():
+        # Split city and state, assuming the format is "City, State"
+        _, state = city_state.split(", ")
 
-    # Prepare a dictionary with city names and the number of attractions
-    attractions_count = {}
-    for city in attractions_by_city.keys():
-        attractions_count[city] = len(attractions_by_city[city])
+        # Count attractions per state
+        if state not in attractions_count_by_state:
+            attractions_count_by_state[state] = 0
+        attractions_count_by_state[state] += len(attractions_by_city[city_state])
 
     try:
-        # Plot a bar chart with the number of attractions by city
+        # Plot a bar chart with the number of attractions by state
         fig = px.bar(
-            x=list(attractions_count.keys()),
-            y=list(attractions_count.values()),
-            labels={"x": "Cidade", "y": "Número de Atrações"},
-            title="Atrações por Cidade",
+            x=list(attractions_count_by_state.keys()),
+            y=list(attractions_count_by_state.values()),
+            labels={"x": "UF", "y": "Número de Atrações"},
+            title="Atrações por Estado",
         )
         st.plotly_chart(fig)
     except ValueError:
