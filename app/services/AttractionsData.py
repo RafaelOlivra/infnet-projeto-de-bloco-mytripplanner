@@ -35,10 +35,9 @@ class AttractionsData:
             slug = self.slugify(city_name, state_name)
 
         # Convert the Attraction objects to JSON
-        json = "["
         for attraction in attractions:
             json += attraction.model_dump_json() + ","
-        json = json[:-1] + "]"
+        json = "[" + json[:-1] + "]"
 
         # Save the updated or new data
         return self.app_data.save("attractions", slug, json, replace=True)
@@ -84,6 +83,9 @@ class AttractionsData:
         """
         all_attractions = []
         for city_attractions in self.app_data.get_all("attractions"):
+            if not city_attractions:
+                continue
+
             for attraction in city_attractions:
                 all_attractions.append(AttractionModel(**attraction))
         return all_attractions
@@ -97,6 +99,9 @@ class AttractionsData:
         """
         attractions_by_city = {}
         for city_attractions in self.app_data.get_all("attractions"):
+            if not city_attractions:
+                continue
+
             city_name = (
                 city_attractions[0]["city_name"]
                 + ", "
@@ -117,6 +122,9 @@ class AttractionsData:
         """
         cities = []
         for city_attractions in self.app_data.get_all("attractions"):
+            if not city_attractions:
+                continue
+
             city_name = (
                 city_attractions[0]["city_name"]
                 + ", "

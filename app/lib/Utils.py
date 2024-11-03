@@ -1,5 +1,6 @@
 import re
 import requests
+import json
 
 from datetime import datetime, date
 
@@ -48,6 +49,23 @@ class Utils:
 
         # Strip hyphens from the beginning and end of the string
         return slug.strip("-")
+
+    @staticmethod
+    def is_json(data: str) -> bool:
+        """
+        Check if a given string is valid JSON.
+
+        Args:
+        - data (str): The string to check.
+
+        Returns:
+        - bool: True if the string is valid JSON, False otherwise.
+        """
+        try:
+            json.loads(data)
+            return True
+        except ValueError:
+            return False
 
     @staticmethod
     def url_encode(text: str) -> str:
