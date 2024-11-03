@@ -41,7 +41,8 @@ class AppData:
 
     def get_config(self, key: str) -> Any:
         """
-        Retrieve configuration data from the config JSON file.
+        Retrieve configuration data from the config JSON file, with the option
+        to override values using environment variables.
 
         Args:
             key (str): The specific key in the configuration file.
@@ -56,11 +57,21 @@ class AppData:
             "localhost"
         """
         config_file = "app/config/cfg.json"
+
+        # Allow overriding config values with environment variables
+        env_key = f"__CONFIG_OVERRIDE_{key}"
+
+        # Check if the key exists in environment variables
+        if env_key in os.environ:
+            return os.getenv(env_key)
+
+        # Otherwise, load from JSON config file
         if os.path.exists(config_file):
             with open(config_file, "r") as f:
                 data = json.load(f)
                 return data.get(key)
-        return None
+
+        return None  # Return None if the key is not found in either place
 
     def get_api_key(self, key: str) -> None:
         """

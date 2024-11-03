@@ -38,6 +38,46 @@ def test_get_config_key_not_exists(app_data, tmpdir):
             assert result is None
 
 
+def test_get_config_override(app_data, tmpdir):
+    # Sample config data that would exist in the JSON file
+    config_data = {"permanent_storage_dir": "./data/02_processed/"}
+    config_file = tmpdir.join("cfg.json")
+    config_file.write(json.dumps(config_data))
+
+    # Mock the environment variable to test override functionality
+    with mock.patch.dict(
+        os.environ, {"__CONFIG_OVERRIDE_permanent_storage_dir": "__OVERRIDE__"}
+    ):
+        # Mock os.path.exists to simulate the config file path and open to read the mocked config data
+        with mock.patch("os.path.exists", return_value=True):
+            with mock.patch(
+                "builtins.open", mock.mock_open(read_data=json.dumps(config_data))
+            ):
+                result = app_data.get_config("permanent_storage_dir")
+                # Assert that the environment variable value takes precedence over the config file value
+                assert result == "__OVERRIDE__"
+
+
+def test_get_config_no_override(app_data, tmpdir):
+    # Sample config data that would exist in the JSON file
+    config_data = {"permanent_storage_dir": "./data/02_processed/"}
+    config_file = tmpdir.join("cfg.json")
+    config_file.write(json.dumps(config_data))
+
+    # Ensure there's no environment variable for the key
+    if "__CONFIG_OVERRIDE_permanent_storage_dir" in os.environ:
+        del os.environ["__CONFIG_OVERRIDE_permanent_storage_dir"]
+
+    # Mock os.path.exists to simulate the config file path and open to read the mocked config data
+    with mock.patch("os.path.exists", return_value=True):
+        with mock.patch(
+            "builtins.open", mock.mock_open(read_data=json.dumps(config_data))
+        ):
+            result = app_data.get_config("permanent_storage_dir")
+            # Assert that the JSON file value is used when there's no environment override
+            assert result == "./data/02_processed/"
+
+
 def test_get_api_key_found(app_data):
     with mock.patch.dict(os.environ, {"GOOGLEMAPS_API_KEY": "test_api_key"}):
         result = app_data.get_api_key("googlemaps")
