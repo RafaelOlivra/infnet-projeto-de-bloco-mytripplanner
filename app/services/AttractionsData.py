@@ -35,6 +35,7 @@ class AttractionsData:
             slug = self.slugify(city_name, state_name)
 
         # Convert the Attraction objects to JSON
+        json = ""
         for attraction in attractions:
             json += attraction.model_dump_json() + ","
         json = "[" + json[:-1] + "]"
