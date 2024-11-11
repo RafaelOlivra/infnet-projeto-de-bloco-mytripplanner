@@ -4,5 +4,8 @@
     "permanent_storage_dir": "./data/02_processed/",
     "log_dir": "./data/.log",
     "city_state_json": "./data/02_processed/estados-cidades.json",
-    "datetime_display_format": "%d/%m/%Y"
+    "datetime_display_format": "%d/%m/%Y",
+    "ai_integration": {
+        "base_prompt": "What is the name of the city you want to know the weather?"
+    }
 }
