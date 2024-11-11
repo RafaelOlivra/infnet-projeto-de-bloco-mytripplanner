@@ -33,7 +33,7 @@ api_key_header = api_key_handler.header
 # Trip API
 # --------------------------
 # Create a new trip
-@app.post("/trip")
+@app.post("/trip", response_model=TripModel)
 @limiter.limit("10/minute")
 async def create_user_trip(
     request: Request,
@@ -58,7 +58,7 @@ async def create_user_trip(
 
 # Get a specific trip
 # @app.get("/trip")
-@app.get("/trip/{trip_id}")
+@app.get("/trip/{trip_id}", response_model=TripModel)
 @limiter.limit("20/minute")
 async def get_user_trip(
     request: Request,
@@ -77,7 +77,7 @@ async def get_user_trip(
 
 
 # Get all user trips
-@app.get("/trips")
+@app.get("/trips", response_model=list[TripModel])
 @limiter.limit("40/minute")
 async def get_user_trips(
     request: Request,
