@@ -1,0 +1,17 @@
+streamlit<1.38.0
+streamlit-tags==1.2.8
+streamlit-extras==0.4.7
+streamlit_js_eval
+pandas==2.2.2
+python-dotenv==1.0.1
+beautifulsoup4==4.10.0
+fastapi==0.115.2
+pydantic==2.9.2
+pytest==8.3.3
+uvicorn==0.15.0
+slowapi
+limits
+httpx
+plotly
+pydeck
+wordcloud

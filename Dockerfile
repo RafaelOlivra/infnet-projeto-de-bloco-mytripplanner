@@ -12,10 +12,10 @@ RUN mkdir /usr/src/app
 WORKDIR /usr/src/app
 
 # Copy requirements and install dependencies
-COPY ./requirements.txt .
+COPY ./requirements-deploy.txt .
 RUN python -m pip install --upgrade pip
 RUN pip install --no-cache-dir pyarrow
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements-deploy.txt
 
 # Set environment variable
 ENV PYTHONUNBUFFERED 1
