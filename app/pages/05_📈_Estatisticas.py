@@ -208,20 +208,29 @@ def View_Stats():
     stopwords_pt_br = stopwords_pt_br.split()
 
     # Create the word cloud
-    wordcloud = wc.WordCloud(
-        width=800,
-        height=400,
-        stopwords=stopwords_pt_br,
-        background_color="white",
-        colormap="viridis",
-    ).generate(" ".join(words))
+    @st.cache_data(ttl=60 * 60 * 24, show_spinner=True)
+    def generate_wordcloud(words, stopwords):
+        return (
+            wc.WordCloud(
+                width=800,
+                height=400,
+                stopwords=stopwords,
+                background_color="white",
+                colormap="viridis",
+            )
+            .generate(" ".join(words))
+            .to_image()
+        )
 
     st.write(
         """
         ###### Nuvem de Palavras
         """
     )
-    st.image(wordcloud.to_image(), use_column_width=True)
+    st.image(
+        generate_wordcloud(words=words, stopwords=stopwords_pt_br),
+        use_column_width=True,
+    )
 
 
 # --------------------------

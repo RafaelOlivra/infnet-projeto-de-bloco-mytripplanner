@@ -98,7 +98,7 @@ class YelpScrapper:
     # --------------------------
     # Utils
     # --------------------------
-    @st.cache_data(ttl=86400)
+    @st.cache_data(ttl=86400, show_spinner=False)
     def _fetch_html(_self, url: str) -> str:
         """
         Fetches the HTML content from the given URL.
