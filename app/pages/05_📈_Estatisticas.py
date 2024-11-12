@@ -1,7 +1,9 @@
+import re
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 import pydeck as pdk
+import wordcloud as wc
 
 from lib.LatLong import LatLong
 
@@ -37,6 +39,8 @@ def View_Stats():
     # Overall Stats
     # --------------------------
 
+    trips = TripData().get_all_trips()
+
     # Total users
     with st.container(border=True):
         cols = st.columns(5)
@@ -46,7 +50,7 @@ def View_Stats():
         cols[1].metric("Total de Viagens", f"{TripData().count_all()}")
 
         # Visited cities
-        visited_cities = TripData().get_all_trips()
+        visited_cities = trips
         cities = set()
         for trip in visited_cities:
             cities.add(trip.destination_city + ", " + trip.destination_state)
@@ -73,7 +77,6 @@ def View_Stats():
     ##### Plot the a map with most visited cities
 
     # Get the most visited places
-    trips = TripData().get_all_trips()
     trips_by_destination_tracker = []
     trips_by_destination = []
     for trip in trips:
@@ -155,6 +158,70 @@ def View_Stats():
         st.plotly_chart(fig)
     except ValueError:
         st.write("Nenhuma atração encontrada.")
+
+    # --------------------------
+    # Word Cloud with words from the trips
+    # --------------------------
+    words = []
+
+    def get_words(phrase: str = ""):
+        # Use regex to replace any character that is not a letter or number with a space
+        cleaned_phrase = re.sub(r"[^\w\s]", "", phrase.lower())  # Remove punctuation
+        cleaned_phrase = re.sub(
+            r"\s+", " ", cleaned_phrase
+        )  # Replace multiple spaces/newlines with a single space
+        words = cleaned_phrase.split()  # Split by space into words list
+        return words
+
+    for trip in trips:
+        # Get words from the title and description
+        words.extend(get_words(trip.title))
+        words.extend(get_words(trip.origin_city))
+        words.extend(get_words(trip.origin_state))
+        words.extend(get_words(trip.destination_city))
+        words.extend(get_words(trip.destination_state))
+        words.extend(get_words(trip.goals))
+        words.extend(get_words(trip.notes))
+
+    # Stopwords
+    stopwords_pt_br = """
+    a à agora aí ainda além algumas algo algumas alguns ali ano anos ante antes 
+    ao aos apenas apoio após aquela aquelas aquele aqueles aqui aquilo as às assim 
+    até atrás bem bom cada cá casa caso coisa com como comprido conhecido contra 
+    contudo custa da daquele daqueles das de debaixo dela delas dele deles demais 
+    dentro depois desde dessa dessas desse desses desta destas deste destes deve 
+    devem devendo dever deverá deverão deveria deveriam devia deviam disse disso disto 
+    dito diz dizem do dois dos doze duas durante e é ela elas ele eles em 
+    embora enquanto entre era eram essa essas esse esses esta está estamos estão 
+    estar estas estava estavam este estes estou eu fazer faz fiz foi for foram 
+    fosse foram fui há isso isto já la lá lhe lhes lo mais maior mas me 
+    mesma mesmas mesmo mesmos meu meus minha minhas muito muitos na não nas 
+    nem nenhum nessa nessas neste nossos nossa nossas num numa nós o os onde 
+    ou outra outras outro outros para pela pelas pelo pelos perante pode poder 
+    poderá podia podia pois por porque portanto pouco poucos pra qual qualquer 
+    quando quanto que quem ser se seja sejam sem sempre sendo seu seus só 
+    sob sobre sua suas tal também tanta tantas tanto tão te tem tendo tenha 
+    ter teu teus tive tivemos tiver tiveram tivesse tivessem tiveste tivestes toda 
+    todas todo todos tu tua tuas tudo último um uma umas uns vendo ver 
+    vez vindo vir você vocês vos
+    """
+    stopwords_pt_br = stopwords_pt_br.split()
+
+    # Create the word cloud
+    wordcloud = wc.WordCloud(
+        width=800,
+        height=400,
+        stopwords=stopwords_pt_br,
+        background_color="white",
+        colormap="viridis",
+    ).generate(" ".join(words))
+
+    st.write(
+        """
+        ###### Nuvem de Palavras
+        """
+    )
+    st.image(wordcloud.to_image(), use_column_width=True)
 
 
 # --------------------------

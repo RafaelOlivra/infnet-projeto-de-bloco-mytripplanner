@@ -15,7 +15,7 @@ httpx
 plotly
 pydeck
 wordcloud
+accelerate
 transformers
-git+https://github.com/huggingface/accelerate
-torch
+torch>=1.10.0
 --index-url https://download.pytorch.org/whl/nightly/cu121
