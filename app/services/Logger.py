@@ -39,6 +39,16 @@ class SimpleLogger:
         # Add the handler to the logger
         self.logger.addHandler(handler)
 
+    def log(self, message, obj=None, level="INFO"):
+        if level == "WARNING":
+            self.log_warning(message, obj)
+        elif level == "ERROR":
+            self.log_error(message, obj)
+        elif level == "DEBUG":
+            self.log_debug(message, obj)
+        else:
+            self.log_info(message, obj)
+
     def log_info(self, message, obj=None):
         self._log_with_object(logging.INFO, message, obj)
 
@@ -71,3 +81,8 @@ class SimpleLogger:
             self.logger.error(message)
         elif level == logging.DEBUG:
             self.logger.debug(message)
+
+
+# Generic log function
+def _log(message, obj=None, level="INFO"):
+    return SimpleLogger().log(message=message, obj=obj, level=level)

@@ -5,10 +5,12 @@ from datetime import datetime, time
 
 from unittest.mock import patch
 from services.AiProvider import AiProvider
+from services.Logger import _log
 from lib.Utils import Utils
 
 from tests.test_Trip import mock_trip_model, mock_trip
 from tests.test_Itinerary import mock_activity, mock_itinerary
+from tests.test_Attractions import mock_attractions
 
 
 def mock_weather():
@@ -27,3 +29,14 @@ def test_generate_weather_summary():
     assert "2024-11-13T00:00:00 - nuvens dispersas" in summary
     assert "chuva moderada" in summary
     assert "Não há dados do tempo" in summary
+
+
+def test_generate_attractions_summary():
+    ai_provider = AiProvider()
+    attractions_list = mock_attractions()
+
+    summary = ai_provider._generate_attractions_summary(
+        attractions_list=attractions_list
+    )
+
+    _log(summary)

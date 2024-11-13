@@ -9,10 +9,10 @@ prompt: |
 
     The itinerary will be for a trip to %%LOCATION%%, and will have 3 days.
     The expected weather for the days are:
-
     %%WEATHER%%
 
-    The itinerary should include a visit to %%ATTRACTIONS%%.
+    The itinerary should include a visit to these local attractions:
+    %%ATTRACTIONS%%
 
     <|FORMAT|>
 
