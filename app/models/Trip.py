@@ -8,6 +8,8 @@ from models.Weather import ForecastModel
 from models.Weather import ForecastModel
 from models.Attraction import AttractionModel
 
+from lib.Utils import Utils
+
 
 class TripModel(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -33,13 +35,13 @@ class TripModel(BaseModel):
     tags: List[str] = Field(default_factory=list)
 
     @field_validator("created_at", "start_date", "end_date")
-    def convert_to_datetime(cls, value):
+    def convert_to_datetime(cls, value) -> datetime:
         """
         Convert date to datetime if necessary.
         """
         if isinstance(value, date) and not isinstance(value, datetime):
             return datetime(value.year, value.month, value.day)
-        return value
+        return Utils.to_datetime(value)
 
     def __getitem__(self, attribute: str):
         return self.__getattribute__(attribute)

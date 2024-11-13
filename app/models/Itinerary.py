@@ -17,11 +17,12 @@ class ActivityModel(BaseModel):
         start_time = field_values.start_time
         if start_time and end_time <= start_time:
             raise ValueError("end_time must be later than start_time")
-        return end_time
+        return field_values
 
 
 class ItineraryModel(BaseModel):
     date: datetime | date | str
+    title: str
     items: List[ActivityModel]
 
     @field_validator("date")

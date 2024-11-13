@@ -9,37 +9,32 @@ from models.Itinerary import ItineraryModel, ActivityModel
 
 # Mock data for testing
 def mock_itinerary():
-    return [
-        ItineraryModel(
-            date=datetime.datetime.now(),
-            items=[
-                {
-                    "start_time": time(8, 0),
-                    "end_time": time(10, 0),
-                    "location": "Test",
-                    "title": "Test",
-                    "description": "Test",
-                },
-                {
-                    "start_time": time(10, 0),
-                    "end_time": time(12, 0),
-                    "location": "Test 2",
-                    "title": "Test 3",
-                    "description": "Test 5",
-                },
-            ],
-        )
-    ]
+    itinerary = {
+        "date": datetime.now(),
+        "title": "Day 1",
+        "items": [
+            {
+                "start_time": time(8, 0),
+                "end_time": time(10, 0),
+                "location": "Test",
+                "title": "Test",
+                "description": "Test",
+            },
+            {
+                "start_time": time(10, 0),
+                "end_time": time(12, 0),
+                "location": "Test 2",
+                "title": "Test 3",
+                "description": "Test 5",
+            },
+        ],
+    }
+    return [ItineraryModel(**itinerary)]
 
 
 def mock_activity():
-    return ActivityModel(
-        start_time=time(8, 0),
-        end_time=time(10, 0),
-        location="Test",
-        title="Test",
-        description="Test description",
-    )
+    activity = mock_itinerary()[0].items[0].model_dump()
+    return ActivityModel(**activity)
 
 
 def test_invalid_time_order():

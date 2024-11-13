@@ -5,7 +5,5 @@
     "log_dir": "./data/.log",
     "city_state_json": "./data/02_processed/estados-cidades.json",
     "datetime_display_format": "%d/%m/%Y",
-    "ai_integration": {
-        "base_prompt": "What is the name of the city you want to know the weather?"
-    }
+    "itinerary_gen_prompt_yaml": "./app/config/prompt.yaml"
 }

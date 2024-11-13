@@ -11,6 +11,7 @@ Caddyfile
 *.temp
 .run.powershell
 /data/.storage/
+/data/.log/
 *.storage
 /app/__app__.py
 

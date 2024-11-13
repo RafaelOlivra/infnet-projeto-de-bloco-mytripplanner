@@ -9,22 +9,13 @@ from services.YelpScrapper import YelpScrapper
 from models.Attraction import AttractionModel
 from views.AttractionsView import AttractionsView
 
+from tests.test_Trip import mock_trip_dict
+
 
 # Mock data for testing
 def mock_attractions():
-    return [
-        AttractionModel(
-            name="Test",
-            city_name="São Paulo",
-            state_name="SP",
-            url="https://www.yelp.com/biz/test",
-            review_count=0,
-            review_stars=0,
-            description="",
-            image="https://www.yelp.com/biz/test",
-            created_at=(datetime.datetime.now() - datetime.timedelta(days=1)),
-        )
-    ]
+    attraction_data = mock_trip_dict()["attractions"][0]
+    return [AttractionModel(**attraction_data)]
 
 
 # Test slug generation
@@ -58,14 +49,14 @@ def test_YelpScrapper_get_near_attractions():
     assert type(results[0]) == AttractionModel
 
 
-# Test saving attractions to the cache
+# Test saving attractions
 @patch("services.AttractionsData.AppData.save")
 def test_AttractionsData_save(app_data_save_mock):
     # Create a mock instance of AppData
     app_data_save_mock.return_value = True
 
     # Arrange
-    slug = "sp_sao-paulo"
+    slug = "rj_arraial-do-cabo"
     attractions = mock_attractions()
 
     # Act
@@ -75,7 +66,7 @@ def test_AttractionsData_save(app_data_save_mock):
     assert results is True
 
 
-# Test retrieving attractions from the cache
+# Test retrieving attractions
 @patch("services.AttractionsData.AppData.get")
 def test_AttractionsData_get(app_data_get_mock):
     # Create a mock instance of AppData
@@ -83,13 +74,14 @@ def test_AttractionsData_get(app_data_get_mock):
     app_data_get_mock.return_value = json.loads(json_data)
 
     limit = 1
-    slug = "sp_sao-paulo"
+    slug = "rj_arraial-do-cabo"
 
     # Act
     results = AttractionsData().get(slug)
 
     # Assert
     assert results is not None
+    assert results[0].description == mock_attractions()[0].description
     assert len(results) == limit
     assert type(results[0]) == AttractionModel
     current_time = datetime.datetime.now()

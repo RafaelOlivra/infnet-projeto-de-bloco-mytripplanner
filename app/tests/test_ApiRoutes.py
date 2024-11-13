@@ -8,7 +8,7 @@ from routers.api import app, ApiKeyHandler
 from services.TripData import TripData
 from services.Trip import Trip
 
-from tests.test_Trip import mock_trip_data
+from tests.test_Trip import mock_trip_dict
 
 # Create a test client for the FastAPI app
 client = TestClient(app)
@@ -36,12 +36,12 @@ def test_no_api_key():
 def test_get_user_trips(mock__get_raw_keys, mock_trip_data_get_user_trips):
     mock__get_raw_keys.return_value = demo_key
     mock_trip_data_get_user_trips.return_value = [
-        TripData()._to_trip_model(trip_data=mock_trip_data())
+        TripData()._to_trip_model(trip_data=mock_trip_dict())
     ]
 
     response = client.get(f"/trips", headers=headers)
     assert response.status_code == status.HTTP_200_OK
-    assert response.json()[0]["slug"] == [mock_trip_data()][0]["slug"]
+    assert response.json()[0]["slug"] == [mock_trip_dict()][0]["slug"]
 
 
 @patch("services.TripData.TripData.get_user_trip")
@@ -49,13 +49,13 @@ def test_get_user_trips(mock__get_raw_keys, mock_trip_data_get_user_trips):
 def test_get_user_trip(mock__get_raw_keys, mock_trip_data_get_user_trip):
     mock__get_raw_keys.return_value = demo_key
     mock_trip_data_get_user_trip.return_value = TripData()._to_trip_model(
-        trip_data=mock_trip_data()
+        trip_data=mock_trip_dict()
     )
 
-    trip_id = mock_trip_data()["id"]
+    trip_id = mock_trip_dict()["id"]
     response = client.get(f"/trip/{trip_id}", headers=headers)
     assert response.status_code == status.HTTP_200_OK
-    assert response.json()["slug"] == mock_trip_data()["slug"]
+    assert response.json()["slug"] == mock_trip_dict()["slug"]
 
 
 @patch("services.TripData.AppData.save")
@@ -66,13 +66,13 @@ def test_create_user_trip(
 ):
     mock__get_raw_keys.return_value = demo_key
     mock_trip_data_get_user_trip.return_value = [
-        TripData()._to_trip_model(trip_data=mock_trip_data())
+        TripData()._to_trip_model(trip_data=mock_trip_dict())
     ]
     mock_app_data_save.return_value = True
 
-    response = client.post(f"/trip", headers=headers, json=mock_trip_data())
+    response = client.post(f"/trip", headers=headers, json=mock_trip_dict())
     assert response.status_code == status.HTTP_200_OK
-    assert response.json()["slug"] == mock_trip_data()["slug"]
+    assert response.json()["slug"] == mock_trip_dict()["slug"]
 
 
 @patch("routers.api.ApiKeyHandler._get_raw_keys")
@@ -88,7 +88,7 @@ def test_delete_user_trip(mock__get_raw_keys):
     mock__get_raw_keys.return_value = demo_key
 
     # Create a new trip
-    trip = Trip(trip_data=mock_trip_data())
+    trip = Trip(trip_data=mock_trip_dict())
     trip_id = trip.get("id")
 
     response = client.delete(f"/trip/{trip_id}", headers=headers)

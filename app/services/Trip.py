@@ -17,17 +17,19 @@ from models.Trip import TripModel
 
 
 class Trip:
-    def __init__(self, trip_id: str = None, trip_data: dict = None, date_verify=True):
+    def __init__(
+        self, trip_id: str = None, trip_data: dict = None, date_verify=True, save=True
+    ):
         if trip_id:
             if not self._load(trip_id):
                 raise ValueError(f"Trip with ID {trip_id} could not be loaded.")
         elif trip_data:
-            self.create(trip_data, date_verify=date_verify)
+            self.create(trip_data, date_verify=date_verify, save=save)
 
     # --------------------------
     # CRUD Operations
     # --------------------------
-    def create(self, trip_data: dict, date_verify=True) -> bool:
+    def create(self, trip_data: dict, date_verify=True, save=True) -> bool:
         if not trip_data:
             raise ValueError("Trip data is required to create a trip.")
 
@@ -102,7 +104,7 @@ class Trip:
             trip_data["weather"] = weather
 
         self.model = TripModel(**trip_data)
-        return self._save()
+        return self._save() if save else True
 
     def get(self, attribute: str = None):
         if not self.model:

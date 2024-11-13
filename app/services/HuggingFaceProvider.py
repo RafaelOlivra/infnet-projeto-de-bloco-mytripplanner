@@ -4,10 +4,11 @@ import streamlit as st
 from transformers import pipeline
 import torch
 
+from services.AiProvider import AiProvider
 from services.AppData import AppData
 
 
-class HuggingFaceProvider:
+class HuggingFaceProvider(AiProvider):
     def __init__(self, api_key=None):
         # Set the API key, either from the environment or directly from the parameter
         self.api_key = api_key or AppData().get_api_key("HUGGINGFACE_API_KEY")
@@ -20,13 +21,13 @@ class HuggingFaceProvider:
         self.model = {}
         self.model.mode = "text-generation"
         self.model.name = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-        self.model.role_prompt = AppData().get_config("assistant_base_prompt")
+        self.model.prompt = super().prompt
 
         if not self.api_key:
             raise ValueError("API key is required for Hugging Face API")
 
     def ask(self, message: str) -> dict:
-        generator = pipeline("text-generation", model=self.model)
+        generator = pipeline(self.model.mode, model=self.model.name)
         device = torch.device("cuda")
 
         pipe = pipeline(
