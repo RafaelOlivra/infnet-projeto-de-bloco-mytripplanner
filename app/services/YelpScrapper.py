@@ -3,6 +3,7 @@ import bs4
 import streamlit as st
 
 from services.AppData import AppData
+from services.Logger import SimpleLogger
 from lib.Utils import Utils
 
 from models.Attraction import AttractionModel
@@ -78,6 +79,10 @@ class YelpScrapper:
             if len(cards) >= limit:
                 break
 
+        SimpleLogger().log_info(
+            f"Found {len(cards)} attractions in {city_name}, {state_name}"
+        )
+
         # Handle limit, by calling the function recursively to get more cards
         while recursive and len(cards) < limit:
             _limit = limit - len(cards)
@@ -91,6 +96,8 @@ class YelpScrapper:
             )
             if _cards:
                 cards.extend(_cards)
+            else:
+                break
 
         # Return the cards
         return cards
@@ -112,12 +119,18 @@ class YelpScrapper:
         Raises:
             requests.HTTPError: If there is an HTTP error during the request.
         """
-        print(f"Fetching HTML content from: {url}")
 
         # Apply hardcoded proxy for now
         # TODO: Implement a better way to handle proxies
+
         api_key = AppData().get_api_key("scraperapi")
         proxy_prefix = f"http://api.scraperapi.com?api_key={api_key}&premium=true&url="
+
+        # api_key = AppData().get_api_key("rfproxy")
+        # proxy_prefix = f"https://pr.rafaeloliveira.design/?api_key={api_key}&url="
+
+        SimpleLogger().log_info(f"Fetching HTML content from: {url}")
+
         url = proxy_prefix + url
 
         response = requests.get(url)

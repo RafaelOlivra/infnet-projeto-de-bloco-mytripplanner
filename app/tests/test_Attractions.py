@@ -6,6 +6,7 @@ from unittest.mock import patch
 from lib.Utils import Utils
 from services.AttractionsData import AttractionsData
 from services.YelpScrapper import YelpScrapper
+from services.Logger import SimpleLogger
 from models.Attraction import AttractionModel
 from views.AttractionsView import AttractionsView
 
@@ -43,7 +44,7 @@ def test_YelpScrapper_get_near_attractions():
     results = YelpScrapper().get_near_attractions(
         city_name=city_name, state_name=state_name, start=start, limit=limit
     )
-
+    
     # Assert
     assert len(results) == limit
     assert type(results[0]) == AttractionModel
