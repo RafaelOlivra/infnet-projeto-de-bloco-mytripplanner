@@ -99,6 +99,8 @@ class AppData:
             "scraperapi": "SCRAPER_API_KEY",
             "rfproxy": "RF_PROXY_API_KEY",
             "fastapi": "FASTAPI_KEYS",
+            "huggingface": "HUGGINGFACE_API_KEY",
+            "googlegemini": "GEMINY_API_KEY",
         }
 
         try:

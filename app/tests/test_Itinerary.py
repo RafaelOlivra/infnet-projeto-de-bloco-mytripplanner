@@ -4,7 +4,7 @@ import pytest
 from datetime import datetime, time
 
 from unittest.mock import patch
-from models.Itinerary import ItineraryModel, ActivityModel
+from models.Itinerary import DailyItineraryModel, ActivityModel
 
 
 # Mock data for testing
@@ -29,7 +29,7 @@ def mock_itinerary():
             },
         ],
     }
-    return [ItineraryModel(**itinerary)]
+    return [DailyItineraryModel(**itinerary)]
 
 
 def mock_activity():

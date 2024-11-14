@@ -7,7 +7,7 @@ from typing import List, Optional
 from models.Weather import ForecastModel
 from models.Weather import ForecastModel
 from models.Attraction import AttractionModel
-from models.Itinerary import ItineraryModel
+from models.Itinerary import DailyItineraryModel
 
 from lib.Utils import Utils
 
@@ -31,7 +31,7 @@ class TripModel(BaseModel):
     end_date: datetime | date | str
     weather: Optional[List[ForecastModel]] = None
     attractions: Optional[List[AttractionModel]] = None
-    itinerary: Optional[List[ItineraryModel]] = None
+    itinerary: Optional[List[DailyItineraryModel]] = None
     goals: str = ""
     notes: str = ""
     tags: List[str] = Field(default_factory=list)

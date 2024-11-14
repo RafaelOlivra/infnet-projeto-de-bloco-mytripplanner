@@ -1,4 +1,7 @@
 import yaml
+import json
+import re
+
 from datetime import datetime, date, timedelta
 from typing import List, Optional
 
@@ -6,7 +9,7 @@ from services.AppData import AppData
 from services.Logger import SimpleLogger
 
 from models.Weather import ForecastModel
-from models.Itinerary import ItineraryModel
+from models.Itinerary import DailyItineraryModel
 from models.Attraction import AttractionModel
 
 from lib.Utils import Utils
@@ -22,36 +25,58 @@ class AiProvider:
         ]
         self.prompt = None
 
-    def ask(self, message: str) -> dict:
+        # Initialize empty data
+        self.location = None
+        self.start_date = None
+        self.end_date = None
+        self.forecast_list = None
+        self.attractions_list = None
+
+    def generate(self) -> dict[str, str]:
         raise NotImplementedError("Ask method must be implemented in child class")
+
+    def prepare(
+        self,
+        location: str = None,
+        start_date: date = None,
+        end_date: date = None,
+        forecast_list: List[ForecastModel] = None,
+        attractions_list: List[AttractionModel] = None,
+    ) -> dict:
+
+        self.location = location
+        self.start_date = start_date
+        self.end_date = end_date
+        self.forecast_list = forecast_list
+        self.attractions_list = attractions_list
 
     def _generate_final_prompt(
         self,
-        location: str,
-        start_date: date,
-        end_date: date,
-        forecast_list: List[ForecastModel],
-        attractions_list: List[AttractionModel],
         base_prompt: str = None,
     ) -> str:
         # Allow prompt to be overridden
         prompt = base_prompt if base_prompt else self._load_base_prompt()
 
         # Set the location
-        location = self._strip_reserved_templates(location)
-        prompt = prompt.replace("%%LOCATION%%", location)
+        if self.location is not None:
+            location = self._strip_reserved_templates(self.location)
+            prompt = prompt.replace("%%LOCATION%%", location)
 
         # Set the weather
-        weather = self._generate_weather_summary(
-            forecast_list=forecast_list, start_date=start_date, end_date=end_date
-        )
-        weather = self._strip_reserved_templates(weather)
-        prompt = prompt.replace("%%WEATHER%%", weather)
+        if self.forecast_list is not None:
+            weather = self._generate_weather_summary(
+                forecast_list=self.forecast_list,
+                start_date=self.start_date,
+                end_date=self.end_date,
+            )
+            weather = self._strip_reserved_templates(weather)
+            prompt = prompt.replace("%%WEATHER%%", weather)
 
         # Set the attractions
-        attractions = self._generate_attractions_summary(attractions_list)
-        attractions = self._strip_reserved_templates(attractions)
-        prompt = prompt.replace("%%ATTRACTIONS%%", attractions)
+        if self.attractions_list is not None:
+            attractions = self._generate_attractions_summary(self.attractions_list)
+            attractions = self._strip_reserved_templates(attractions)
+            prompt = prompt.replace("%%ATTRACTIONS%%", attractions)
 
         return prompt
 
@@ -102,6 +127,25 @@ class AiProvider:
             data = yaml.safe_load(file)
             self.prompt = data["prompt"]
             return self.prompt
+
+    def _to_json(self, response: dict) -> dict:
+        # Extract the response string
+        response_str = response.get("response", "")
+
+        # Use regex to remove the markdown code block formatting
+        json_str = re.sub(r"```json\n|\n```", "", response_str).strip()
+
+        # Parse the cleaned JSON string into a Python object
+        parsed_json = json.loads(json_str)
+
+        return parsed_json
+
+    def _to_itinerary(self, response: dict) -> List[DailyItineraryModel]:
+        json = self._to_json(response)
+        return [DailyItineraryModel(**itinerary) for itinerary in json]
+
+    def _override_base_prompt(self, prompt: str) -> None:
+        self.prompt = prompt
 
     def _strip_reserved_templates(self, text: str) -> str:
         for template in self.reserved_templates:

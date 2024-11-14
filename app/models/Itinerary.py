@@ -20,7 +20,7 @@ class ActivityModel(BaseModel):
         return field_values
 
 
-class ItineraryModel(BaseModel):
+class DailyItineraryModel(BaseModel):
     date: datetime | date | str
     title: str
     items: List[ActivityModel]

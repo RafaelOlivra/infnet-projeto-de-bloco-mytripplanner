@@ -29,7 +29,7 @@ class SimpleLogger:
 
         # Create a rotating file handler
         handler = RotatingFileHandler(
-            log_path, maxBytes=max_size, backupCount=backup_count
+            log_path, maxBytes=max_size, backupCount=backup_count, encoding="utf-8"
         )
 
         # Define the log format
