@@ -36,7 +36,7 @@ class ItineraryView:
     def render_daily_itinerary(self, day: DailyItineraryModel):
         with st.container(border=True):
             st.write(
-                f"### 📅 {Utils.to_date_string(day.date, format="display")} - {day.title}"
+                f"### 📅 {Utils.to_date_string(day.date, format='display')} - {day.title}"
             )
             for activity in day.items:
                 self.render_activity(activity)
