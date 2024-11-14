@@ -80,6 +80,48 @@ def mock_trip_dict() -> dict:
                 "image": "https://s3-media0.fl.yelpcdn.com/bphoto/9t3__2a-LlPTLdosAVXgOw/348s.jpg",
             },
         ],
+        "itinerary": [
+            {
+                "date": start_date,
+                "title": "Dia 1",
+                "items": [
+                    {
+                        "start_time": "09:00",
+                        "end_time": "11:00",
+                        "location": "Praia do Arrail - Arraial do Cabo, RJ",
+                        "title": "Manhã na Praia do Arrail",
+                        "description": "Aproveite a manhã relaxando na Praia do Arrail com nuvens dispersas.",
+                    },
+                    {
+                        "start_time": "11:30",
+                        "end_time": "13:00",
+                        "location": "Centro de Arraial do Cabo, RJ",
+                        "title": "Almoço em Restaurante Local",
+                        "description": "Desfrute de pratos tradicionais em um restaurante aconchegante no centro.",
+                    },
+                ],
+            },
+            {
+                "date": end_date,
+                "title": "Dia 2",
+                "items": [
+                    {
+                        "start_time": "09:00",
+                        "end_time": "11:00",
+                        "location": "Atração Genérica - Arraial do Cabo, RJ",
+                        "title": "Exploração da Atração Genérica",
+                        "description": "Descubra os encantos locais da Atração Genérica em Arraial do Cabo.",
+                    },
+                    {
+                        "start_time": "11:30",
+                        "end_time": "13:00",
+                        "location": "Praia dos Anjos - Arraial do Cabo, RJ",
+                        "title": "Relaxamento na Praia dos Anjos",
+                        "description": "Desfrute do sol e do mar nesta bela praia.",
+                    },
+                ],
+            },
+        ],
         "goals": "Test",
         "notes": "This is a test note",
         "tags": ["teste"],

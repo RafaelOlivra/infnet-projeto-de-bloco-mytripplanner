@@ -14,12 +14,13 @@ from lib.Utils import Utils
 
 class AiProvider:
     def __init__(self):
-        self.prompt_file = AppData().get_config("assistant_base_prompt")
+        self.prompt_file = AppData().get_config("ai_config_file")
         self.reserved_templates = [
             "%%LOCATION%%",
             "%%WEATHER%%",
             "%%ATTRACTIONS%%",
         ]
+        self.prompt = None
 
     def ask(self, message: str) -> dict:
         raise NotImplementedError("Ask method must be implemented in child class")
@@ -31,7 +32,7 @@ class AiProvider:
         end_date: date,
         forecast_list: List[ForecastModel],
         attractions_list: List[AttractionModel],
-        base_prompt: str,
+        base_prompt: str = None,
     ) -> str:
         # Allow prompt to be overridden
         prompt = base_prompt if base_prompt else self._load_base_prompt()
@@ -92,15 +93,17 @@ class AiProvider:
             locations += f"* {attraction.name} - {attraction.city_name}, {attraction.state_name} \n"
         return locations
 
-    def _load_prompt_file(self) -> str:
+    def _load_base_prompt(self) -> str:
+
+        if self.prompt:
+            return self.prompt
+
         with open(self.prompt_file, "r") as file:
             data = yaml.safe_load(file)
-            return data["prompt"]
+            self.prompt = data["prompt"]
+            return self.prompt
 
     def _strip_reserved_templates(self, text: str) -> str:
         for template in self.reserved_templates:
             text = text.replace(template, "")
         return text
-
-    def _load_base_prompt(self) -> str:
-        return self.prompt
