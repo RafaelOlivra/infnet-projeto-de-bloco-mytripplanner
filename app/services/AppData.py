@@ -4,6 +4,8 @@ import streamlit as st
 
 from typing import Any, Union
 
+from services.Logger import _log
+
 
 class AppData:
     """
@@ -67,7 +69,7 @@ class AppData:
 
         # Otherwise, load from JSON config file
         if os.path.exists(config_file):
-            with open(config_file, "r") as f:
+            with open(config_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 return data.get(key)
 
@@ -107,7 +109,7 @@ class AppData:
             if not key_map.get(key):
                 raise ValueError("API key not found.")
         except ValueError as e:
-            print(f"Error retrieving API key: {e}")
+            _log(f"Error retrieving API key: {e}", "ERROR")
             return None
 
         return os.getenv(key_map.get(key))
@@ -192,13 +194,13 @@ class AppData:
         file_path = f"{save_path}/{id}.json"
 
         if os.path.exists(file_path):
-            with open(file_path, "r") as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 try:
                     data = json.load(f)
                     if isinstance(data, str):
                         data = json.loads(data)
                 except Exception as e:
-                    print(f"Error loading data from file: {e}")
+                    _log(f"Error loading data from file: {e}", "ERROR")
                     data = None
             return data
         return None
@@ -376,11 +378,11 @@ class AppData:
             json = json.dumps(json)
 
         try:
-            with open(file_path, "w") as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.write(json)
             return True
         except Exception as e:
-            print(f"Error saving data to file: {e}")
+            _log(f"Error saving data to file: {e}", "ERROR")
             return False
 
     def _delete_file(self, file_path: str) -> bool:

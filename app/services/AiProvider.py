@@ -123,7 +123,7 @@ class AiProvider:
         if self.prompt:
             return self.prompt
 
-        with open(self.prompt_file, "r") as file:
+        with open(self.prompt_file, "r", encoding="utf-8") as file:
             data = yaml.safe_load(file)
             self.prompt = data["prompt"]
             return self.prompt

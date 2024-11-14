@@ -5,17 +5,21 @@ import json
 from logging.handlers import RotatingFileHandler
 from datetime import datetime
 
-from services.AppData import AppData
-
 
 class SimpleLogger:
     def __init__(
         self,
-        log_folder=AppData().get_config("log_dir"),
         log_filename="app.log",
         max_size=1_000_000,
         backup_count=5,
     ):
+
+        # Get the log folder from the config file
+        log_folder = self.get_log_dir()
+
+        if not log_folder:
+            raise ValueError("Log directory not found in config file")
+
         # Create the log folder if it does not exist
         if not os.path.exists(log_folder):
             os.makedirs(log_folder)
@@ -38,6 +42,10 @@ class SimpleLogger:
 
         # Add the handler to the logger
         self.logger.addHandler(handler)
+
+    # --------------------------
+    # Log functions
+    # --------------------------
 
     def log(self, message, obj=None, level="INFO"):
         if level == "WARNING":
@@ -82,7 +90,34 @@ class SimpleLogger:
         elif level == logging.DEBUG:
             self.logger.debug(message)
 
+    # --------------------------
+    # System Utils
+    # --------------------------
+    def get_log_dir(self):
+        """
+        Retrieve the log folder path from the config file.
+        """
+        key = "log_dir"
+        config_file = "app/config/cfg.json"
 
-# Generic log function
+        # Allow overriding config values with environment variables
+        env_key = f"__CONFIG_OVERRIDE_{key}"
+
+        # Check if the key exists in environment variables
+        if env_key in os.environ:
+            return os.getenv(env_key)
+
+        # Otherwise, load from JSON config file
+        if os.path.exists(config_file):
+            with open(config_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data.get(key)
+
+        return None
+
+
+# ----------------------------
+# Generic Log Function Export
+# ----------------------------
 def _log(message, obj=None, level="INFO"):
     return SimpleLogger().log(message=message, obj=obj, level=level)

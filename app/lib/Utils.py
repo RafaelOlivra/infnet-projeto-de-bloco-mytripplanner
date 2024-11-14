@@ -98,6 +98,14 @@ class Utils:
             return date.isoformat()
 
     @staticmethod
+    def to_time_string(time: datetime | str) -> str:
+        # Convert string to datetime object from isoformat
+        if isinstance(time, str):
+            time = datetime.fromisoformat(time)
+
+        return str(time.strftime(AppData().get_config("time_display_format")))
+
+    @staticmethod
     def to_datetime(_date) -> datetime:
         """
         Convert a date string to a datetime object.

@@ -2,6 +2,7 @@ from pydantic import ValidationError
 
 from services.AppData import AppData
 from lib.Utils import Utils
+from services.Logger import _log
 
 from models.Trip import TripModel
 
@@ -181,6 +182,9 @@ class TripData:
         trips = self.app_data.get_all("trip", limit=limit)
         trips = [self._to_trip_model(trip) for trip in trips]
 
+        # Remove empty or invalid trip data
+        trips = [trip for trip in trips if trip]
+
         # Sort the trips by the specified field
         if order_by:
             if order_by == "created_at":
@@ -211,6 +215,7 @@ class TripData:
         Returns:
             TripModel: The trip data as a TripModel object.
         """
+
         if not trip_data:
             return None
 
@@ -229,5 +234,5 @@ class TripData:
 
             return TripModel(**trip_data)
         except ValidationError as e:
-            print(f"Error validating trip data: {e}")
+            _log(f"Error validating trip data: {e}", "ERROR")
             return None

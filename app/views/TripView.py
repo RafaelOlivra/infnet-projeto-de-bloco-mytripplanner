@@ -9,8 +9,11 @@ from lib.Utils import Utils
 
 from views.WeatherView import WeatherView
 from views.AttractionsView import AttractionsView
+from views.ItineraryView import ItineraryView
 
 from services.Trip import Trip
+
+from tests.test_AiProvider import mock_itinerary
 
 
 class TripView:
@@ -51,7 +54,7 @@ class TripView:
             self.render_attractions()
 
         st.write("#### 🤖 Roteiro")
-        self.render_schedule()
+        self.render_itinerary()
 
         if self.trip.notes:
             st.write("#### 📝 Notas")
@@ -138,19 +141,13 @@ class TripView:
             with st.container(border=True):
                 st.text(f"{self.trip.goals}")
 
-    def render_schedule(self):
+    def render_itinerary(self):
         """
-        Render the trip schedule.
+        Render the trip itinerary.
         """
         if not self.trip:
             return
-
-        # Display schedule
-        # if self.trip.schedule:
-        #     with st.container(border=True):
-        #         st.write(self.trip.schedule)
-        with st.container(border=True):
-            st.write("Em breve...")
+        ItineraryView(itinerary=self.trip.itinerary).render_itinerary()
 
     def render_forecast(self):
         trip_length = Trip._calculate_trip_length(
