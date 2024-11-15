@@ -42,6 +42,11 @@ def update_selected_attractions(attraction_name, remove=False):
     Update the selected attractions and save it using session state.
     """
     selected_attractions = get_selected_attractions()
+
+    # Initialize the selected attractions if it's empty
+    if not selected_attractions:
+        selected_attractions = set()
+
     if remove:
         if attraction_name in selected_attractions:
             selected_attractions.remove(attraction_name)
@@ -56,6 +61,15 @@ def get_selected_attractions():
     Get the selected attractions from the session state.
     """
     return st.session_state.selected_attractions
+
+
+def clear_cached_values():
+    """
+    Clear the cached values in the session state.
+    """
+    st.session_state.selected_attractions = None
+    st.session_state.cached_itinerary = None
+    st.session_state.show_new_trip_form = None
 
 
 # --------------------------
@@ -108,6 +122,8 @@ def Cadastrar():
             ][0]
 
     if not title or not travel_by:
+        # if the form is empty, clear the cached values for safety
+        clear_cached_values()
         return
 
     # City and State
@@ -352,9 +368,7 @@ def Cadastrar():
             st.success("Viagem cadastrada com sucesso!")
 
             # Clear the required session state
-            st.session_state.selected_attractions = None
-            st.session_state.cached_itinerary = None
-            st.session_state.show_new_trip_form = None
+            clear_cached_values()
 
             # Change to the trip view
             st.session_state.selected_trip_id = trip.get("id")

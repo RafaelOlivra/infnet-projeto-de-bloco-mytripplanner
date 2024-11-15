@@ -11,19 +11,25 @@ from services.Logger import _log
 from models.Weather import ForecastModel
 from models.Itinerary import DailyItineraryModel
 from models.Attraction import AttractionModel
+from models.Trip import TripModel
 
 from lib.Utils import Utils
 
 
 class AiProvider:
     def __init__(self):
-        self.prompt_file = AppData().get_config("ai_config_file")
+        self.config_file = AppData().get_config("ai_config_file")
         self.reserved_templates = [
             "%%LOCATION%%",
             "%%WEATHER%%",
             "%%ATTRACTIONS%%",
+            "%%TRAVEL_BY%%",
+            "%%ITINERARY%%",
+            "%%NO_OF_DAYS%%",
+            "%%TRIP_JSON%%",
         ]
-        self.prompt = None
+        self.gen_itinerary_prompt = None
+        self.gen_trip_summary_prompt = None
 
         # Initialize empty data
         self.location = None
@@ -31,8 +37,9 @@ class AiProvider:
         self.end_date = None
         self.forecast_list = None
         self.attractions_list = None
+        self.trip_model = None
 
-    def generate(self) -> dict[str, str]:
+    def ask(self, prompt: str) -> dict[str, str]:
         raise NotImplementedError("Ask method must be implemented in child class")
 
     def prepare(
@@ -42,6 +49,7 @@ class AiProvider:
         end_date: date = None,
         forecast_list: List[ForecastModel] = None,
         attractions_list: List[AttractionModel] = None,
+        trip_model: TripModel = None,
     ) -> dict:
 
         self.location = location
@@ -49,13 +57,37 @@ class AiProvider:
         self.end_date = end_date
         self.forecast_list = forecast_list
         self.attractions_list = attractions_list
+        self.trip_model = trip_model
 
-    def _generate_final_prompt(
+    def generate_itinerary(self) -> List[DailyItineraryModel]:
+        prompt = self._generate_prompt_from_template(
+            template_key="gen_itinerary_prompt"
+        )
+        response = self.ask(prompt=prompt)
+        return self._to_itinerary(response)
+
+    def generate_trip_summary(self) -> str:
+        prompt = self._generate_prompt_from_template(
+            template_key="gen_trip_summary_prompt"
+        )
+        response = self.ask(prompt=prompt)
+        return response.get("response", "")
+
+    def prompt(self, prompt: str) -> str:
+        response = self.ask(prompt=prompt)
+        return response.get("response", "")
+
+    def _generate_prompt_from_template(
         self,
+        template_key: str = "gen_itinerary_prompt",
         base_prompt: str = None,
     ) -> str:
         # Allow prompt to be overridden
-        prompt = base_prompt if base_prompt else self._load_base_prompt()
+        prompt = (
+            base_prompt
+            if base_prompt
+            else self._load_base_prompt(template_key=template_key)
+        )
 
         # Set the number of days
         if self.start_date is not None and self.end_date is not None:
@@ -88,6 +120,18 @@ class AiProvider:
             attractions = self._generate_attractions_summary(self.attractions_list)
             attractions = self._strip_reserved_templates(attractions)
             prompt = prompt.replace("%%ATTRACTIONS%%", attractions)
+
+        # Set the itinerary
+        if self.trip_model is not None:
+            itinerary = self._generate_itinerary_summary(self.trip_model.itinerary)
+            itinerary = self._strip_reserved_templates(itinerary)
+            prompt = prompt.replace("%%ITINERARY%%", itinerary)
+
+        # Set the trip JSON
+        if self.trip_model is not None:
+            trip_json = self.trip_model.model_dump_json()
+            trip_json = self._strip_reserved_templates(trip_json)
+            prompt = prompt.replace("%%TRIP_JSON%%", trip_json)
 
         # _log(prompt, level="DEBUG")
 
@@ -140,15 +184,17 @@ class AiProvider:
             locations += f"* {attraction.name} - {attraction.city_name}, {attraction.state_name} \n"
         return locations
 
-    def _load_base_prompt(self) -> str:
+    def _generate_itinerary_summary(self, itinerary: List[DailyItineraryModel]) -> str:
 
-        if self.prompt:
-            return self.prompt
+        if not itinerary:
+            return "* Não há roteiro disponível"
 
-        with open(self.prompt_file, "r", encoding="utf-8") as file:
-            data = yaml.safe_load(file)
-            self.prompt = data["prompt"]
-            return self.prompt
+        summary = ""
+        for day in itinerary:
+            summary += f"### {Utils.to_date_string(day.date, format='display')} - {day.title} \n"
+            for activity in day.items:
+                summary += f"* [{Utils.to_time_string(activity.start_time)} - {Utils.to_time_string(activity.end_time)}] {activity.title} | {activity.location}\n"
+        return summary
 
     def _to_json(self, response: dict) -> dict:
         # Extract the response string
@@ -166,10 +212,27 @@ class AiProvider:
         json = self._to_json(response)
         return [DailyItineraryModel(**itinerary) for itinerary in json]
 
-    def _override_base_prompt(self, prompt: str) -> None:
-        self.prompt = prompt
+    def _load_base_prompt(self, template_key: str = "gen_itinerary_prompt") -> str:
+        if self.get(template_key):
+            return self.get(template_key)
+
+        with open(self.config_file, "r", encoding="utf-8") as file:
+            data = yaml.safe_load(file)
+            return self.set(template_key, data[template_key])
+
+    def _override_base_prompt(
+        self, prompt: str = "", template_key: str = "gen_itinerary_prompt"
+    ) -> None:
+        self.set(template_key, prompt)
 
     def _strip_reserved_templates(self, text: str) -> str:
         for template in self.reserved_templates:
             text = text.replace(template, "")
         return text
+
+    def get(self, name):
+        return getattr(self, name)
+
+    def set(self, name, value):
+        setattr(self, name, value)
+        return value

@@ -260,6 +260,9 @@ class Trip:
             )
 
     def from_model(self, trip_model: TripModel) -> "Trip":
+        if not trip_model:
+            return None
+        
         self.model = trip_model
         return self
 
@@ -282,6 +285,8 @@ class Trip:
     # --------------------------
     # Utils
     # --------------------------
+    def is_expired(self):
+        return self.get("end_date") < datetime.now()
 
     @staticmethod
     def _calculate_trip_length(start_date: datetime = None, end_date: datetime = None):

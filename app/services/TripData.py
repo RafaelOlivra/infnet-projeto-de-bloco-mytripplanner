@@ -70,6 +70,10 @@ class TripData:
 
         # Update the trip data with the new key-value pair
         if key and value:
+            # if key = __ALL__, replace the entire trip data
+            if key == "__ALL__":
+                return self.save(trip_id, value)
+
             setattr(trip_data, key, value)
         else:
             raise ValueError("Key and value are required to update the trip.")

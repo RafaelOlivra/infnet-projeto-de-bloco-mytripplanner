@@ -17,9 +17,7 @@ class GeminiProvider(AiProvider):
         genai.configure(api_key=self.api_key)
         self.model_name = "gemini-1.5-flash"
 
-    def generate(self) -> dict[str, str]:
-        prompt = self._generate_final_prompt()
-
+    def ask(self, prompt: str) -> dict[str, str]:
         try:
             _log("Generating content with Gemini.")
 

@@ -11,12 +11,14 @@ from tests.test_Trip import mock_trip_model, mock_trip
 from tests.test_Itinerary import mock_activity, mock_itinerary
 from tests.test_Attractions import mock_attractions
 
+from models.Itinerary import DailyItineraryModel
+
 
 def mock_weather():
     return mock_trip_model().weather
 
 
-def mock_itinerary_gen_request() -> dict:
+def mock_ai_gen_itinerary_request() -> dict:
     location = (
         mock_trip_model().destination_city + ", " + mock_trip_model().destination_state
     )
@@ -34,7 +36,7 @@ def mock_itinerary_gen_request() -> dict:
     )
 
 
-def mock_ai_provider_response() -> dict:
+def mock_ai_gen_itinerary_response() -> dict:
     return {
         "response": '```json\n[\n  {\n    "date": "2024-11-14",\n    "title": "Dia 1",\n    "items": [\n      {\n        "start_time": "09:00",\n        "end_time": "12:00",\n        "location": "Praia do Arraial - Arraial do Cabo, RJ",\n        "title": "Manhã na Praia do Arraial",\n        "description": "Comece o dia relaxando nas areias brancas da Praia do Arraial, aproveitando o sol e as águas cristalinas. Com o céu com nuvens dispersas, o dia promete ser agradável para um mergulho refrescante ou para simplesmente apreciar a beleza natural da região."\n      },\n      {\n        "start_time": "13:00",\n        "end_time": "15:00",\n        "location": "Atração Genérica - Arraial do Cabo, RJ",\n        "title": "Visita à Atração Genérica",\n        "description": "Após a praia, explore a Atração Genérica, uma atração local que oferece uma experiência única. Aproveite o tempo para conhecer mais sobre a história e a cultura da região."\n      }\n    ]\n  },\n  {\n    "date": "2024-11-15",\n    "title": "Dia 2",\n    "items": [\n      {\n        "start_time": "10:00",\n        "end_time": "12:00",\n        "location": "Praia do Arraial - Arraial do Cabo, RJ",\n        "title": "Caminhada pela Praia do Arraial",\n        "description": "Aproveite a manhã para uma caminhada relaxante pela Praia do Arraial. As condições climáticas podem ser imprevisíveis, mas a beleza natural da praia vale a pena, mesmo com o tempo nublado."\n      },\n      {\n        "start_time": "14:00",\n        "end_time": "17:00",\n        "location": "Atração Genérica - Arraial do Cabo, RJ",\n        "title": "Tarde na Atração Genérica",\n        "description": "Aproveite a tarde para explorar mais a fundo a Atração Genérica. Desfrute de atividades locais, como compras de artesanato ou degustação de pratos típicos da região."\n      }\n    ]\n  },\n  {\n    "date": "2024-11-21",\n    "title": "Dia 3",\n    "items": [\n      {\n        "start_time": "10:00",\n        "end_time": "12:00",\n        "location": "Praia do Arraial - Arraial do Cabo, RJ",\n        "title": "Dia na Praia do Arraial (com chuva)",\n        "description": "Aproveite a manhã para um dia relaxante na Praia do Arraial, mesmo com chuva. A Praia do Arraial é um lugar mágico, e a beleza natural da região é ainda mais encantadora sob a chuva."\n      },\n      {\n        "start_time": "13:00",\n        "end_time": "15:00",\n        "location": "Atração Genérica - Arraial do Cabo, RJ",\n        "title": "Visita à Atração Genérica",\n        "description": "Após a praia, aproveite a tarde para visitar a Atração Genérica. Procure um lugar coberto para se proteger da chuva e desfrutar de um momento cultural."\n      }\n    ]\n  }\n]\n```',
         "provider": "Google Gemini",
@@ -47,7 +49,7 @@ def mock_ai_provider_response() -> dict:
 def test_generate_weather_summary():
     ai_provider = AiProvider()
 
-    itinerary_request = mock_itinerary_gen_request()
+    itinerary_request = mock_ai_gen_itinerary_request()
     forecast_list = itinerary_request["forecast_list"]
 
     summary = ai_provider._generate_weather_summary(
@@ -66,7 +68,7 @@ def test_generate_weather_summary():
 
 def test_empty_generate_weather_summary():
     ai_provider = AiProvider()
-    itinerary_request = mock_itinerary_gen_request()
+    itinerary_request = mock_ai_gen_itinerary_request()
     forecast_list = None
 
     summary = ai_provider._generate_weather_summary(
@@ -82,7 +84,7 @@ def test_empty_generate_weather_summary():
 
 def test_generate_attractions_summary():
     ai_provider = AiProvider()
-    attractions_list = mock_itinerary_gen_request()["attractions_list"]
+    attractions_list = mock_ai_gen_itinerary_request()["attractions_list"]
 
     summary = ai_provider._generate_attractions_summary(
         attractions_list=attractions_list
@@ -109,13 +111,45 @@ def test_empty_generate_attractions_summary():
     assert test_summary in summary
 
 
+def test_generate_itinerary_summary():
+    ai_provider = AiProvider()
+    itinerary = mock_itinerary()
+
+    summary = ai_provider._generate_itinerary_summary(itinerary=itinerary)
+    _log(summary, level="DEBUG")
+
+    # Che'ck for the presence of the test strings
+    test_summary = f"### {Utils.to_date_string(itinerary[0].date, format='display')} - {itinerary[0].title} \n"
+    assert test_summary in summary
+
+    activity = itinerary[0].items[0]
+    test_summary = f"* [{Utils.to_time_string(activity.start_time)} - {Utils.to_time_string(activity.end_time)}] {activity.title} | {activity.location}"
+    assert test_summary in summary
+
+
+def test_full_trip_template_replace():
+    ai_provider = AiProvider()
+    trip_model = mock_trip_model()
+
+    test_prompt = "%%TRIP_JSON%%"
+    ai_provider.prepare(trip_model=trip_model)
+
+    final_prompt = ai_provider._generate_prompt_from_template(base_prompt=test_prompt)
+    _log(final_prompt, level="DEBUG")
+
+    assert "destination_city" in final_prompt
+    assert "destination_state" in final_prompt
+    assert "start_date" in final_prompt
+    assert "end_date" in final_prompt
+
+
 def test_generate_final_prompt():
     ai_provider = AiProvider()
-    itinerary_request = mock_itinerary_gen_request()
+    itinerary_request = mock_ai_gen_itinerary_request()
 
     ai_provider.prepare(**itinerary_request)
 
-    prompt = ai_provider._generate_final_prompt()
+    prompt = ai_provider._generate_prompt_from_template()
 
     # Check for the presence of the test strings
 
@@ -124,7 +158,7 @@ def test_generate_final_prompt():
 
     # Weather summary
     forecast_item = itinerary_request["forecast_list"][0]
-    date = Utils.to_datetime(forecast_item.date).isoformat()
+    date = Utils.to_date_string(forecast_item.date, format="iso_date_only")
     test_summary = date + " - " + forecast_item.weather
     assert test_summary in prompt
 
@@ -143,7 +177,7 @@ def test_generate_final_prompt():
 
 def test_itinerary_conversion():
     ai_provider = AiProvider()
-    response = mock_ai_provider_response()
+    response = mock_ai_gen_itinerary_response()
 
     # Test the json conversion
     itinerary = ai_provider._to_json(response)
@@ -168,17 +202,13 @@ def test_hugging_face_provider_init():
 def test_hugging_face_simple_response():
     ai_provider = HuggingFaceProvider()
 
-    ai_provider._override_base_prompt("The capital of Brazil is ...")
-    response = ai_provider.generate()
+    response = ai_provider.prompt(prompt="The capital of Brazil is ...")
 
     _log(response, level="DEBUG")
 
     assert response is not None
-    assert response["response"] is not None
-    assert response["response"] != ""
-    assert ("brasília" in response["response"].lower()) or (
-        "brasilia" in response["response"].lower()
-    )
+    assert response != ""
+    assert ("brasília" in response.lower()) or ("brasilia" in response.lower())
 
 
 # --------------------------
@@ -196,31 +226,25 @@ def test_gemini_provider_init():
 def test_gemini_simple_response():
     ai_provider = GeminiProvider()
 
-    ai_provider._override_base_prompt("1+1 = ?")
-    response = ai_provider.generate()
+    response = ai_provider.prompt("1+1 = ?")
 
     _log(response, level="DEBUG")
 
     assert response is not None
-    assert response["response"] is not None
-    assert response["response"] != ""
-    assert "2" in response["response"]
+    assert response != ""
+    assert "2" in response
 
 
 def test_gemini_generate_itinerary():
     ai_provider = GeminiProvider()
-    itinerary_request = mock_itinerary_gen_request()
+    itinerary_request = mock_ai_gen_itinerary_request()
 
     ai_provider.prepare(**itinerary_request)
-    response = ai_provider.generate()
+    response = ai_provider.generate_itinerary()
 
     # Test the response
     _log(response, level="DEBUG")
 
     assert response is not None
-    assert response["response"] is not None
-    assert response["response"] != ""
-
-    # Test the itinerary conversion
-    itinerary = ai_provider._to_itinerary(response)
-    _log(itinerary, level="DEBUG")
+    assert response != ""
+    assert type(response[0]) == DailyItineraryModel

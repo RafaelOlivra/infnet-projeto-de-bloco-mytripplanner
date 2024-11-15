@@ -9,6 +9,10 @@ from models.Trip import TripModel
 from services.Trip import Trip
 from services.TripData import TripData
 from services.ApiKeyHandler import ApiKeyHandler
+from services.GeminiProvider import GeminiProvider
+
+from services.Logger import _log
+
 
 app = FastAPI()
 
@@ -33,7 +37,7 @@ api_key_header = api_key_handler.header
 # Trip API
 # --------------------------
 # Create a new trip
-@app.post("/trip", response_model=TripModel)
+@app.post("/trip", response_model=TripModel, tags=["trip"])
 @limiter.limit("10/minute")
 async def create_user_trip(
     request: Request,
@@ -58,7 +62,7 @@ async def create_user_trip(
 
 # Get a specific trip
 # @app.get("/trip")
-@app.get("/trip/{trip_id}", response_model=TripModel)
+@app.get("/trip/{trip_id}", response_model=TripModel, tags=["trip"])
 @limiter.limit("20/minute")
 async def get_user_trip(
     request: Request,
@@ -77,7 +81,7 @@ async def get_user_trip(
 
 
 # Get all user trips
-@app.get("/trips", response_model=list[TripModel])
+@app.get("/trips", response_model=list[TripModel], tags=["trip"])
 @limiter.limit("40/minute")
 async def get_user_trips(
     request: Request,
@@ -100,7 +104,7 @@ async def get_user_trips(
 
 # Delete a specific trip
 # @app.delete("/trip")
-@app.delete("/trip/{trip_id}")
+@app.delete("/trip/{trip_id}", tags=["trip"])
 @limiter.limit("10/minute")
 async def delete_user_trip(
     request: Request,
@@ -120,3 +124,57 @@ async def delete_user_trip(
         return {"detail": "Trip deleted successfully"}
     else:
         raise HTTPException(status_code=500, detail="Failed to delete trip")
+
+
+# --------------------------
+# Trip AI API
+# --------------------------
+
+
+# Generate a new itinerary for a trip
+# @app.put("/trip/gen/itinerary/{trip_id}", response_model=TripModel, tags=["trip"])
+@app.put("/trip/gen/itinerary/{trip_id}", response_model=TripModel, tags=["trip - AI"])
+@limiter.limit("5/minute")
+async def generate_trip_itinerary(
+    request: Request,
+    trip_id: str,
+    update_trip: bool = False,
+    api_key: str = Depends(api_key_handler.validate_key),
+) -> TripModel:
+    # Get user_id from API key
+    user_id = api_key_handler.get_user_id(api_key)
+
+    trip_model = TripData().get_user_trip(trip_id=trip_id, user_id=user_id)
+    trip = Trip().from_model(trip_model)
+
+    if not trip:
+        raise HTTPException(status_code=404, detail="Trip not found")
+
+    # Check if the trip is expired
+    if trip.is_expired():
+        raise HTTPException(status_code=400, detail="Trip has expired")
+
+    # Generate itinerary
+    ai_provider = GeminiProvider()
+    ai_provider.prepare(
+        location=trip_model.destination_city + ", " + trip_model.destination_state,
+        start_date=trip_model.start_date,
+        end_date=trip_model.end_date,
+        forecast_list=trip_model.weather,
+        attractions_list=trip_model.attractions,
+    )
+
+    try:
+        trip_model.itinerary = ai_provider.generate_itinerary()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to generate itinerary: {str(e)}"
+        )
+
+    # Update trip in database
+    if update_trip:
+        TripData().update(
+            trip_id=trip_model.id, key="itinerary", value=trip_model.itinerary
+        )
+
+    return trip_model

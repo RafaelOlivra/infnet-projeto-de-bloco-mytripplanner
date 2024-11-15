@@ -35,6 +35,7 @@ class TripModel(BaseModel):
     goals: str = ""
     notes: str = ""
     tags: List[str] = Field(default_factory=list)
+    summary: Optional[str] = ""
 
     @field_validator("created_at", "start_date", "end_date")
     def convert_to_datetime(cls, value) -> datetime:

@@ -77,7 +77,7 @@ class ItineraryView:
         )
 
         with st.spinner("Gerando roteiro..."):
-            response = ai_provider.generate()
+            response = ai_provider._generate_itinerary()
 
             if not response:
                 st.error("Não foi possível gerar o roteiro com IA.")

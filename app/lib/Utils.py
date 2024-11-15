@@ -97,6 +97,8 @@ class Utils:
 
         if format == "display":
             return str(_date.strftime(AppData().get_config("datetime_display_format")))
+        elif format == "iso_date_only":
+            return _date.strftime("%Y-%m-%d")
         else:
             # Return isoformat by default
             return _date.isoformat()

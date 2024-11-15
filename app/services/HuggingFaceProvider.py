@@ -33,10 +33,7 @@ class HuggingFaceProvider(AiProvider):
             torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
         )
 
-    def generate(self) -> dict[str, str]:
-        # Generate text based on the message
-        prompt = self._generate_final_prompt()
-
+    def ask(self, prompt: str) -> dict[str, str]:
         message = [
             {
                 "role": "system",
