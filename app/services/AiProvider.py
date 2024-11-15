@@ -6,7 +6,7 @@ from datetime import datetime, date, timedelta
 from typing import List, Optional
 
 from services.AppData import AppData
-from services.Logger import SimpleLogger
+from services.Logger import _log
 
 from models.Weather import ForecastModel
 from models.Itinerary import DailyItineraryModel
@@ -57,6 +57,11 @@ class AiProvider:
         # Allow prompt to be overridden
         prompt = base_prompt if base_prompt else self._load_base_prompt()
 
+        # Set the number of days
+        if self.start_date is not None and self.end_date is not None:
+            days = (self.end_date - self.start_date).days + 1
+            prompt = prompt.replace("%%NO_OF_DAYS%%", str(days))
+
         # Set the location
         if self.location is not None:
             location = self._strip_reserved_templates(self.location)
@@ -68,6 +73,7 @@ class AiProvider:
                 forecast_list=self.forecast_list,
                 start_date=self.start_date,
                 end_date=self.end_date,
+                strip_time=True,
             )
             weather = self._strip_reserved_templates(weather)
             prompt = prompt.replace("%%WEATHER%%", weather)
@@ -78,10 +84,16 @@ class AiProvider:
             attractions = self._strip_reserved_templates(attractions)
             prompt = prompt.replace("%%ATTRACTIONS%%", attractions)
 
+        # _log(prompt, level="DEBUG")
+
         return prompt
 
     def _generate_weather_summary(
-        self, forecast_list: List[ForecastModel], start_date: date, end_date: date
+        self,
+        forecast_list: List[ForecastModel],
+        start_date: date,
+        end_date: date,
+        strip_time: bool = False,
     ) -> str:
 
         if not forecast_list:
@@ -100,10 +112,15 @@ class AiProvider:
                     forecast = f
                     break
 
+            # Strip the time from the date (The part after the T in the ISO format)
+            day = Utils.to_date_string(day)
+            if strip_time:
+                day = day.split("T")[0]
+
             if forecast is not None:
-                summary += f"* {Utils.to_date_string(day)} - {forecast.weather} \n"
+                summary += f"* {day} - {forecast.weather} \n"
             else:
-                summary += f"* {Utils.to_date_string(day)} - Não há dados do tempo \n"
+                summary += f"* {day} - Não há dados do tempo \n"
         return summary
 
     def _generate_attractions_summary(

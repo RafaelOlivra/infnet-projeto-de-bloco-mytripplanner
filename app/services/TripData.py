@@ -234,5 +234,5 @@ class TripData:
 
             return TripModel(**trip_data)
         except ValidationError as e:
-            _log(f"Error validating trip data: {e}", "ERROR")
+            _log(f"Error validating trip data: {e}", level="ERROR")
             return None

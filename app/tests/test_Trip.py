@@ -11,7 +11,7 @@ from services.TripData import TripData
 
 # Mock trip data for testing
 start_date = datetime.now().isoformat()
-end_date = (datetime.now() + timedelta(days=7)).isoformat()
+end_date = (datetime.now() + timedelta(days=2)).isoformat()
 
 
 def mock_trip_dict() -> dict:

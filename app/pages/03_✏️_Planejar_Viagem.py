@@ -10,6 +10,11 @@ from services.GoogleMaps import GoogleMaps
 
 from views.WeatherView import WeatherView
 from views.AttractionsView import AttractionsView
+from views.ItineraryView import ItineraryView
+
+from models.Attraction import AttractionModel
+from models.Weather import ForecastModel
+
 
 # --------------------------
 # Session State
@@ -24,6 +29,9 @@ if "show_new_trip_form" not in st.session_state:
 
 if "selected_trip_id" not in st.session_state:
     st.session_state.selected_trip_id = None
+
+if "cached_itinerary" not in st.session_state:
+    st.session_state.cached_itinerary = None
 
 
 # --------------------------
@@ -161,7 +169,7 @@ def Cadastrar():
     st.write("---")
     st.write("### 📅 3. Quando?")
     today = datetime.datetime.now()
-    week_from_today = today + datetime.timedelta(days=7)
+    week_from_today = today + datetime.timedelta(days=2)
     date = st.date_input(
         "Data da Viagem",
         (today, week_from_today),
@@ -227,16 +235,47 @@ def Cadastrar():
             if attraction.name in get_selected_attractions():
                 attractions.append(attraction)
 
+    # Convert to AttractionModel
     if attractions.__len__() == 0:
         attractions = None
 
-    # Trip AI generation
+    # Trip AI Itinerary generation
     st.write("---")
     st.write("### 🤖 5. Gerar Roteiro com IA")
     st.write(
         "Aqui você pode consultar e criar um roteiro da viagem com ajuda de Inteligência Artificial."
     )
-    st.write("Em breve...")
+
+    itinerary = st.session_state.cached_itinerary
+    if not itinerary:
+        if st.button(
+            "Gerar Roteiro Personalizado",
+            use_container_width=True,
+            key="generate_itinerary",
+        ):
+            if itinerary:
+                st.info("Você já gerou um roteiro para esta viagem.")
+
+            itinerary = ItineraryView.render_itinerary_generator(
+                location=f"{destination_city}, {destination_state}",
+                start_date=start_date,
+                end_date=end_date,
+                forecast_list=weather,
+                attractions_list=attractions,
+            )
+
+            if itinerary:
+                st.session_state.cached_itinerary = itinerary
+
+    if itinerary:
+        st.success("Roteiro gerado com sucesso!")
+        ItineraryView(itinerary=itinerary).render_itinerary()
+        if st.button(
+            "Limpar Roteiro",
+            use_container_width=True,
+            key="reset_itinerary",
+        ):
+            st.session_state.cached_itinerary = None
 
     st.write("---")
     st.write("### 📝 6. Sobre a Viagem")
@@ -267,6 +306,7 @@ def Cadastrar():
             "end_date": end_date,
             "weather": weather,
             "attractions": attractions,
+            "itinerary": itinerary,
             "goals": goals,
             "tags": tags,
             "notes": notes,
@@ -277,7 +317,8 @@ def Cadastrar():
             st.success("Viagem cadastrada com sucesso!")
 
             # Clear session state
-            del st.session_state.add_new_trip_form
+            st.session_state.add_new_trip_form = None
+            st.session_state.cached_itinerary = None
 
             # Change to the trip view
             st.session_state.selected_trip_id = trip.get("id")

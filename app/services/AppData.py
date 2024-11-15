@@ -109,7 +109,7 @@ class AppData:
             if not key_map.get(key):
                 raise ValueError("API key not found.")
         except ValueError as e:
-            _log(f"Error retrieving API key: {e}", "ERROR")
+            _log(f"Error retrieving API key: {e}", level="ERROR")
             return None
 
         return os.getenv(key_map.get(key))
@@ -200,7 +200,7 @@ class AppData:
                     if isinstance(data, str):
                         data = json.loads(data)
                 except Exception as e:
-                    _log(f"Error loading data from file: {e}", "ERROR")
+                    _log(f"Error loading data from file: {e}", level="ERROR")
                     data = None
             return data
         return None
@@ -382,7 +382,7 @@ class AppData:
                 f.write(json)
             return True
         except Exception as e:
-            _log(f"Error saving data to file: {e}", "ERROR")
+            _log(f"Error saving data to file: {e}", level="ERROR")
             return False
 
     def _delete_file(self, file_path: str) -> bool:

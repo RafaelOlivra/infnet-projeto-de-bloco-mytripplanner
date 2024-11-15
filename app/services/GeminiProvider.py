@@ -27,7 +27,4 @@ class GeminiProvider(AiProvider):
             return {"response": response.text, "provider": "Google Gemini"}
         except Exception as e:
             _log(f"{str(e)}", level="ERROR")
-            return {
-                "response": "An error occurred while generating the response",
-                "provider": "Google Gemini",
-            }
+            return None

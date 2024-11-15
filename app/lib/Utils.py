@@ -86,24 +86,28 @@ class Utils:
         return requests.utils.quote(text)
 
     @staticmethod
-    def to_date_string(date: datetime | str, format="") -> str:
+    def to_date_string(_date: date | datetime | str, format="") -> str:
         # Convert string to datetime object from isoformat
-        if isinstance(date, str):
-            date = datetime.fromisoformat(date)
+        if isinstance(_date, str):
+            _date = datetime.fromisoformat(_date)
+
+        # Convert date to datetime object
+        if isinstance(_date, date):
+            _date = datetime.combine(_date, datetime.min.time())
 
         if format == "display":
-            return str(date.strftime(AppData().get_config("datetime_display_format")))
+            return str(_date.strftime(AppData().get_config("datetime_display_format")))
         else:
             # Return isoformat by default
-            return date.isoformat()
+            return _date.isoformat()
 
     @staticmethod
-    def to_time_string(time: datetime | str) -> str:
+    def to_time_string(_time: datetime | str) -> str:
         # Convert string to datetime object from isoformat
-        if isinstance(time, str):
-            time = datetime.fromisoformat(time)
+        if isinstance(_time, str):
+            _time = datetime.fromisoformat(_time)
 
-        return str(time.strftime(AppData().get_config("time_display_format")))
+        return str(_time.strftime(AppData().get_config("time_display_format")))
 
     @staticmethod
     def to_datetime(_date) -> datetime:

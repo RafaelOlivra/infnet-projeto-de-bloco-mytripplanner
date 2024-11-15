@@ -48,23 +48,27 @@ class HuggingFaceProvider(AiProvider):
             message, tokenize=False, add_generation_prompt=False
         )
 
-        response = self.pipe(
-            prompt,
-            max_new_tokens=256,
-            do_sample=True,
-            temperature=0.7,
-            top_k=50,
-            top_p=0.95,
-        )
+        try:
+            response = self.pipe(
+                prompt,
+                max_new_tokens=256,
+                do_sample=True,
+                temperature=0.7,
+                top_k=50,
+                top_p=0.95,
+            )
 
-        # Generate a response using the Hugging Face pipeline
-        # response = self.pipe(prompt, max_length=1000, max_new_tokens=256)
+            # Generate a response using the Hugging Face pipeline
+            # response = self.pipe(prompt, max_length=1000, max_new_tokens=256)
 
-        # Clean the response and return it
-        return {
-            "response": self._clean_response(response[0]["generated_text"]),
-            "provider": "HuggingFace",
-        }
+            # Clean the response and return it
+            return {
+                "response": self._clean_response(response[0]["generated_text"]),
+                "provider": "HuggingFace",
+            }
+        except Exception as e:
+            _log(f"{str(e)}", level="ERROR")
+            return None
 
     def _clean_response(self, response: str) -> str:
         # Remove the system message from the response

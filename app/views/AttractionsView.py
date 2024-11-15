@@ -4,6 +4,7 @@ import random
 
 from services.YelpScrapper import YelpScrapper
 from services.AttractionsData import AttractionsData
+from services.Logger import _log
 from lib.Utils import Utils
 
 from models.Attraction import AttractionModel
@@ -18,7 +19,7 @@ class AttractionsView:
         start: int = 0,
         limit: int = 18,
         attractions: List[AttractionModel] = None,
-        expire_time: int = 864000,  # 10 days
+        expire_time: int = 8640000,  # 100 days
     ):
         """
         Initialize the AttractionsView class.
@@ -144,13 +145,21 @@ class AttractionsView:
 
             # Check if the data is expired
             if attractions and self._attractions_expired(attractions[0].created_at):
+                old_attractions = attractions  # Save the old data
                 attractions = None
 
             if attractions:
                 return attractions
 
             # Fetch the attractions data
-            return self._fetch_attractions()
+            try:
+                attractions = self._fetch_attractions()
+            except Exception as e:
+                _log(f"Error fetching attractions: {e}", level="ERROR")
+                # Use the old data if available
+                attractions = old_attractions if old_attractions else []
+
+            return attractions
 
     def _fetch_attractions(self) -> List[AttractionModel]:
         """
@@ -178,6 +187,8 @@ class AttractionsView:
         Returns:
             bool: True if the data is expired, False otherwise.
         """
-        return (
-            datetime.datetime.now() - Utils.to_datetime(created_at)
-        ).total_seconds() > self.expire_time
+        lifetime = datetime.datetime.now() - Utils.to_datetime(created_at)
+        lifetime_seconds = lifetime.total_seconds()
+        is_expired = lifetime_seconds > self.expire_time
+
+        return is_expired
