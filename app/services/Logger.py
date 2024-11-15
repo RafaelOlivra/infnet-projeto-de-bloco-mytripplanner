@@ -7,12 +7,49 @@ from datetime import datetime
 
 
 class SimpleLogger:
+    """
+    A utility class for logging messages with support for log rotation.
+
+    This class provides a structured way to log messages to a file, with the
+    ability to handle rotating log files and optionally include additional
+    objects in the log messages. Log settings can be customized, and the
+    log directory is retrieved from a configuration file.
+
+    Attributes:
+        logger (logging.Logger): The main logger object used for logging messages.
+
+    Methods:
+        log(message: str, obj: Any = None, level: str = "INFO"):
+            Log a message at a specified level.
+        log_info(message: str, obj: Any = None):
+            Log an informational message.
+        log_warning(message: str, obj: Any = None):
+            Log a warning message.
+        log_error(message: str, obj: Any = None):
+            Log an error message.
+        log_debug(message: str, obj: Any = None):
+            Log a debug message.
+        get_log_dir() -> Optional[str]:
+            Retrieve the log folder path from the configuration file.
+    """
+
     def __init__(
         self,
         log_filename="app.log",
         max_size=1_000_000,
         backup_count=5,
     ):
+        """
+        Initialize the SimpleLogger class.
+
+        Args:
+            log_filename (str): The name of the log file.
+            max_size (int): The maximum size of a log file before rotation occurs (in bytes).
+            backup_count (int): The number of backup files to keep.
+
+        Raises:
+            ValueError: If the log directory is not found in the configuration file.
+        """
 
         # Get the log folder from the config file
         log_folder = self.get_log_dir()
@@ -48,6 +85,14 @@ class SimpleLogger:
     # --------------------------
 
     def log(self, message, obj=None, level="INFO"):
+        """
+        Log a message at the specified level, optionally including an object.
+
+        Args:
+            message (str): The log message.
+            obj (Any): An optional object to include in the log message.
+            level (str): The log level (e.g., "INFO", "WARNING", "ERROR", "DEBUG").
+        """
         if level == "WARNING":
             self.log_warning(message, obj)
         elif level == "ERROR":
@@ -58,18 +103,54 @@ class SimpleLogger:
             self.log_info(message, obj)
 
     def log_info(self, message, obj=None):
+        """
+        Log an informational message.
+
+        Args:
+            message (str): The log message.
+            obj (Any): An optional object to include in the log message.
+        """
         self._log_with_object(logging.INFO, message, obj)
 
     def log_warning(self, message, obj=None):
+        """
+        Log a warning message.
+
+        Args:
+            message (str): The log message.
+            obj (Any): An optional object to include in the log message.
+        """
         self._log_with_object(logging.WARNING, message, obj)
 
     def log_error(self, message, obj=None):
+        """
+        Log an error message.
+
+        Args:
+            message (str): The log message.
+            obj (Any): An optional object to include in the log message.
+        """
         self._log_with_object(logging.ERROR, message, obj)
 
     def log_debug(self, message, obj=None):
+        """
+        Log a debug message.
+
+        Args:
+            message (str): The log message.
+            obj (Any): An optional object to include in the log message.
+        """
         self._log_with_object(logging.DEBUG, message, obj)
 
     def _log_with_object(self, level, message, obj):
+        """
+        Log a message containing an object.
+
+        Args:
+            level (str): The log level (e.g., "INFO", "WARNING", "ERROR", "DEBUG").
+            message (str): The log message.
+            obj (Any): An optional object to include in the log message.
+        """
         # Convert the object to a string if it exists, using JSON if possible
         if obj is not None:
             try:
@@ -95,7 +176,13 @@ class SimpleLogger:
     # --------------------------
     def get_log_dir(self):
         """
-        Retrieve the log folder path from the config file.
+        Retrieve the log folder path from the configuration file.
+
+        The method first checks if the log directory is overridden in environment
+        variables. If not, it retrieves the path from the JSON configuration file.
+
+        Returns:
+            Optional[str]: The log folder path, or None if not found.
         """
         key = "log_dir"
         config_file = "app/config/cfg.json"
@@ -120,4 +207,19 @@ class SimpleLogger:
 # Generic Log Function Export
 # ----------------------------
 def _log(message, obj=None, level="INFO"):
-    return SimpleLogger().log(message=message, obj=obj, level=level)
+    """
+    A generic function to log a message at the specified level.
+
+    Args:
+        message (str): The log message.
+        obj (Any): An optional object to include in the log message.
+        level (str): The log level (e.g., "INFO", "WARNING", "ERROR", "DEBUG").
+    """
+
+    # Add global logger if not already defined
+    global logger
+
+    if "logger" not in globals() or logger is None:
+        logger = SimpleLogger()
+
+    return logger.log(message=message, obj=obj, level=level)

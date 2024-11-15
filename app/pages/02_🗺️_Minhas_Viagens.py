@@ -14,6 +14,12 @@ if "selected_trip_id" not in st.session_state:
     st.session_state.selected_trip_id = None
 
 
+def set_selected_trip_id(selected_trip_id):
+    if selected_trip_id != st.session_state.selected_trip_id:
+        st.session_state.selected_trip_id = selected_trip_id
+        st.rerun()
+
+
 # --------------------------
 # View Trip Data
 # --------------------------
@@ -68,7 +74,7 @@ def View_Trip():
             )
 
             # Set the selected trip id in the session state
-            st.session_state.selected_trip_id = selected_trip_id
+            set_selected_trip_id(selected_trip_id)
 
     st.write("---")
 

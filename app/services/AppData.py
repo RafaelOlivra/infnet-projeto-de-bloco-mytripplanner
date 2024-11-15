@@ -14,19 +14,6 @@ class AppData:
     This class provides methods for managing configuration data, API keys, and various types of
     application data (e.g., trip data, attractions). It supports CRUD operations on JSON files
     and interacts with environment variables for secure storage of API keys.
-
-    Attributes:
-        None
-
-    Methods:
-        get_config(key: str) -> Any
-        get_api_key(key: str) -> str
-        save(type: str, id: str, json: Union[str, dict], replace: bool = False) -> bool
-        get(type: str, id: str) -> dict
-        get_all(type: str) -> list
-        get_all_ids(type: str) -> list
-        update(type: str, id: str, key: str, value: str) -> bool
-        delete(type: str, id: str) -> bool
     """
 
     def __init__(self):
@@ -51,12 +38,6 @@ class AppData:
 
         Returns:
             Any: The configuration value, or None if the key does not exist.
-
-        Example:
-            >>> app_data = AppData()
-            >>> db_host = app_data.get_config("database_host")
-            >>> print(db_host)
-            "localhost"
         """
         config_file = "app/config/cfg.json"
 
@@ -84,12 +65,6 @@ class AppData:
 
         Returns:
             str: The corresponding API key, or None if not found.
-
-        Example:
-            >>> app_data = AppData()
-            >>> gmaps_key = app_data.get_api_key("googlemaps")
-            >>> print(gmaps_key)
-            "AIzaSyBIzaSyBIzaSyBI..."
 
         Note:
             This method uses a predefined mapping of service names to environment variable names.
@@ -135,13 +110,6 @@ class AppData:
 
         Raises:
             ValueError: If the id is invalid.
-
-        Example:
-            >>> app_data = AppData()
-            >>> trip_data = {"destination": "Paris", "duration": 7}
-            >>> success = app_data.save("trip", "paris_2023", trip_data)
-            >>> print(success)
-            True
         """
         if not type or not id or not json:
             return False
@@ -175,12 +143,6 @@ class AppData:
 
         Raises:
             ValueError: If the id is invalid.
-
-        Example:
-            >>> app_data = AppData()
-            >>> trip_data = app_data.get("trip", "paris_2023")
-            >>> print(trip_data)
-            {"destination": "Paris", "duration": 7}
         """
         if not type or not id:
             return None
@@ -200,7 +162,7 @@ class AppData:
                     if isinstance(data, str):
                         data = json.loads(data)
                 except Exception as e:
-                    _log(f"Error loading data from file: {e}", level="ERROR")
+                    _log(f"Error loading data from {file_path}: {e}", level="ERROR")
                     data = None
             return data
         return None
@@ -214,12 +176,6 @@ class AppData:
 
         Returns:
             list: A list of all data items of the specified type.
-
-        Example:
-            >>> app_data = AppData()
-            >>> all_trips = app_data.get_all("trip")
-            >>> print(len(all_trips))
-            3
         """
         if not type:
             return []
@@ -252,12 +208,6 @@ class AppData:
 
         Returns:
             list: A list of all IDs for the specified data type.
-
-        Example:
-            >>> app_data = AppData()
-            >>> trip_ids = app_data.get_all_ids("trip")
-            >>> print(trip_ids)
-            ["paris_2023", "tokyo_2024", "nyc_2022"]
         """
         if not type:
             return []
@@ -286,12 +236,6 @@ class AppData:
 
         Raises:
             ValueError: If the id is invalid.
-
-        Example:
-            >>> app_data = AppData()
-            >>> success = app_data.update("trip", "paris_2023", "duration", "10")
-            >>> print(success)
-            True
         """
         if not type or not id or not key:
             return False
@@ -316,12 +260,6 @@ class AppData:
 
         Raises:
             ValueError: If the id is invalid.
-
-        Example:
-            >>> app_data = AppData()
-            >>> success = app_data.delete("trip", "paris_2023")
-            >>> print(success)
-            True
         """
         if not type or not id:
             return False
@@ -346,12 +284,6 @@ class AppData:
 
         Returns:
             int: The number of items of the specified type.
-
-        Example:
-            >>> app_data = AppData()
-            >>> trip_count = app_data.count("trip")
-            >>> print(trip_count)
-            3
         """
         return len(_self.get_all_ids(type))
 
@@ -430,12 +362,6 @@ class AppData:
 
         Raises:
             ValueError: If the ID is invalid.
-
-        Example:
-            >>> app_data = AppData()
-            >>> clean_id = app_data.sanitize_id("My Trip 2023!")
-            >>> print(clean_id)
-            "my_trip_2023"
         """
         try:
             if not id:
