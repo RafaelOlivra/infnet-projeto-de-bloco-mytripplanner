@@ -27,6 +27,7 @@ Esse é um projeto criado para o curso de Ciência de Dados da faculdade Infnet.
 
 ## Changelog
 
+-   15/Nov/2024 \* Adicionado Suporte a geração de Roteiros
 -   03/Nov/2024 \* Adicionado Suporte para .env Overrides
 -   28/Oct/2024 \* Implementado Página de Estatísticas
 -   18/Oct/2024 \* Atualizado Business Docs

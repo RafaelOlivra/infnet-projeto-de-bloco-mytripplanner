@@ -43,7 +43,7 @@ class ItineraryView:
         with st.container(border=True):
             if day.items.__len__() > 0:
                 st.write(
-                    f"### 📅 {Utils.to_date_string(day.date, format='display')} - {day.title}"
+                    f"#### 📅 {Utils.to_date_string(day.date, format='display')} - {day.title}"
                 )
                 for activity in day.items:
                     self.render_activity(activity)
@@ -52,7 +52,7 @@ class ItineraryView:
         with st.container(border=True):
             st.write(
                 f"""
-                ##### 🕒 {Utils.to_time_string(activity.start_time)} | {activity.title}
+                ##### 🕒 {Utils.to_time_string(activity.start_time)} - {Utils.to_time_string(activity.end_time)} | {activity.title}
                 📍 **{activity.location}**  \
                     
                 ✨ {activity.description}
@@ -76,7 +76,7 @@ class ItineraryView:
             attractions_list=attractions_list,
         )
 
-        with st.spinner("Gerando roteiro com IA..."):
+        with st.spinner("Gerando roteiro..."):
             response = ai_provider.generate()
 
             if not response:

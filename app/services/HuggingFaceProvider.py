@@ -49,6 +49,8 @@ class HuggingFaceProvider(AiProvider):
         )
 
         try:
+            _log("Generating content with HuggingFace.")
+
             response = self.pipe(
                 prompt,
                 max_new_tokens=256,

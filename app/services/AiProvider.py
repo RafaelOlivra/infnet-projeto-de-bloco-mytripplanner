@@ -59,8 +59,13 @@ class AiProvider:
 
         # Set the number of days
         if self.start_date is not None and self.end_date is not None:
-            days = (self.end_date - self.start_date).days + 1
-            prompt = prompt.replace("%%NO_OF_DAYS%%", str(days))
+            trip_length = (self.end_date - self.start_date).days + 1
+
+            # Set to max 4 days (for now)
+            if trip_length > 4:
+                trip_length = 4
+
+            prompt = prompt.replace("%%NO_OF_DAYS%%", str(trip_length))
 
         # Set the location
         if self.location is not None:

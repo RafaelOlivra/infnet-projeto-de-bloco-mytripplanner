@@ -21,6 +21,8 @@ class GeminiProvider(AiProvider):
         prompt = self._generate_final_prompt()
 
         try:
+            _log("Generating content with Gemini.")
+
             model = genai.GenerativeModel(self.model_name)
             response = model.generate_content(prompt)
 

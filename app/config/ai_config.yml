@@ -2,16 +2,16 @@ prompt: |
     Generate a detailed travel itinerary in JSON utilizing the specified <|FORMAT|>. Each itinerary should cover one specific day and include a list of activities for that day. Each activity should contain the following fields:
 
     - start_time: The start time of the activity in HH:MM format.
-    - end_time: The end time of the activity in HH:MM format, must be later than the start_time.
+    - end_time: The end time of the activity in HH:MM format, later than the start_time.
     - location: The location where the activity takes place [In Portuguese].
     - title: A descriptive title of the activity (e.g., "Lunch at Local Restaurant") [In Portuguese].
-    - description: Additional details about the activity [In Portuguese].
+    - description: Additional details about the activity, potentially including info about the weather) [In Portuguese - Around 25 words].
 
-    The itinerary will be for a trip to %%LOCATION%%. The trip will have %%NO_OF_DAYS%% days.
-    The expected weather for the days are:
+    The itinerary is for a trip to %%LOCATION%%. The trip have %%NO_OF_DAYS%% days.
+    The expected weather for the following days are:
     %%WEATHER%%
 
-    The itinerary should include a visit to these local attractions:
+    The itinerary must include a visit to these local attractions (Try to not include all in the same day):
     %%ATTRACTIONS%%
 
     <|FORMAT|>
@@ -33,7 +33,7 @@ prompt: |
             "end_time": "13:30",
             "location": "Santa Teresa",
             "title": "Almoço na Santa Teresa",
-            "description": "Desfrute de um almoço aconchegante em um tradicional restaurante brasileiro."
+            "description": "O tempo está bom para desfrutar um almoço aconchegante em um restaurante."
           }
         ]
       },
