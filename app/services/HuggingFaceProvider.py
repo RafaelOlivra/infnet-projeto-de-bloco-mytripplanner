@@ -50,11 +50,8 @@ class HuggingFaceProvider(AiProvider):
 
             response = self.pipe(
                 prompt,
-                max_new_tokens=256,
                 do_sample=True,
-                temperature=0.7,
-                top_k=50,
-                top_p=0.95,
+                temperature=0.6,
             )
 
             # Generate a response using the Hugging Face pipeline
@@ -70,5 +67,8 @@ class HuggingFaceProvider(AiProvider):
             return None
 
     def _clean_response(self, response: str) -> str:
+        if "<|assistant|>" in response:
+            return response.split("\n<|assistant|>\n")[1].strip()
+
         # Remove the system message from the response
-        return response.split("\n<|assistant|>\n")[1].strip()
+        return response.strip()

@@ -14,6 +14,7 @@ Caddyfile
 /data/.log/
 *.storage
 /app/__app__.py
+*.dat
 
 # Compiled Python bytecode
 *.py[cod]

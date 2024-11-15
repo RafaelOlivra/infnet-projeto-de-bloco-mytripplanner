@@ -10,6 +10,7 @@ from services.Trip import Trip
 from services.TripData import TripData
 from services.ApiKeyHandler import ApiKeyHandler
 from services.GeminiProvider import GeminiProvider
+from services.SentimentAnalysisProvider import SentimentAnalysisProvider
 
 from services.Logger import _log
 
@@ -61,7 +62,6 @@ async def create_user_trip(
 
 
 # Get a specific trip
-# @app.get("/trip")
 @app.get("/trip/{trip_id}", response_model=TripModel, tags=["trip"])
 @limiter.limit("20/minute")
 async def get_user_trip(
@@ -103,7 +103,6 @@ async def get_user_trips(
 
 
 # Delete a specific trip
-# @app.delete("/trip")
 @app.delete("/trip/{trip_id}", tags=["trip"])
 @limiter.limit("10/minute")
 async def delete_user_trip(
@@ -132,7 +131,6 @@ async def delete_user_trip(
 
 
 # Generate a new itinerary for a trip
-# @app.put("/trip/gen/itinerary/{trip_id}", response_model=TripModel, tags=["trip"])
 @app.put("/trip/gen/itinerary/{trip_id}", response_model=TripModel, tags=["trip - AI"])
 @limiter.limit("5/minute")
 async def generate_trip_itinerary(
@@ -178,3 +176,32 @@ async def generate_trip_itinerary(
         )
 
     return trip_model
+
+
+# --------------------------
+# General AI API
+# --------------------------
+
+
+# Process general text send by the user
+@app.post("/ai/processar_texto", tags=["AI - General"])
+@limiter.limit("20/minute")
+async def processar_texto(
+    request: Request,
+    text: str,
+    api_key: str = Depends(api_key_handler.validate_key),
+) -> dict[str, str]:
+    ai_provider = SentimentAnalysisProvider()
+    prompt = """{{Your Text Here}}"""
+    prompt = prompt.replace("{{Your Text Here}}", text)
+    response = ai_provider.prompt(prompt=prompt)
+    _log(response)
+
+    # Extract the line with the "Sentiment:"
+    response = response.split("Sentiment:")[1].strip()
+    if not response:
+        raise HTTPException(status_code=500, detail="Failed to process text")
+
+    sentiment = response.split("\n")[0].strip().upper()
+
+    return {"sentiment": sentiment}

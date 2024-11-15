@@ -64,14 +64,15 @@ class AiProvider:
             template_key="gen_itinerary_prompt"
         )
         response = self.ask(prompt=prompt)
-        return self._to_itinerary(response)
+        return self._to_itinerary(response) if response else []
 
     def generate_trip_summary(self) -> str:
         prompt = self._generate_prompt_from_template(
             template_key="gen_trip_summary_prompt"
         )
+        _log(prompt, level="DEBUG")
         response = self.ask(prompt=prompt)
-        return response.get("response", "")
+        return response.get("response", "") if response else ""
 
     def prompt(self, prompt: str) -> str:
         response = self.ask(prompt=prompt)
@@ -89,9 +90,52 @@ class AiProvider:
             else self._load_base_prompt(template_key=template_key)
         )
 
+        # -- Prepare variables
+
+        # %%NO_OF_DAYS%%
+        start_date = self.start_date if self.start_date is not None else None
+        start_date = (
+            self.trip_model.start_date if self.trip_model is not None else start_date
+        )
+        end_date = self.end_date if self.end_date is not None else None
+        end_date = self.trip_model.end_date if self.trip_model is not None else end_date
+
+        # %%LOCATION%%
+        location = self.location if self.location is not None else None
+        location = (
+            self.trip_model.destination_city + " - " + self.trip_model.destination_state
+            if self.trip_model is not None
+            else location
+        )
+
+        # %%WEATHER%%
+        weather = self.forecast_list if self.forecast_list is not None else None
+        weather = self.trip_model.weather if self.trip_model is not None else weather
+        forecast_list = weather
+
+        # %%ATTRACTIONS%%
+        attractions = (
+            self.attractions_list if self.attractions_list is not None else None
+        )
+        attractions = (
+            self.trip_model.attractions if self.trip_model is not None else attractions
+        )
+
+        # %%TRIP_JSON%%
+        trip_model = self.trip_model if self.trip_model is not None else None
+        trip_json = trip_model.model_dump_json()
+
+        # %%ITINERARY%%
+        itinerary = trip_model.itinerary if trip_model is not None else None
+
+        # %%TRAVEL_BY%%
+        travel_by = trip_model.travel_by if trip_model is not None else None
+
+        # -- Replace variables
+
         # Set the number of days
-        if self.start_date is not None and self.end_date is not None:
-            trip_length = (self.end_date - self.start_date).days + 1
+        if start_date is not None and end_date is not None:
+            trip_length = (end_date - start_date).days + 1
 
             # Set to max 4 days (for now)
             if trip_length > 4:
@@ -100,38 +144,42 @@ class AiProvider:
             prompt = prompt.replace("%%NO_OF_DAYS%%", str(trip_length))
 
         # Set the location
-        if self.location is not None:
-            location = self._strip_reserved_templates(self.location)
+        if location is not None:
+            location = self._strip_reserved_templates(location)
             prompt = prompt.replace("%%LOCATION%%", location)
 
         # Set the weather
-        if self.forecast_list is not None:
+        if forecast_list is not None:
             weather = self._generate_weather_summary(
-                forecast_list=self.forecast_list,
-                start_date=self.start_date,
-                end_date=self.end_date,
+                forecast_list=forecast_list,
+                start_date=start_date,
+                end_date=end_date,
                 strip_time=True,
             )
             weather = self._strip_reserved_templates(weather)
             prompt = prompt.replace("%%WEATHER%%", weather)
 
         # Set the attractions
-        if self.attractions_list is not None:
-            attractions = self._generate_attractions_summary(self.attractions_list)
+        if attractions is not None:
+            attractions = self._generate_attractions_summary(attractions)
             attractions = self._strip_reserved_templates(attractions)
             prompt = prompt.replace("%%ATTRACTIONS%%", attractions)
 
+        # Set the trip JSON
+        if trip_model is not None:
+            trip_json = self._strip_reserved_templates(trip_json)
+            prompt = prompt.replace("%%TRIP_JSON%%", trip_json)
+
         # Set the itinerary
-        if self.trip_model is not None:
-            itinerary = self._generate_itinerary_summary(self.trip_model.itinerary)
+        if trip_model is not None:
+            itinerary = self._generate_itinerary_summary(trip_model.itinerary)
             itinerary = self._strip_reserved_templates(itinerary)
             prompt = prompt.replace("%%ITINERARY%%", itinerary)
 
-        # Set the trip JSON
-        if self.trip_model is not None:
-            trip_json = self.trip_model.model_dump_json()
-            trip_json = self._strip_reserved_templates(trip_json)
-            prompt = prompt.replace("%%TRIP_JSON%%", trip_json)
+        # Set trip travel by
+        if travel_by is not None:
+            travel_by = self._strip_reserved_templates(travel_by)
+            prompt = prompt.replace("%%TRAVEL_BY%%", travel_by)
 
         # _log(prompt, level="DEBUG")
 

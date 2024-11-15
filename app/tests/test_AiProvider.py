@@ -211,6 +211,37 @@ def test_hugging_face_simple_response():
     assert ("brasília" in response.lower()) or ("brasilia" in response.lower())
 
 
+def test_hugging_face_summarize_sentence():
+    ai_provider = HuggingFaceProvider()
+
+    prompt = """
+    Summarize this text:
+    
+    Think of it as a simple matter of supply and demand. Although the labor market has eased from the days of COVID-19, it remains tight, and unemployment is currently 4.1%. Businesses still report difficulty finding workers.
+    Meanwhile, in some sectors of the economy – construction, hospitality and agriculture – foreign-born workers make up a significant percentage of the labor pool. And many of them are immigrants in the country illegally or workers who may have temporary visas.
+    """
+    response = ai_provider.prompt(prompt=prompt)
+
+    _log(response, level="DEBUG")
+
+    assert response is not None
+    assert response != ""
+
+
+@pytest.mark.skip(reason="This won't work yet")
+def test_hugging_face_generate_trip_summary():
+    ai_provider = HuggingFaceProvider()
+    trip_model = mock_trip_model()
+
+    ai_provider.prepare(trip_model=trip_model)
+    trip_summary = ai_provider.generate_trip_summary()
+
+    _log(trip_summary, level="DEBUG")
+
+    assert trip_summary is not None
+    assert trip_summary != ""
+
+
 # --------------------------
 # GeminiProvider Tests
 # --------------------------
@@ -248,3 +279,16 @@ def test_gemini_generate_itinerary():
     assert response is not None
     assert response != ""
     assert type(response[0]) == DailyItineraryModel
+
+
+def test_gemini_generate_trip_summary():
+    ai_provider = GeminiProvider()
+    trip_model = mock_trip_model()
+
+    ai_provider.prepare(trip_model=trip_model)
+    trip_summary = ai_provider.generate_trip_summary()
+
+    _log(trip_summary, level="DEBUG")
+
+    assert trip_summary is not None
+    assert trip_summary != ""
