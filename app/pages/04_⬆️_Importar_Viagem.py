@@ -2,6 +2,7 @@ import streamlit as st
 import time
 
 from services.Trip import Trip
+from services.Logger import _log
 
 # --------------------------
 # Session State
@@ -53,6 +54,9 @@ def View_Trip():
             except Exception as e:
                 st.error(f"Erro ao importar viagem: {str(e)}")
                 return
+
+            # Save the trip
+            trip._save()
 
     if trip:
         st.success("Viagem importada com sucesso!")

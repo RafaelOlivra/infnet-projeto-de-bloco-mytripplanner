@@ -7,6 +7,7 @@ from unittest.mock import patch
 from models.Trip import TripModel
 from services.Trip import Trip
 from services.TripData import TripData
+from services.Logger import _log
 
 
 # Mock trip data for testing
@@ -125,6 +126,13 @@ def mock_trip_dict() -> dict:
         "goals": "Test",
         "notes": "This is a test note",
         "tags": ["teste"],
+        "summary": "This is a test summary",
+        "meta": [
+            {
+                "feedback": "Nice trip",
+                "sentiment": "POSITIVE",
+            }
+        ],
     }
 
 
@@ -136,16 +144,18 @@ def mock_trip_model() -> TripModel:
     return mock_trip().model
 
 
-def mock_trip_csv_old_date():
-    return f"""id,user_id,created_at,slug,title,origin_city,origin_state,origin_longitude,origin_latitude,destination_city,destination_state,destination_longitude,destination_latitude,travel_by,start_date,end_date,goals,notes,tags,weather_base64,attractions_base64
-0000000-0000-0000-0000-000000000000,0,2024-10-15T00:00:00,viagem-a-angra-dos-reis,Viagem à Angra dos Reis,Sorocaba,SP,-23.4709096,-47.4851438,Angra dos Reis,RJ,-23.0069216,-44.3185172,driving,{start_date},{end_date},Conhecer a cidade,Conhecer as praias,passeio____COMMA____praia____COMMA____sol,W3sidGltZXN0YW1wIjogMTcyOTAwNDQwMCwgImRhdGUiOiAiMjAyNC0xMC0xNVQwMDowMDowMCIsICJjaXR5X25hbWUiOiAiQW5ncmEgZG9zIFJlaXMiLCAic3RhdGVfbmFtZSI6ICJSSiIsICJ0ZW1wZXJhdHVyZSI6IG51bGwsICJ0ZW1wZXJhdHVyZV9taW4iOiAyMC4xOSwgInRlbXBlcmF0dXJlX21heCI6IDIzLjc3LCAid2VhdGhlciI6ICJudWJsYWRvIiwgIndpbmRfc3BlZWQiOiAxLjgxfSwgeyJ0aW1lc3RhbXAiOiAxNzI5MDQ3NjAwLCAiZGF0ZSI6ICIyMDI0LTEwLTE2VDAwOjAwOjAwIiwgImNpdHlfbmFtZSI6ICJBbmdyYSBkb3MgUmVpcyIsICJzdGF0ZV9uYW1lIjogIlJKIiwgInRlbXBlcmF0dXJlIjogbnVsbCwgInRlbXBlcmF0dXJlX21pbiI6IDE5LjY0LCAidGVtcGVyYXR1cmVfbWF4IjogMjUuMjksICJ3ZWF0aGVyIjogIm51YmxhZG8iLCAid2luZF9zcGVlZCI6IDEuNzYxMjV9LCB7InRpbWVzdGFtcCI6IDE3MjkxMzQwMDAsICJkYXRlIjogIjIwMjQtMTAtMTdUMDA6MDA6MDAiLCAiY2l0eV9uYW1lIjogIkFuZ3JhIGRvcyBSZWlzIiwgInN0YXRlX25hbWUiOiAiUkoiLCAidGVtcGVyYXR1cmUiOiBudWxsLCAidGVtcGVyYXR1cmVfbWluIjogMjAuNzQsICJ0ZW1wZXJhdHVyZV9tYXgiOiAyNC45NywgIndlYXRoZXIiOiAibnVibGFkbyIsICJ3aW5kX3NwZWVkIjogMS41NTI1fSwgeyJ0aW1lc3RhbXAiOiAxNzI5MjIwNDAwLCAiZGF0ZSI6ICIyMDI0LTEwLTE4VDAwOjAwOjAwIiwgImNpdHlfbmFtZSI6ICJBbmdyYSBkb3MgUmVpcyIsICJzdGF0ZV9uYW1lIjogIlJKIiwgInRlbXBlcmF0dXJlIjogbnVsbCwgInRlbXBlcmF0dXJlX21pbiI6IDIxLjc2LCAidGVtcGVyYXR1cmVfbWF4IjogMjUuNywgIndlYXRoZXIiOiAibnVibGFkbyIsICJ3aW5kX3NwZWVkIjogMS42MjV9LCB7InRpbWVzdGFtcCI6IDE3MjkzMDY4MDAsICJkYXRlIjogIjIwMjQtMTAtMTlUMDA6MDA6MDAiLCAiY2l0eV9uYW1lIjogIkFuZ3JhIGRvcyBSZWlzIiwgInN0YXRlX25hbWUiOiAiUkoiLCAidGVtcGVyYXR1cmUiOiBudWxsLCAidGVtcGVyYXR1cmVfbWluIjogMjIuMSwgInRlbXBlcmF0dXJlX21heCI6IDI0LjAzLCAid2VhdGhlciI6ICJjaHV2YSBsZXZlIiwgIndpbmRfc3BlZWQiOiAxLjE0NzV9LCB7InRpbWVzdGFtcCI6IDE3MjkzOTMyMDAsICJkYXRlIjogIjIwMjQtMTAtMjBUMDA6MDA6MDAiLCAiY2l0eV9uYW1lIjogIkFuZ3JhIGRvcyBSZWlzIiwgInN0YXRlX25hbWUiOiAiUkoiLCAidGVtcGVyYXR1cmUiOiBudWxsLCAidGVtcGVyYXR1cmVfbWluIjogMjIuMiwgInRlbXBlcmF0dXJlX21heCI6IDIyLjgyLCAid2VhdGhlciI6ICJjaHV2YSBmb3J0ZSIsICJ3aW5kX3NwZWVkIjogMS4yMDc1fV0=,W3siaWQiOiAiZGM5MGE1OTktMjY5NS00MGNkLTljYTItMmY3OTkzNGY5YTY5IiwgImNpdHlfbmFtZSI6ICJBbmdyYSBkb3MgUmVpcyIsICJzdGF0ZV9uYW1lIjogIlJKIiwgIm5hbWUiOiAiQmFyIGRvIEx1aXoiLCAidXJsIjogImh0dHBzOi8vd3d3LnllbHAuY29tL2Jpei9iYXItZG8tbHVpei1hbmdyYS1kb3MtcmVpcyIsICJyZXZpZXdfY291bnQiOiAyLCAicmV2aWV3X3N0YXJzIjogNC4wLCAiZGVzY3JpcHRpb24iOiAiIiwgImltYWdlIjogImh0dHBzOi8vczMtbWVkaWEwLmZsLnllbHBjZG4uY29tL2JwaG90by83eWF1bkx2eGI3cDBCY2djR2t5RVZ3LzM0OHMuanBnIn0sIHsiaWQiOiAiN2M1YWQ3ZDAtYTEyOC00NDFmLWI3ZDgtNmMwMjI1NTdiNjhjIiwgImNpdHlfbmFtZSI6ICJBbmdyYSBkb3MgUmVpcyIsICJzdGF0ZV9uYW1lIjogIlJKIiwgIm5hbWUiOiAiUHJhaWEgZGEgUGFybmFpb2NhIiwgInVybCI6ICJodHRwczovL3d3dy55ZWxwLmNvbS9iaXovcHJhaWEtZGEtcGFybmFpb2NhLWFuZ3JhLWRvcy1yZWlzIiwgInJldmlld19jb3VudCI6IDIsICJyZXZpZXdfc3RhcnMiOiA1LjAsICJkZXNjcmlwdGlvbiI6ICIiLCAiaW1hZ2UiOiAiaHR0cHM6Ly9zMy1tZWRpYTAuZmwueWVscGNkbi5jb20vYnBob3RvL2JzYUFpM3ZhXy00V2h4SmNtV0xTRlEvMzQ4cy5qcGcifV0=
-"""
+def mock_trip_csv_new_date():
+    trip = mock_trip_dict()
+    csv = Trip(trip_data=trip, save=False).to_csv()
+    return csv
 
 
 def mock_trip_csv_old_date():
-    return f"""id,user_id,created_at,slug,title,origin_city,origin_state,origin_longitude,origin_latitude,destination_city,destination_state,destination_longitude,destination_latitude,travel_by,start_date,end_date,goals,notes,tags,weather_base64,attractions_base64
-0000000-0000-0000-0000-000000000000,0,2024-10-18T00:00:00,viagem-a-angra-dos-reis,Viagem à Angra dos Reis,Sorocaba,SP,-23.4709096,-47.4851438,São Paulo,SP,-23.5557714,-46.6395571,bicycling,2024-10-19T00:00:00,2024-10-20T00:00:00,Bater meu recorde,Lorem ipsum,bicicleta____COMMA____bike,W3sidGltZXN0YW1wIjogMTcyOTI5NjAwMCwgImRhdGUiOiAiMjAyNC0xMC0xOVQwMDowMDowMCIsICJjaXR5X25hbWUiOiAiU1x1MDBlM28gUGF1bG8iLCAic3RhdGVfbmFtZSI6ICJTUCIsICJ0ZW1wZXJhdHVyZSI6IG51bGwsICJ0ZW1wZXJhdHVyZV9taW4iOiAxNi4yOSwgInRlbXBlcmF0dXJlX21heCI6IDE5LjU5LCAid2VhdGhlciI6ICJjaHV2YSBtb2RlcmFkYSIsICJ3aW5kX3NwZWVkIjogNC4xMjI1MDAwMDAwMDAwMDA1fSwgeyJ0aW1lc3RhbXAiOiAxNzI5MzgyNDAwLCAiZGF0ZSI6ICIyMDI0LTEwLTIwVDAwOjAwOjAwIiwgImNpdHlfbmFtZSI6ICJTXHUwMGUzbyBQYXVsbyIsICJzdGF0ZV9uYW1lIjogIlNQIiwgInRlbXBlcmF0dXJlIjogbnVsbCwgInRlbXBlcmF0dXJlX21pbiI6IDE1LjE4LCAidGVtcGVyYXR1cmVfbWF4IjogMTcuMTgsICJ3ZWF0aGVyIjogImNodXZhIGxldmUiLCAid2luZF9zcGVlZCI6IDMuODN9XQ==,W3siaWQiOiAiYTNjY2ZjZTItZWM5ZS00MTI2LThjMDQtMzU0ZjE4NzI3MDI4IiwgImNpdHlfbmFtZSI6ICJTXHUwMGUzbyBQYXVsbyIsICJzdGF0ZV9uYW1lIjogIlNQIiwgIm5hbWUiOiAiU2t5ZSBCYXIgJiBSZXN0YXVyYW50ZSIsICJ1cmwiOiAiaHR0cHM6Ly93d3cueWVscC5jb20vYml6L3NreWUtYmFyLWUtcmVzdGF1cmFudGUtcyVDMyVBM28tcGF1bG8iLCAicmV2aWV3X2NvdW50IjogNjcsICJyZXZpZXdfc3RhcnMiOiA0LjQsICJkZXNjcmlwdGlvbiI6ICIiLCAiaW1hZ2UiOiAiaHR0cHM6Ly9zMy1tZWRpYTAuZmwueWVscGNkbi5jb20vYnBob3RvL1ZHR05fZTFkQzhFb2FPUnBzNHJDUkEvMzQ4cy5qcGcifSwgeyJpZCI6ICJlZmQ2ODE2Yy0zNzRjLTQxNzAtODVjYS0xZGVkN2Q3MTlkOWIiLCAiY2l0eV9uYW1lIjogIlNcdTAwZTNvIFBhdWxvIiwgInN0YXRlX25hbWUiOiAiU1AiLCAibmFtZSI6ICJCYXJiYWNvYSIsICJ1cmwiOiAiaHR0cHM6Ly93d3cueWVscC5jb20vYml6L2JhcmJhY29hLXMlQzMlQTNvLXBhdWxvIiwgInJldmlld19jb3VudCI6IDQ1LCAicmV2aWV3X3N0YXJzIjogNC40LCAiZGVzY3JpcHRpb24iOiAiIiwgImltYWdlIjogImh0dHBzOi8vczMtbWVkaWEwLmZsLnllbHBjZG4uY29tL2JwaG90by8wejJfdTlROUVZZFVPc2o1OFNqX09RLzM0OHMuanBnIn1d
-"""
+    trip = mock_trip_dict()
+    trip["start_date"] = "2023-11-16T00:00:00"
+    trip["end_date"] = "2023-11-17T00:00:00"
+    csv = Trip(trip_data=trip, save=False).to_csv()
+    return csv
 
 
 # Test creating a new trip
@@ -204,16 +214,48 @@ def test_delete_trip():
     assert TripData().get(trip_id=trip_id) is None
 
 
+def test_export_trip_json():
+    # Create a new trip
+    trip = Trip(trip_data=mock_trip_dict())
+
+    # Export the trip to JSON
+    json_data = trip.to_json()
+
+    # Check if the trip was exported correctly
+    assert json.loads(json_data)["slug"] == "teste"
+
+
+def test_export_trip_csv():
+    # Create a new trip
+    trip = Trip(trip_data=mock_trip_dict())
+
+    # Export the trip to CSV
+    csv_data = trip.to_csv()
+    csv_header = csv_data.split("\n")[0]
+
+    # Check if the trip was exported correctly
+    assert csv_data.split("\n")[1].split(",")[3] == "teste"
+    assert "weather_base64" in csv_header
+    assert "attractions_base64" in csv_header
+    assert "itinerary_base64" in csv_header
+    assert "weather," not in csv_header
+    assert "attractions," not in csv_header
+    assert "itinerary," not in csv_header
+    assert "meta," not in csv_header
+
+    # _log(csv_data)
+
+
 @patch("services.TripData.AppData.save")
 def test_import_trip_csv(app_data_save_mock):
     # Create a mock instance of AppData
     app_data_save_mock.return_value = True
 
     # Create a new trip
-    trip = Trip().from_csv(mock_trip_csv_old_date())
+    trip = Trip().from_csv(mock_trip_csv_new_date())
 
     # Check if the trip was imported correctly
-    assert trip["slug"] == "viagem-a-angra-dos-reis"
+    assert trip["slug"] == "teste"
 
 
 @patch("services.TripData.AppData.save")
@@ -221,11 +263,11 @@ def test_import_trip_json(app_data_save_mock):
     # Create a mock instance of AppData
     app_data_save_mock.return_value = True
 
-    trip = Trip().from_csv(mock_trip_csv_old_date())
+    trip = Trip().from_csv(mock_trip_csv_new_date())
     json_data = trip.to_json()
 
     # Create a new trip
     trip = Trip().from_json(json_data)
 
     # Check if the trip was imported correctly
-    assert trip["slug"] == "viagem-a-angra-dos-reis"
+    assert trip["slug"] == "teste"

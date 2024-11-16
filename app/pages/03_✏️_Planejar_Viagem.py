@@ -363,7 +363,7 @@ def Cadastrar():
             "notes": notes,
         }
 
-        trip = Trip(trip_data=trip_data)
+        trip = Trip(trip_data=trip_data, save=True)
         if trip:
             st.success("Viagem cadastrada com sucesso!")
 
