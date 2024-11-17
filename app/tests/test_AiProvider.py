@@ -6,6 +6,7 @@ from services.AiProvider import AiProvider
 from services.Logger import _log
 from services.HuggingFaceProvider import HuggingFaceProvider
 from services.GeminiProvider import GeminiProvider
+from services.SentimentAnalysisProvider import SentimentAnalyzer
 
 from tests.test_Trip import mock_trip_model, mock_trip
 from tests.test_Itinerary import mock_activity, mock_itinerary
@@ -292,3 +293,21 @@ def test_gemini_generate_trip_summary():
 
     assert trip_summary is not None
     assert trip_summary != ""
+
+
+# --------------------------
+# Sentiment Analysis Tests
+# --------------------------
+# Test initialization
+def test_sentiment_analysis_init():
+    ai_provider = SentimentAnalyzer()
+    assert ai_provider.model_name is not None
+
+
+# Test the ask method with a "negative" prompt
+def test_sentiment_analysis_negative():
+    ai_provider = SentimentAnalyzer()
+    sentiment = ai_provider.analyze_sentiment("I hate this movie, it's terrible!")
+    assert sentiment is not None
+    assert sentiment != ""
+    assert "NEGATIVE" in sentiment

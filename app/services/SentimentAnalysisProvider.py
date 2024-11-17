@@ -6,14 +6,9 @@ from services.AppData import AppData
 from services.Logger import _log
 
 
-class SentimentAnalysisProvider(AiProvider):
-    def __init__(self, api_key=None):
+class SentimentAnalyzer(AiProvider):
+    def __init__(self):
         super().__init__()  # Initialize the parent class
-
-        # Set the API key, either from the environment or directly from the parameter
-        self.api_key = api_key or AppData().get_api_key("huggingface")
-        if not self.api_key:
-            raise ValueError("API key is required for Hugging Face API")
 
         # Device configuration: use GPU if available, otherwise fallback to CPU
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -42,7 +37,7 @@ class SentimentAnalysisProvider(AiProvider):
             # Prepare the response in the same format
             return {
                 "response": self._format_response(prompt, response),
-                "provider": "HuggingFace",
+                "provider": "SentimentAnalyzer",
             }
         except Exception as e:
             _log(f"Error during sentiment analysis: {str(e)}", level="ERROR")
@@ -53,6 +48,14 @@ class SentimentAnalysisProvider(AiProvider):
         sentiment = response[0]["label"]
         confidence = response[0]["score"]
         return f"Text: '{prompt}'\nSentiment: {sentiment}\nConfidence: {confidence:.2f}"
+
+    def analyze_sentiment(self, text: str) -> str:
+        response = self.ask(prompt=text)
+        if not response:
+            return None
+        response = response["response"]
+        response = response.split("Sentiment:")[1].strip()
+        return response.split("\n")[0].strip().upper()
 
     def _clean_response(self, response: str) -> str:
         # No cleaning needed for sentiment analysis, but maintaining the method for structure

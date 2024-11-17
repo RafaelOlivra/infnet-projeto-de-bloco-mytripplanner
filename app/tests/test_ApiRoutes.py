@@ -31,6 +31,9 @@ def test_no_api_key():
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
+# --------------------------
+# Trip API
+# --------------------------
 @patch("services.TripData.TripData.get_user_trips")
 @patch("routers.api.ApiKeyHandler._get_raw_keys")
 def test_get_user_trips(mock__get_raw_keys, mock_trip_data_get_user_trips):
@@ -96,3 +99,19 @@ def test_delete_user_trip(mock__get_raw_keys):
     assert response.json()["detail"] == "Trip deleted successfully"
 
     trip.delete()  # Clean up
+
+
+# --------------------------
+# Trip AI API
+# --------------------------
+@patch("routers.api.ApiKeyHandler._get_raw_keys")
+def test_sentiment_analysis(mock__get_raw_keys):
+    mock__get_raw_keys.return_value = demo_key
+
+    response = client.post(
+        f"/ai/processar_texto",
+        headers=headers,
+        json={"text": "I love this place!"},
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["sentiment"] == "POSITIVE"

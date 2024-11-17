@@ -4,13 +4,15 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
+from pydantic import BaseModel
+
 from models.Trip import TripModel
 
 from services.Trip import Trip
 from services.TripData import TripData
 from services.ApiKeyHandler import ApiKeyHandler
 from services.GeminiProvider import GeminiProvider
-from services.SentimentAnalysisProvider import SentimentAnalysisProvider
+from services.SentimentAnalysisProvider import SentimentAnalyzer
 
 from services.Logger import _log
 
@@ -115,7 +117,7 @@ async def delete_user_trip(
 
     trip_model = TripData().get_user_trip(trip_id=trip_id, user_id=user_id)
     trip = Trip().from_model(trip_model)
-    
+
     _log(trip_model)
 
     if not trip:
@@ -185,25 +187,24 @@ async def generate_trip_itinerary(
 # --------------------------
 
 
+class TextModel(BaseModel):
+    text: str
+
+
 # Process general text send by the user
 @app.post("/ai/processar_texto", tags=["AI - General"])
 @limiter.limit("20/minute")
 async def processar_texto(
     request: Request,
-    text: str,
+    text: TextModel,
     api_key: str = Depends(api_key_handler.validate_key),
 ) -> dict[str, str]:
-    ai_provider = SentimentAnalysisProvider()
+    ai_provider = SentimentAnalyzer()
+    text = text.text
     prompt = """{{Your Text Here}}"""
     prompt = prompt.replace("{{Your Text Here}}", text)
-    response = ai_provider.prompt(prompt=prompt)
-    _log(response)
-
-    # Extract the line with the "Sentiment:"
-    response = response.split("Sentiment:")[1].strip()
-    if not response:
+    sentiment = ai_provider.analyze_sentiment(prompt)
+    if not sentiment:
         raise HTTPException(status_code=500, detail="Failed to process text")
-
-    sentiment = response.split("\n")[0].strip().upper()
 
     return {"sentiment": sentiment}
