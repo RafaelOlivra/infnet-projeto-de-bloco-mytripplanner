@@ -1,8 +1,8 @@
 from pydantic import ValidationError
 
-from services.AppData import AppData
 from lib.Utils import Utils
 from services.Logger import _log
+from services.AppData import AppData
 
 from models.Trip import TripModel
 

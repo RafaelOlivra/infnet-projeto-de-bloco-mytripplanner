@@ -231,7 +231,8 @@ class Trip:
 
         # Convert meta to a string
         if "meta" in data and data["meta"] is not None:
-            meta_base64 = self._serialize_to_base64(data["meta"])
+            meta_base64 = [data["meta"]]
+            meta_base64 = self._serialize_to_base64(meta_base64)
             data["meta_base64"] = meta_base64
             del data["meta"]
 
@@ -300,6 +301,15 @@ class Trip:
                     )
                     if value == "____NONE____":
                         data[key] = None
+
+            # If meta is a list, get the first item as dict
+            if "meta" in data:
+                if isinstance(data["meta"], list):
+                    data["meta"] = data["meta"][0]
+                    if not data["meta"]:
+                        data["meta"] = {}
+                else:
+                    data["meta"] = {}
 
             # If tags is a string, convert it to a list
             if "tags" in data and data["tags"] and isinstance(data["tags"], str):
