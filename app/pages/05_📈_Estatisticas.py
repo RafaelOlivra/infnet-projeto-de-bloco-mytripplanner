@@ -12,6 +12,8 @@ from services.AttractionsData import AttractionsData
 from services.AppData import AppData
 from services.TripData import TripData
 
+from services.SentimentAnalysisProvider import SentimentAnalyzer
+
 
 # --------------------------
 # View Stats
@@ -52,8 +54,10 @@ def View_Stats():
         # Visited cities
         visited_cities = trips
         cities = set()
-        for trip in visited_cities:
-            cities.add(trip.destination_city + ", " + trip.destination_state)
+        for trip_model in visited_cities:
+            cities.add(
+                trip_model.destination_city + ", " + trip_model.destination_state
+            )
         cols[2].metric("Cidades Visitadas", f"{len(cities)}")
 
         # Scraped cities
@@ -79,14 +83,14 @@ def View_Stats():
     # Get the most visited places
     trips_by_destination_tracker = []
     trips_by_destination = []
-    for trip in trips:
-        destination = trip.destination_city + ", " + trip.destination_state
+    for trip_model in trips:
+        destination = trip_model.destination_city + ", " + trip_model.destination_state
         if destination not in trips_by_destination_tracker:
             trips_by_destination_tracker.append(destination)
 
             # Add geolocation to the destination
             lat, long = LatLong().get_coordinates(
-                city=trip.destination_city, state=trip.destination_state
+                city=trip_model.destination_city, state=trip_model.destination_state
             )
 
             trips_by_destination.append(
@@ -100,7 +104,7 @@ def View_Stats():
         else:
             for item in trips_by_destination:
                 if item["destination"] == destination:
-                    item["visits"] += len(trip.attractions)
+                    item["visits"] += len(trip_model.attractions)
 
     # Create a DataFrame with the data
     df = pd.DataFrame(trips_by_destination)
@@ -160,6 +164,34 @@ def View_Stats():
         st.write("Nenhuma atração encontrada.")
 
     # --------------------------
+    # Do sentiment analysis on the trips
+    # --------------------------
+    # Get the sentiment of the trips
+    with st.spinner("Analisando sentimentos..."):
+        sentiments_tracker = []
+        for trip_model in trips:
+            trip = Trip().from_model(trip_model)
+            sentiment = trip.get_meta("sentiment")
+            if not sentiment:
+                feedback = trip.get_meta("feedback")
+                if feedback:
+                    sentiment = SentimentAnalyzer().analyze_sentiment(feedback)
+                    trip.set_meta("sentiment", sentiment)
+                else:
+                    sentiment = "N/A"
+            sentiments_tracker.append(sentiment)
+
+    # Create a DataFrame with the data
+    df = pd.DataFrame(sentiments_tracker, columns=["Sentimento"])
+
+    # Plot the sentiment analysis in a pie chart
+    try:
+        fig = px.pie(df, names="Sentimento", title="Análise de Sentimentos")
+        st.plotly_chart(fig)
+    except ValueError:
+        st.write("Nenhum sentimento encontrado.")
+
+    # --------------------------
     # Word Cloud with words from the trips
     # --------------------------
     words = []
@@ -173,15 +205,15 @@ def View_Stats():
         words = cleaned_phrase.split()  # Split by space into words list
         return words
 
-    for trip in trips:
+    for trip_model in trips:
         # Get words from the title and description
-        words.extend(get_words(trip.title))
-        words.extend(get_words(trip.origin_city))
-        words.extend(get_words(trip.origin_state))
-        words.extend(get_words(trip.destination_city))
-        words.extend(get_words(trip.destination_state))
-        words.extend(get_words(trip.goals))
-        words.extend(get_words(trip.notes))
+        words.extend(get_words(trip_model.title))
+        words.extend(get_words(trip_model.origin_city))
+        words.extend(get_words(trip_model.origin_state))
+        words.extend(get_words(trip_model.destination_city))
+        words.extend(get_words(trip_model.destination_state))
+        words.extend(get_words(trip_model.goals))
+        words.extend(get_words(trip_model.notes))
 
     # Stopwords
     stopwords_pt_br = """

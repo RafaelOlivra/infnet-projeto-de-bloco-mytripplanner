@@ -167,7 +167,7 @@ class Trip:
         except Exception as e:
             return None
 
-    def update_meta(self, meta_key: dict, value) -> bool:
+    def set_meta(self, meta_key: str, value) -> bool:
         if not self.model:
             return False
 
@@ -183,6 +183,9 @@ class Trip:
         self.model.meta = meta
 
         return self._save()
+
+    def update_meta(self, meta_key: dict, value) -> bool:
+        return self.set_meta(meta_key, value)
 
     def delete_meta(self, meta_key: str) -> bool:
         if not self.model:
