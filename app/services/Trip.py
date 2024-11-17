@@ -154,6 +154,50 @@ class Trip:
             return True
 
     # --------------------------
+    # Custom Metadata Operations
+    # --------------------------
+
+    def get_meta(self, meta_key: str) -> any:
+        if not self.model:
+            return None
+
+        meta = self.model.meta
+        try:
+            return meta[meta_key]
+        except Exception as e:
+            return None
+
+    def update_meta(self, meta_key: dict, value) -> bool:
+        if not self.model:
+            return False
+
+        # Get the current meta data
+        meta = self.model.meta
+
+        # Check if the meta data is a dictionary
+        if not isinstance(meta, dict):
+            meta = {}
+
+        # Update the meta data
+        meta[meta_key] = value
+        self.model.meta = meta
+
+        return self._save()
+
+    def delete_meta(self, meta_key: str) -> bool:
+        if not self.model:
+            return False
+
+        # Get the current meta data
+        meta = self.model.meta
+
+        # Delete the meta data
+        meta.pop(meta_key, None)
+        self.model.meta = meta
+
+        return self._save()
+
+    # --------------------------
     # Export/Import
     # --------------------------
     def to_json(self):
@@ -168,46 +212,26 @@ class Trip:
         data["created_at"] = Utils.to_date_string(data["created_at"])
 
         # Serialize datetime objects
-        # if "weather" in data:
-        #     for forecast in data["weather"]:
-        #         forecast["date"] = Utils.to_date_string(forecast["date"])
-
-        # data["weather_base64"] = base64.b64encode(
-        #     json.dumps(data.pop("weather")).encode()
-        # ).decode()
         if "weather" in data and data["weather"] is not None:
-            weather_base64 = self._dict_to_base64(data["weather"])
+            weather_base64 = self._serialize_to_base64(data["weather"])
             data["weather_base64"] = weather_base64
             del data["weather"]
 
         # Convert attractions fields to strings
-        # if "attractions" in data:
-        #     for attraction in data["attractions"]:
-        #         if "url" in attraction:
-        #             attraction["url"] = str(attraction["url"])
-        #         if "image" in attraction:
-        #             attraction["image"] = str(attraction["image"])
-        #         if "created_at" in attraction:
-        #             attraction["created_at"] = Utils.to_date_string(
-        #                 attraction["created_at"]
-        #             )
-        # data["attractions_base64"] = base64.b64encode(
-        #     json.dumps(data.pop("attractions")).encode()
-        # ).decode()
         if "attractions" in data and data["attractions"] is not None:
-            attractions_base64 = self._dict_to_base64(data["attractions"])
+            attractions_base64 = self._serialize_to_base64(data["attractions"])
             data["attractions_base64"] = attractions_base64
             del data["attractions"]
 
         # Convert itinerary to a string
         if "itinerary" in data and data["itinerary"] is not None:
-            itinerary_base64 = self._dict_to_base64(data["itinerary"])
+            itinerary_base64 = self._serialize_to_base64(data["itinerary"])
             data["itinerary_base64"] = itinerary_base64
             del data["itinerary"]
 
         # Convert meta to a string
         if "meta" in data and data["meta"] is not None:
-            meta_base64 = self._dict_to_base64(data["meta"])
+            meta_base64 = self._serialize_to_base64(data["meta"])
             data["meta_base64"] = meta_base64
             del data["meta"]
 
@@ -260,7 +284,9 @@ class Trip:
             _data = data.copy()
             for key, value in _data.items():
                 if key.endswith("_base64"):
-                    data[key.replace("_base64", "")] = self._dict_from_base64(value)
+                    data[key.replace("_base64", "")] = self._serialize_from_base64(
+                        value
+                    )
                     data.pop(key, None)
 
             # Replace the placeholder with real values
@@ -317,24 +343,28 @@ class Trip:
     # --------------------------
     # Base64 Serialization
     # --------------------------
-    def _dict_to_base64(self, obj_list: list[dict]) -> str:
+    def _serialize_to_base64(self, items: list[dict]) -> str:
         """
         Search every value in a multi-level dictionary for objects that can be serialized to base64.
         Initially we serialize date and url objects, but we can add more types later.
         """
-        for obj in obj_list:
-            for key, value in obj.items():
+
+        if not items or not isinstance(items, list):
+            return ""
+
+        for item in items:
+            for key, value in item.items():
 
                 # Serialize dates to string
                 # Dates
                 if isinstance(value, datetime) or isinstance(value, date):
-                    obj[key] = Utils.to_date_string(value)
+                    item[key] = Utils.to_date_string(value)
                 # Time objects
                 elif "datetime.time" in str(type(value)):
-                    obj[key] = Utils.to_time_string(value)
+                    item[key] = Utils.to_time_string(value)
                 # Dict
                 elif isinstance(value, dict):
-                    obj[key] = Utils.to_date_string_recursive(value)
+                    item[key] = Utils.to_date_string_recursive(value)
                 # List
                 elif isinstance(value, list):
                     for i, item in enumerate(value):
@@ -342,16 +372,16 @@ class Trip:
 
                 # Convert non numeric values to string
                 if not isinstance(value, (int, float)):
-                    obj[key] = str(value)
+                    item[key] = str(value)
 
                 # Convert None to placeholders
                 if value == None:
-                    obj[key] = "____NONE____"
+                    item[key] = "____NONE____"
 
         # Serialize the list to base64
-        return base64.b64encode(json.dumps(obj_list).encode()).decode()
+        return base64.b64encode(json.dumps(items).encode()).decode()
 
-    def _dict_from_base64(self, base64_str: str) -> list[dict]:
+    def _serialize_from_base64(self, base64_str: str) -> list[dict]:
         """
         Deserialize a base64 string to a dictionary.
         """
@@ -374,14 +404,14 @@ class Trip:
             data = json.loads(data_str)
 
             # If the values is a string, but looks like a list, convert it to a list
-            for obj in data:
-                for key, value in obj.items():
+            for item in data:
+                for key, value in item.items():
                     if (
                         type(value) == str
                         and value.startswith("[")
                         and value.endswith("]")
                     ):
-                        obj[key] = json.loads(value)
+                        item[key] = json.loads(value)
             return data
         except Exception as e:
             _log(f"Error deserializing base64: {str(e)}")
@@ -390,7 +420,6 @@ class Trip:
     # --------------------------
     # Utils
     # --------------------------
-
     def is_expired(self):
         return self.get("end_date") < datetime.now()
 

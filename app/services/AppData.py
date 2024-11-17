@@ -307,7 +307,7 @@ class AppData:
             os.makedirs(folder)
 
         if isinstance(json, dict):
-            json = json.dumps(json)
+            json = json.dumps(json, indent=4)
 
         try:
             with open(file_path, "w", encoding="utf-8") as f:

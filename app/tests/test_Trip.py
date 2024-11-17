@@ -127,12 +127,10 @@ def mock_trip_dict() -> dict:
         "notes": "This is a test note",
         "tags": ["teste"],
         "summary": "This is a test summary",
-        "meta": [
-            {
-                "feedback": "Nice trip",
-                "sentiment": "POSITIVE",
-            }
-        ],
+        "meta": {
+            "feedback": "Nice trip",
+            "sentiment": "POSITIVE",
+        },
     }
 
 
@@ -156,6 +154,11 @@ def mock_trip_csv_old_date():
     trip["end_date"] = "2023-11-17T00:00:00"
     csv = Trip(trip_data=trip, save=False).to_csv()
     return csv
+
+
+# --------------------------
+# CRUD Tests
+# --------------------------
 
 
 # Test creating a new trip
@@ -214,6 +217,57 @@ def test_delete_trip():
     assert TripData().get(trip_id=trip_id) is None
 
 
+# --------------------------
+# Meta Tests
+# --------------------------
+
+
+def test_get_trip_meta():
+    # Create a new trip
+    trip = Trip(trip_data=mock_trip_dict())
+
+    # Check if the trip meta was retrieved correctly
+    assert trip.get_meta("sentiment") == "POSITIVE"
+
+
+# Test updating a meta property from the trip
+@patch("services.TripData.AppData.save")
+def test_update_trip_meta(app_data_save_mock):
+
+    # Create a mock instance of AppData
+    app_data_save_mock.return_value = True
+
+    # Create a new trip
+    trip = Trip(trip_data=mock_trip_dict())
+
+    # _log(trip["meta"])
+
+    # Update the trip meta
+    trip.update_meta("feedback", "Nice trip")
+
+    # Check if the trip meta was updated correctly
+    assert trip.get_meta("feedback") == "Nice trip"
+
+
+# Test deleting a meta property from the trip
+@patch("services.TripData.AppData.save")
+def test_delete_trip_meta(app_data_save_mock):
+    # Create a mock instance of AppData
+    app_data_save_mock.return_value = True
+
+    # Create a new trip
+    trip = Trip(trip_data=mock_trip_dict())
+
+    # Delete the trip meta
+    trip.delete_meta("feedback")
+
+    # Check if the trip meta was deleted correctly
+    assert trip.get_meta("feedback") is None
+
+
+# --------------------------
+# Import/Export Testes
+# --------------------------
 def test_export_trip_json():
     # Create a new trip
     trip = Trip(trip_data=mock_trip_dict())

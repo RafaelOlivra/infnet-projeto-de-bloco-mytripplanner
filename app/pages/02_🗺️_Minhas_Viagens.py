@@ -4,6 +4,7 @@ from streamlit_js_eval import streamlit_js_eval
 
 from services.TripData import TripData
 from services.Trip import Trip
+from services.Logger import _log
 
 from views.TripView import TripView
 
@@ -13,10 +14,20 @@ from views.TripView import TripView
 if "selected_trip_id" not in st.session_state:
     st.session_state.selected_trip_id = None
 
+if "feedback_text" not in st.session_state:
+    st.session_state.feedback_text = None
+
 
 def set_selected_trip_id(selected_trip_id):
     if selected_trip_id != st.session_state.selected_trip_id:
         st.session_state.selected_trip_id = selected_trip_id
+        st.session_state.feedback_text = None
+        st.rerun()
+
+
+def update_feedback_text(feedback_text):
+    if feedback_text != st.session_state.feedback_text:
+        st.session_state.feedback_text = feedback_text
         st.rerun()
 
 
@@ -113,6 +124,26 @@ def View_Trip():
             use_container_width=True,
         )
 
+    # Add Feedback field
+    st.write("---")
+    st.write("### 📝 Feedback")
+    st.write("Deixe seu feedback sobre a viagem.")
+
+    feedback_text = st.session_state.feedback_text
+    if not feedback_text:
+        feedback_text = trip.get_meta("feedback")
+
+    feedback_text = st.text_area("Feedback", key="send_feedback", value=feedback_text)
+    if st.button(
+        "Enviar Feedback",
+        key="send_feedback_btn",
+        type="primary",
+        use_container_width=True,
+    ):
+        trip.update_meta("feedback", feedback_text)
+        st.success("Feedback atualizado com sucesso!")
+        update_feedback_text(feedback_text)
+
     # Allow users to delete the trip
     st.write("---")
     st.write("### 🗑️ Deletar Viagem")
@@ -136,6 +167,7 @@ def View_Trip():
         with st.spinner("Atualizando..."):
             time.sleep(2)
             st.session_state.selected_trip_id = None
+            st.session_state.feedback_text = None
             selected_trip_id = None
             # st.switch_page("pages/02_🗺️_Minhas_Viagens.py")
             streamlit_js_eval(js_expressions="parent.window.location.reload()")
