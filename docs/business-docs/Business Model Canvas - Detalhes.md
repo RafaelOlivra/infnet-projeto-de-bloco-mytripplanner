@@ -1,6 +1,6 @@
 # Business Model Canvas \- Detalhamento \- MyTripPlanner
 
-[Acessar Business Model Canvas](https://docs.google.com/drawings/d/1LDVFgGZBJcKsntF1MJgB\_Y5skqeSBI1mjtDtm7hmOt8/edit)
+[Acessar Business Model Canvas](https://docs.google.com/drawings/d/1LDVFgGZBJcKsntF1MJgB_Y5skqeSBI1mjtDtm7hmOt8/edit)
 
 ## Parcerias Chave
 
@@ -21,7 +21,7 @@
 
 ### Provedores de Inteligência Artificial e Pesquisa
 
-* **Exemplos:** OpenAI, Perplexity AI, Phind.  
+* **Exemplos:** OpenAI, Geminy, HuggingFace.  
 * **Valor:** Fornecem tecnologias de inteligência artificial para melhorar a experiência do usuário, como chatbots para suporte ao cliente, algoritmos avançados para personalização e recomendação de viagens, previsão de demanda e otimização de rotas.
 
 ### Provedores de Atrações e Serviços Locais
