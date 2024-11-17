@@ -186,7 +186,11 @@ def View_Stats():
 
     # Plot the sentiment analysis in a pie chart
     try:
-        fig = px.pie(df, names="Sentimento", title="Análise de Sentimentos")
+        fig = px.pie(
+            df,
+            names="Sentimento",
+            title="Análise de Sentimentos (Feedback das Viagens)",
+        )
         st.plotly_chart(fig)
     except ValueError:
         st.write("Nenhum sentimento encontrado.")
