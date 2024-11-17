@@ -2,6 +2,7 @@ import json
 import csv
 import base64
 
+
 from datetime import datetime, timedelta, date
 from io import StringIO
 from datetime import datetime
@@ -284,8 +285,6 @@ class Trip:
             # Remove the id field if it exists so a new ID is generated
             data.pop("id", None)
 
-            _log(data)
-
             return Trip(trip_data=data, date_verify=False)
         except Exception as e:
             raise ValueError(
@@ -327,12 +326,19 @@ class Trip:
             for key, value in obj.items():
 
                 # Serialize dates to string
+                # Dates
                 if isinstance(value, datetime) or isinstance(value, date):
                     obj[key] = Utils.to_date_string(value)
-
-                # Serialize the list to base64
+                # Time objects
+                elif "datetime.time" in str(type(value)):
+                    obj[key] = Utils.to_time_string(value)
+                # Dict
                 elif isinstance(value, dict):
-                    obj[key] = self._dict_to_base64([value])[0]
+                    obj[key] = Utils.to_date_string_recursive(value)
+                # List
+                elif isinstance(value, list):
+                    for i, item in enumerate(value):
+                        value[i] = Utils.to_date_string_recursive(item)
 
                 # Convert non numeric values to string
                 if not isinstance(value, (int, float)):
@@ -356,16 +362,29 @@ class Trip:
             data_str = data_str.replace('"____NONE____"', "null")
             data_str = data_str.replace("____NONE____", "null")
 
+            # Fix encoded json strings that are not properly formatted
+            if "[{'" in data_str:
+                data_str = data_str.replace("[{'", '[{"')
+                data_str = data_str.replace("'}]", '"}]')
+                data_str = data_str.replace('"[{', "[{")
+                data_str = data_str.replace('}]"', "}]")
+                data_str = data_str.replace("'", '"')
+
             # Deserialize the string to a list of dictionaries
             data = json.loads(data_str)
 
             # If the values is a string, but looks like a list, convert it to a list
             for obj in data:
                 for key, value in obj.items():
-                    if value.startswith("[") and value.endswith("]"):
+                    if (
+                        type(value) == str
+                        and value.startswith("[")
+                        and value.endswith("]")
+                    ):
                         obj[key] = json.loads(value)
             return data
         except Exception as e:
+            _log(f"Error deserializing base64: {str(e)}")
             return []
 
     # --------------------------

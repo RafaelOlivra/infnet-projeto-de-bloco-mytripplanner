@@ -253,9 +253,14 @@ def test_import_trip_csv(app_data_save_mock):
 
     # Create a new trip
     trip = Trip().from_csv(mock_trip_csv_new_date())
+    trip_model = trip.model
+
+    # _log(trip.to_json())
 
     # Check if the trip was imported correctly
     assert trip["slug"] == "teste"
+    assert trip["weather"][0].city_name == "Arraial do Cabo"
+    assert trip["itinerary"][0].title is not ""
 
 
 @patch("services.TripData.AppData.save")

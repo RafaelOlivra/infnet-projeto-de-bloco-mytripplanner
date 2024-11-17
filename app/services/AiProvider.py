@@ -123,7 +123,8 @@ class AiProvider:
 
         # %%TRIP_JSON%%
         trip_model = self.trip_model if self.trip_model is not None else None
-        trip_json = trip_model.model_dump_json()
+        if trip_model:
+            trip_json = trip_model.model_dump_json()
 
         # %%ITINERARY%%
         itinerary = trip_model.itinerary if trip_model is not None else None

@@ -115,6 +115,8 @@ async def delete_user_trip(
 
     trip_model = TripData().get_user_trip(trip_id=trip_id, user_id=user_id)
     trip = Trip().from_model(trip_model)
+    
+    _log(trip_model)
 
     if not trip:
         raise HTTPException(status_code=404, detail="Trip not found")

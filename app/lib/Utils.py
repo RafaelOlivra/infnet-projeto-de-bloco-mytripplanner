@@ -104,6 +104,28 @@ class Utils:
             return _date.isoformat()
 
     @staticmethod
+    def to_date_string_recursive(items: list | dict, format="") -> list | dict:
+        """
+        Convert all date or time objects to strings.
+        """
+        # Ignore objects that are not lists or dictionaries
+        if not (isinstance(items, list) or isinstance(items, dict)):
+            return items
+
+        for item in items:
+            if isinstance(item, dict) or isinstance(item, list):
+                item = Utils.to_date_string_recursive(items=item, format=format)
+            else:
+                # Convert date objects to strings
+                if isinstance(items[item], datetime) or isinstance(items[item], date):
+                    items[item] = Utils.to_date_string(items[item], format=format)
+
+                # Convert time objects to strings
+                if "datetime.time" in str(type(items[item])):
+                    items[item] = Utils.to_time_string(items[item])
+        return items
+
+    @staticmethod
     def to_time_string(_time: datetime | str) -> str:
         # Convert string to datetime object from isoformat
         if isinstance(_time, str):

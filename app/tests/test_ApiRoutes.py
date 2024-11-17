@@ -88,7 +88,7 @@ def test_delete_user_trip(mock__get_raw_keys):
     mock__get_raw_keys.return_value = demo_key
 
     # Create a new trip
-    trip = Trip(trip_data=mock_trip_dict())
+    trip = Trip(trip_data=mock_trip_dict(), save=True)
     trip_id = trip.get("id")
 
     response = client.delete(f"/trip/{trip_id}", headers=headers)
