@@ -183,16 +183,25 @@ async def generate_trip_itinerary(
 
 
 # --------------------------
-# General AI API
+# SentimentAnalysis API
 # --------------------------
 
 
+# Prepare the request and response models for the sentiment analysis API
 class TextModel(BaseModel):
     text: str
 
 
-# Process general text send by the user
-@app.post("/ai/processar_texto", tags=["AI - General"])
+class SentimentModel(BaseModel):
+    sentiment: str
+
+
+# Do sentiment analysis on a text
+@app.post(
+    "/ai/processar_texto",
+    tags=["AI - Sentiment Analysis"],
+    response_model=SentimentModel,
+)
 @limiter.limit("20/minute")
 async def processar_texto(
     request: Request,
@@ -200,11 +209,11 @@ async def processar_texto(
     api_key: str = Depends(api_key_handler.validate_key),
 ) -> dict[str, str]:
     ai_provider = SentimentAnalyzer()
-    text = text.text
-    prompt = """{{Your Text Here}}"""
-    prompt = prompt.replace("{{Your Text Here}}", text)
-    sentiment = ai_provider.analyze_sentiment(prompt)
-    if not sentiment:
-        raise HTTPException(status_code=500, detail="Failed to process text")
+    prompt = text.text
+
+    try:
+        sentiment = ai_provider.analyze_sentiment(prompt)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to process text: {str(e)}")
 
     return {"sentiment": sentiment}
