@@ -84,4 +84,4 @@ class ItineraryView:
                 return
 
             # Convert to DailyItineraryModel
-            return ai_provider._to_itinerary(response)
+            return response

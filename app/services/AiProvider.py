@@ -246,6 +246,9 @@ class AiProvider:
         return summary
 
     def _to_json(self, response: dict) -> dict:
+        if not response or "response" not in response:
+            return {}
+
         # Extract the response string
         response_str = response.get("response", "")
 
@@ -259,6 +262,10 @@ class AiProvider:
 
     def _to_itinerary(self, response: dict) -> List[DailyItineraryModel]:
         json = self._to_json(response)
+
+        if not json:
+            return []
+
         return [DailyItineraryModel(**itinerary) for itinerary in json]
 
     def _load_base_prompt(self, template_key: str = "gen_itinerary_prompt") -> str:
