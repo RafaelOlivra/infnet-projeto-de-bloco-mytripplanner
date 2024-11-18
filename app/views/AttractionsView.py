@@ -144,6 +144,7 @@ class AttractionsView:
             attractions = AttractionsData().get(self.slug)
 
             # Check if the data is expired
+            old_attractions = None
             if attractions and self._attractions_expired(attractions[0].created_at):
                 old_attractions = attractions  # Save the old data
                 attractions = None
