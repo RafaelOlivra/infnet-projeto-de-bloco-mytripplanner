@@ -7,6 +7,7 @@ from services.Trip import Trip
 
 from services.CityState import CityStateData
 from services.GoogleMaps import GoogleMaps
+from services.Logger import _log
 
 from lib.Utils import Utils
 
