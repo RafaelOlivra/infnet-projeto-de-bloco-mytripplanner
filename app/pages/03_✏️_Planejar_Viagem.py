@@ -17,6 +17,7 @@ from views.ItineraryView import ItineraryView
 
 from models.Attraction import AttractionModel
 from models.Weather import ForecastModel
+from models.Itinerary import DailyItineraryModel
 
 
 # --------------------------
@@ -62,6 +63,10 @@ def get_selected_attractions():
     Get the selected attractions from the session state.
     """
     return st.session_state.selected_attractions
+
+
+def get_cached_itinerary() -> list[DailyItineraryModel]:
+    return st.session_state.cached_itinerary
 
 
 def clear_cached_values():
@@ -293,7 +298,7 @@ def Cadastrar():
                 "💡 Atualmente, nosso assistente pode gerar roteiros para no máximo 4 dias."
             )
 
-        itinerary = st.session_state.cached_itinerary
+        itinerary = get_cached_itinerary()
         if not itinerary:
             if st.button(
                 "Gerar Roteiro Personalizado",
@@ -358,7 +363,11 @@ def Cadastrar():
             "end_date": end_date,
             "weather": weather,
             "attractions": attractions,
-            "itinerary": itinerary,
+            "itinerary": [
+                # Convert DailyItineraryModel to dict to avoid errors
+                daily_itinerary.model_dump()
+                for daily_itinerary in itinerary
+            ],
             "goals": goals,
             "tags": tags,
             "notes": notes,

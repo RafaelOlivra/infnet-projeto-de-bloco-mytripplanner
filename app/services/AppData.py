@@ -347,6 +347,7 @@ class AppData:
         permanent_storage_dir = self.get_config("permanent_storage_dir")
         return {
             "trip": f"{temp_storage_dir}/trip",
+            "image_cache": f"{temp_storage_dir}/_image-cache",
             "attractions": f"{permanent_storage_dir}/attractions",
         }
 

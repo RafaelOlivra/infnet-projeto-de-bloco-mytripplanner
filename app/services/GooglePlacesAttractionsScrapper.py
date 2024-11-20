@@ -1,3 +1,4 @@
+import os
 import requests
 import streamlit as st
 
@@ -9,6 +10,10 @@ from models.Attraction import AttractionModel
 class GooglePlacesAttractionsScrapper:
     def __init__(self):
         self.api_key = AppData().get_api_key("googlemaps")
+        self.image_cache_dir = AppData()._get_storage_map().get("image_cache")
+        os.makedirs(
+            self.image_cache_dir, exist_ok=True
+        )  # Ensure cache directory exists
 
     @st.cache_data(ttl=86400, show_spinner=False)
     def get_near_attractions(
@@ -55,7 +60,7 @@ class GooglePlacesAttractionsScrapper:
         cards = []
         for result in data["results"]:
             image_id = result.get("photos", [{}])[0].get("photo_reference", "")
-            image_url = _self.get_photo_url(image_id)
+            image_url = _self.fetch_and_cache_photo(image_id)
             card = AttractionModel(
                 **{
                     "name": result.get("name"),
@@ -85,7 +90,7 @@ class GooglePlacesAttractionsScrapper:
 
             for result in data["results"]:
                 image_id = result.get("photos", [{}])[0].get("photo_reference", "")
-                image_url = _self.get_photo_url(image_id)
+                image_url = _self.fetch_and_cache_photo(image_id)
                 card = AttractionModel(
                     **{
                         "name": result.get("name"),
@@ -112,17 +117,41 @@ class GooglePlacesAttractionsScrapper:
     # Utils
     # --------------------------
     @st.cache_data(ttl=86400, show_spinner=False)
-    def get_photo_url(_self, photo_reference: str, max_width: int = 400) -> str:
+    def fetch_and_cache_photo(_self, photo_reference: str, max_width: int = 400) -> str:
         """
-        Retrieves the URL for a photo using its reference.
+        Fetches and caches the photo locally using its reference.
 
         Args:
             photo_reference (str): The reference ID of the photo.
             max_width (int): The maximum width of the image.
 
         Returns:
-            str: The URL to the photo.
+            str: The local path to the cached image or an empty string if not available.
         """
         if not photo_reference:
             return ""
-        return f"https://maps.googleapis.com/maps/api/place/photo?maxwidth={max_width}&photoreference={photo_reference}&key={_self.api_key}"
+
+        # Path for the cached image
+        image_path = os.path.join(_self.image_cache_dir, f"{photo_reference}.jpg")
+
+        # Check if the image is already cached
+        if os.path.exists(image_path):
+            return image_path
+
+        # Fetch and cache the image
+        url = (
+            f"https://maps.googleapis.com/maps/api/place/photo?"
+            f"maxwidth={max_width}&photoreference={photo_reference}&key={_self.api_key}"
+        )
+        response = requests.get(url, stream=True)
+        if response.status_code == 200:
+            with open(image_path, "wb") as f:
+                for chunk in response.iter_content(1024):
+                    f.write(chunk)
+            _log(f"[GoogleMapsScrapper] Cached image: {image_path}")
+            return image_path
+
+        _log(
+            f"[GoogleMapsScrapper] Failed to fetch photo for reference: {photo_reference}"
+        )
+        return ""
