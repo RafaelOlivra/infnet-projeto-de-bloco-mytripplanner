@@ -15,6 +15,7 @@ Caddyfile
 *.storage
 /app/__app__.py
 *.dat
+*.jar
 
 # Compiled Python bytecode
 *.py[cod]
