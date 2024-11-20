@@ -82,23 +82,30 @@ class AttractionsView:
         Args:
             attraction (Attraction): Attraction object.
         """
-        st.image(str(attraction.image), use_column_width=True)
+        try:
+            st.image(str(attraction.image), use_column_width=True)
 
-        # Display a star for review_stars
-        stars = "⭐" * int(attraction.review_stars)
-        review_count = (
-            f"({attraction.review_count} reviews)" if attraction.review_count else ""
-        )
+            # Display a star for review_stars
+            stars = "⭐" * int(attraction.review_stars)
+            review_count = (
+                f"({attraction.review_count} reviews)"
+                if attraction.review_count
+                else ""
+            )
 
-        st.write(
-            f"""
-            **{attraction.name}**  \
+            st.write(
+                f"""
+                **{attraction.name}**  \
 
-            {stars} {review_count}  \
+                {stars} {review_count}  \
 
-            [Mais informações]({attraction.url}) ⧉
-            """
-        )
+                [Mais informações]({attraction.url}) ⧉
+                """
+            )
+        except Exception as e:
+            _log(
+                f"[AttractionsView] Error rendering attraction card: {e}", level="ERROR"
+            )
 
     def render_attraction_selector(
         self, attraction: AttractionModel, on_change=None, selected=False
@@ -111,29 +118,37 @@ class AttractionsView:
             on_change (function): Callback function to handle changes in selection (optional).
             selected (bool): Whether the attraction is pre-selected (default: False).
         """
-        st.image(str(attraction.image), use_column_width=True)
+        try:
+            st.image(str(attraction.image), use_column_width=True)
 
-        # Display a star for review_stars
-        stars = "⭐" * int(attraction.review_stars)
-        review_count = (
-            f"({attraction.review_count} reviews)" if attraction.review_count else ""
-        )
+            # Display a star for review_stars
+            stars = "⭐" * int(attraction.review_stars)
+            review_count = (
+                f"({attraction.review_count} reviews)"
+                if attraction.review_count
+                else ""
+            )
 
-        st.write(
-            f"""
-            **{attraction.name}**  \
+            st.write(
+                f"""
+                **{attraction.name}**  \
 
-            {stars} {review_count}  \
+                {stars} {review_count}  \
 
-            [Mais informações]({attraction.url}) ⧉
-            """
-        )
+                [Mais informações]({attraction.url}) ⧉
+                """
+            )
 
-        if st.checkbox("Selecionar", key=attraction.id, value=selected):
-            if on_change:
-                on_change(attraction.name)
-        elif on_change:
-            on_change(attraction.name, remove=True)
+            if st.checkbox("Selecionar", key=attraction.id, value=selected):
+                if on_change:
+                    on_change(attraction.name)
+            elif on_change:
+                on_change(attraction.name, remove=True)
+        except Exception as e:
+            _log(
+                f"[AttractionsView] Error rendering attraction selector: {e}",
+                level="ERROR",
+            )
 
     def _get_attractions(self) -> List[AttractionModel]:
         """
