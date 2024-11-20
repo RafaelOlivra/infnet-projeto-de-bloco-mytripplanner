@@ -161,6 +161,10 @@ class SimpleLogger:
                 obj_str = repr(obj)  # Fallback to repr if JSON serialization fails
             message = f"{message} | Object: {obj_str}"
 
+        # Remove any newlines from the message
+        if type(message) == str:
+            message = message.replace("\n", "\\n")
+
         # Log the message at the specified level
         if level == logging.INFO:
             self.logger.info(message)

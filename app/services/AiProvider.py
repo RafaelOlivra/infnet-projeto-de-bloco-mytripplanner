@@ -22,6 +22,7 @@ class AiProvider:
         self.reserved_templates = [
             "%%LOCATION%%",
             "%%WEATHER%%",
+            "%%GOALS%%",
             "%%ATTRACTIONS%%",
             "%%TRAVEL_BY%%",
             "%%ITINERARY%%",
@@ -36,6 +37,7 @@ class AiProvider:
         self.start_date = None
         self.end_date = None
         self.forecast_list = None
+        self.goals = None
         self.attractions_list = None
         self.trip_model = None
 
@@ -47,6 +49,7 @@ class AiProvider:
         location: str = None,
         start_date: date = None,
         end_date: date = None,
+        goals: str = None,
         forecast_list: List[ForecastModel] = None,
         attractions_list: List[AttractionModel] = None,
         trip_model: TripModel = None,
@@ -55,6 +58,7 @@ class AiProvider:
         self.location = location
         self.start_date = start_date
         self.end_date = end_date
+        self.goals = goals
         self.forecast_list = forecast_list
         self.attractions_list = attractions_list
         self.trip_model = trip_model
@@ -113,6 +117,10 @@ class AiProvider:
         weather = self.trip_model.weather if self.trip_model is not None else weather
         forecast_list = weather
 
+        # %%GOALS%%
+        goals = self.goals if self.goals is not None else None
+        goals = self.trip_model.goals if self.trip_model is not None else goals
+
         # %%ATTRACTIONS%%
         attractions = (
             self.attractions_list if self.attractions_list is not None else None
@@ -160,6 +168,16 @@ class AiProvider:
             weather = self._strip_reserved_templates(weather)
             prompt = prompt.replace("%%WEATHER%%", weather)
 
+        # Set the goals
+        if goals is not None:
+            goals = self._strip_reserved_templates(goals)
+            goals = goals.strip()
+            if not goals:
+                goals = "* Nenhum objetivo foi definido"
+            else:
+                goals = "* " + goals.replace("\n", "\n* ").replace("  ", " ")
+            prompt = prompt.replace("%%GOALS%%", goals.strip())
+
         # Set the attractions
         if attractions is not None:
             attractions = self._generate_attractions_summary(attractions)
@@ -181,8 +199,6 @@ class AiProvider:
         if travel_by is not None:
             travel_by = self._strip_reserved_templates(travel_by)
             prompt = prompt.replace("%%TRAVEL_BY%%", travel_by)
-
-        # _log(prompt, level="DEBUG")
 
         return prompt
 

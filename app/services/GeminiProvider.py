@@ -1,3 +1,4 @@
+import time
 import google.generativeai as genai
 
 from services.AiProvider import AiProvider
@@ -19,10 +20,19 @@ class GeminiProvider(AiProvider):
 
     def ask(self, prompt: str) -> dict[str, str]:
         try:
-            _log("Generating content with Gemini.")
+            _log("Gemini: Generating content...")
+            
+            # Count the time taken to generate the content
+            start_time = time.time()
 
             model = genai.GenerativeModel(self.model_name)
             response = model.generate_content(prompt)
+
+            # Calculate the time taken to generate the content
+            end_time = time.time()
+            time_taken = end_time - start_time
+
+            _log("Gemini: Content ready! Time taken: {:.2f} seconds".format(time_taken))
 
             return {"response": response.text, "provider": "Google Gemini"}
         except Exception as e:

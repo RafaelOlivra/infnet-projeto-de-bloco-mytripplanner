@@ -1,5 +1,7 @@
-from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer
 import torch
+import time
+
+from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer
 
 from services.AiProvider import AiProvider
 from services.AppData import AppData
@@ -46,16 +48,23 @@ class HuggingFaceProvider(AiProvider):
         )
 
         try:
-            _log("Generating content with HuggingFace.")
+            _log("HuggingFace: Generating content...")
 
+            # Count the time taken to generate the content
+            start_time = time.time()
+
+            # Generate a response using the Hugging Face pipeline
             response = self.pipe(
                 prompt,
                 do_sample=True,
                 temperature=0.6,
             )
 
-            # Generate a response using the Hugging Face pipeline
-            # response = self.pipe(prompt, max_length=1000, max_new_tokens=256)
+            # Calculate the time taken to generate the content
+            end_time = time.time()
+            time_taken = end_time - start_time
+
+            _log("HuggingFace: Content ready! Time taken: {:.2f} seconds".format(time_taken))
 
             # Clean the response and return it
             return {

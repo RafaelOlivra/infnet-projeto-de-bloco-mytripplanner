@@ -1,5 +1,6 @@
 from transformers import pipeline, AutoTokenizer
 import torch
+import time
 
 from services.AiProvider import AiProvider
 from services.AppData import AppData
@@ -29,12 +30,25 @@ class SentimentAnalyzer(AiProvider):
 
     def ask(self, prompt: str) -> dict[str, str]:
         try:
-            _log("Performing sentiment analysis with HuggingFace.")
+            _log("HuggingFace: Performing sentiment analysis...")
+
+            # Count the time taken to generate the content
+            start_time = time.time()
 
             # Perform sentiment analysis
             response = self.pipe(prompt)
 
-            # Prepare the response in the same format
+            # Calculate the time taken to generate the content
+            end_time = time.time()
+            time_taken = end_time - start_time
+
+            _log(
+                "HuggingFace: Analysis is ready! Time taken: {:.2f} seconds".format(
+                    time_taken
+                )
+            )
+
+            # Return the response
             return {
                 "response": self._format_response(prompt, response),
                 "provider": "SentimentAnalyzer",

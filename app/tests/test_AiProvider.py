@@ -27,11 +27,13 @@ def mock_ai_gen_itinerary_request() -> dict:
     forecast_list = mock_weather()
     start_date = Utils.to_datetime(mock_trip_model().start_date)
     end_date = Utils.to_datetime(mock_trip_model().end_date)
+    goals = mock_trip_model().goals
 
     return dict(
         location=location,
         start_date=start_date,
         end_date=end_date,
+        goals=goals,
         forecast_list=forecast_list,
         attractions_list=attractions_list,
     )
@@ -83,6 +85,21 @@ def test_empty_generate_weather_summary():
     assert test_summary in summary
 
 
+def test_generate_goals_summary():
+    ai_provider = AiProvider()
+    goals = mock_trip_model().goals
+    ai_provider.prepare(goals=goals)
+    summary = ai_provider._generate_prompt_from_template(
+        template_key="gen_itinerary_prompt"
+    )
+
+    test_summary = "* " + goals.replace("\n", "\n* ").replace("  ", " ")
+
+    _log(summary, level="DEBUG")
+
+    assert test_summary in summary
+
+
 def test_generate_attractions_summary():
     ai_provider = AiProvider()
     attractions_list = mock_ai_gen_itinerary_request()["attractions_list"]
@@ -119,12 +136,13 @@ def test_generate_itinerary_summary():
     summary = ai_provider._generate_itinerary_summary(itinerary=itinerary)
     _log(summary, level="DEBUG")
 
-    # Che'ck for the presence of the test strings
+    # Check for the presence of the test strings
     test_summary = f"### {Utils.to_date_string(itinerary[0].date, format='display')} - {itinerary[0].title} \n"
     assert test_summary in summary
 
     activity = itinerary[0].items[0]
     test_summary = f"* [{Utils.to_time_string(activity.start_time)} - {Utils.to_time_string(activity.end_time)}] {activity.title} | {activity.location}"
+
     assert test_summary in summary
 
 

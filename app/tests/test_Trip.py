@@ -123,7 +123,7 @@ def mock_trip_dict() -> dict:
                 ],
             },
         ],
-        "goals": "Test",
+        "goals": "Conhecer as praias de Arraial do Cabo. \n Aproveitar a gastronomia local.",
         "notes": "This is a test note",
         "tags": ["teste"],
         "summary": "This is a test summary",
