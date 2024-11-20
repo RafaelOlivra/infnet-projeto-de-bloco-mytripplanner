@@ -129,20 +129,25 @@ def View_Trip():
     st.write("### 📝 Feedback")
     st.write("Deixe seu feedback sobre a viagem.")
 
-    feedback_text = st.session_state.feedback_text
-    if not feedback_text:
-        feedback_text = trip.get_meta("feedback")
+    if trip.is_expired():
+        feedback_text = st.session_state.feedback_text
+        if not feedback_text:
+            feedback_text = trip.get_meta("feedback")
 
-    feedback_text = st.text_area("Feedback", key="send_feedback", value=feedback_text)
-    if st.button(
-        "Enviar Feedback",
-        key="send_feedback_btn",
-        type="primary",
-        use_container_width=True,
-    ):
-        trip.update_meta("feedback", feedback_text)
-        st.success("Feedback atualizado com sucesso!")
-        update_feedback_text(feedback_text)
+        feedback_text = st.text_area(
+            "Feedback", key="send_feedback", value=feedback_text
+        )
+        if st.button(
+            "Enviar Feedback",
+            key="send_feedback_btn",
+            type="primary",
+            use_container_width=True,
+        ):
+            trip.update_meta("feedback", feedback_text)
+            st.success("Feedback atualizado com sucesso!")
+            update_feedback_text(feedback_text)
+    else:
+        st.warning("💡 Você poderá deixar seu feedback assim que a viagem terminar.")
 
     # Allow users to delete the trip
     st.write("---")

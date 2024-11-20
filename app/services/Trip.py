@@ -433,7 +433,7 @@ class Trip:
     # --------------------------
     # Utils
     # --------------------------
-    def is_expired(self):
+    def is_expired(self) -> bool:
         return self.get("end_date") < datetime.now()
 
     @staticmethod
