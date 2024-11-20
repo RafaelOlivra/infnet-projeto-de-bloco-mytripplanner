@@ -53,12 +53,12 @@ def View_Stats():
 
         # Visited cities
         visited_cities = trips
-        cities = set()
+        cities_attractions = set()
         for trip_model in visited_cities:
-            cities.add(
+            cities_attractions.add(
                 trip_model.destination_city + ", " + trip_model.destination_state
             )
-        cols[2].metric("Cidades Visitadas", f"{len(cities)}")
+        cols[2].metric("Cidades Visitadas", f"{len(cities_attractions)}")
 
         # Scraped cities
         cols[3].metric("Cidades Scrapeadas", f"{AttractionsData().count_cities()}")
@@ -70,7 +70,7 @@ def View_Stats():
     st.write("")
 
     # --------------------------
-    # Plotly Graphs with Attractions by City
+    # Plotly Graphs with Trips by City
     # --------------------------
     st.write(
         """
@@ -138,6 +138,78 @@ def View_Stats():
     )
 
     st.pydeck_chart(r)
+
+    # --------------------------
+    # Plotly Graphs with Attractions by City
+    # --------------------------
+    st.write("")
+    st.write(
+        """
+        ###### Total de Atrações por Cidade
+        """
+    )
+
+    ##### Plot the a map with the attractions by city
+
+    # Get the attractions by city
+    attractions_by_city = AttractionsData().get_attractions_by_city()
+
+    cities_attractions = []
+    for city_uf in attractions_by_city.keys():
+        # Count attractions per city
+        if city_uf not in cities_attractions:
+            count = 0
+        count += len(attractions_by_city[city_uf])
+
+        # Add geolocation to the destination
+        city_uf, state = city_uf.split(", ")
+        lat, long = LatLong().get_coordinates(city=city_uf, state=state)
+
+        cities_attractions.append(
+            {
+                "city": city_uf,
+                "attractions": count,
+                "lat": lat,
+                "long": long,
+            }
+        )
+
+    # Create a DataFrame with the data
+    df = pd.DataFrame(cities_attractions)
+
+    # Plot the map with pydeck
+
+    # Create a ColumnLayer for the Aérea (Air) data
+    column_layer = pdk.Layer(
+        "ColumnLayer",
+        df,
+        get_position="[long, lat]",
+        get_elevation="attractions",
+        elevation_scale=20000,
+        get_fill_color=[33, 204, 220],
+        elevation_range=[0, 100],
+        radius=10000,
+        pickable=True,
+        extruded=True,
+        auto_highlight=True,
+    )
+
+    view_state = pdk.ViewState(
+        latitude=-15.793889, longitude=-47.882778, zoom=3.5, pitch=10, bearing=0
+    )
+
+    r = pdk.Deck(
+        layers=[column_layer],
+        initial_view_state=view_state,
+        map_provider="mapbox",
+        tooltip={"text": "{city}\n{attractions} Atrações"},
+    )
+
+    st.pydeck_chart(r)
+
+    # --------------------------
+    # Bar chart with the number of attractions by state
+    # --------------------------
 
     ##### Plot a bar chart with the number of attractions by state
     attractions_by_city = AttractionsData().get_attractions_by_city()
