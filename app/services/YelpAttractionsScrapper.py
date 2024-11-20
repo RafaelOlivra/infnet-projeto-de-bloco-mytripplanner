@@ -9,11 +9,11 @@ from lib.Utils import Utils
 from models.Attraction import AttractionModel
 
 
-class YelpScrapper:
+class YelpAttractionsScrapper:
     def __init__(self):
         return None
 
-    @st.cache_data(ttl=86400)
+    @st.cache_data(ttl=86400, show_spinner=False)
     def get_near_attractions(
         _self,
         city_name: str,
@@ -123,11 +123,11 @@ class YelpScrapper:
         # Apply hardcoded proxy for now
         # TODO: Implement a better way to handle proxies
 
-        api_key = AppData().get_api_key("scraperapi")
-        proxy_prefix = f"http://api.scraperapi.com?api_key={api_key}&premium=true&url="
+        # api_key = AppData().get_api_key("scraperapi")
+        # proxy_prefix = f"http://api.scraperapi.com?api_key={api_key}&premium=true&url="
 
-        # api_key = AppData().get_api_key("rfproxy")
-        # proxy_prefix = f"https://pr.rafaeloliveira.design/?api_key={api_key}&url="
+        api_key = AppData().get_api_key("rfproxy")
+        proxy_prefix = f"https://pr.rafaeloliveira.design/?api_key={api_key}&url="
 
         SimpleLogger().log_info(f"Fetching HTML content from: {url}")
 

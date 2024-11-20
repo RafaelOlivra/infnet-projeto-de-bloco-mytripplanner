@@ -5,10 +5,13 @@ from unittest.mock import patch
 
 from lib.Utils import Utils
 from services.AttractionsData import AttractionsData
-from services.YelpScrapper import YelpScrapper
 from services.Logger import _log
-from models.Attraction import AttractionModel
+from services.YelpAttractionsScrapper import YelpAttractionsScrapper
+from app.services.GooglePlacesAttractionsScrapper import GooglePlacesAttractionsScrapper
+
 from views.AttractionsView import AttractionsView
+
+from models.Attraction import AttractionModel
 
 from tests.test_Trip import mock_trip_dict
 
@@ -25,6 +28,11 @@ def mock_attraction() -> AttractionModel:
     return mock_attractions()[0]
 
 
+# --------------------------
+# CRUD Tests
+# --------------------------
+
+
 # Test slug generation
 def test_AttractionsData_slug():
     # Arrange
@@ -36,24 +44,6 @@ def test_AttractionsData_slug():
 
     # Assert
     assert result == "rj_rio-de-janeiro"
-
-
-# Test retrieving more than 10 attractions from Yelp
-def test_YelpScrapper_get_near_attractions():
-    # Arrange
-    city_name = "São Paulo"
-    state_name = "SP"
-    start = 0
-    limit = 19
-
-    # Act
-    results = YelpScrapper().get_near_attractions(
-        city_name=city_name, state_name=state_name, start=start, limit=limit
-    )
-
-    # Assert
-    assert len(results) == limit
-    assert type(results[0]) == AttractionModel
 
 
 # Test saving attractions
@@ -93,3 +83,49 @@ def test_AttractionsData_get(app_data_get_mock):
     assert type(results[0]) == AttractionModel
     current_time = datetime.datetime.now()
     assert Utils.to_datetime(results[0].created_at) < current_time
+
+
+# --------------------------
+# Yelp Integration Tests
+# --------------------------
+
+
+# Test retrieving more than 10 attractions from Yelp
+def test_YelpScrapper_get_near_attractions():
+    # Arrange
+    city_name = "São Paulo"
+    state_name = "SP"
+    start = 0
+    limit = 19
+
+    # Act
+    results = YelpAttractionsScrapper().get_near_attractions(
+        city_name=city_name, state_name=state_name, start=start, limit=limit
+    )
+
+    # Assert
+    assert len(results) == limit
+    assert type(results[0]) == AttractionModel
+
+
+# --------------------------
+# Google Maps Attractions Integration Tests
+# --------------------------
+
+
+# Test retrieving more than 10 attractions from Google Maps
+def test_GoogleMapsScrapper_get_near_attractions():
+    # Arrange
+    city_name = "São Paulo"
+    state_name = "SP"
+    start = 0
+    limit = 19
+
+    # Act
+    results = GooglePlacesAttractionsScrapper().get_near_attractions(
+        city_name=city_name, state_name=state_name, start=start, limit=limit
+    )
+
+    # Assert
+    assert len(results) == limit
+    assert type(results[0]) == AttractionModel

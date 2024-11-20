@@ -14,29 +14,6 @@ def mock_itinerary() -> list[DailyItineraryModel]:
     attraction_data = mock_trip_dict()["itinerary"]
     return [DailyItineraryModel(**attraction) for attraction in attraction_data]
 
-    # itinerary = {
-    #     "date": datetime.now(),
-    #     "title": "Day 1",
-    #     "items": [
-    #         {
-    #             "start_time": time(8, 0),
-    #             "end_time": time(10, 0),
-    #             "location": "Test",
-    #             "title": "Test",
-    #             "description": "Test",
-    #         },
-    #         {
-    #             "start_time": time(10, 0),
-    #             "end_time": time(12, 0),
-    #             "location": "Test 2",
-    #             "title": "Test 3",
-    #             "description": "Test 5",
-    #         },
-    #     ],
-    # }
-    # return [DailyItineraryModel(**itinerary)]
-
-
 def mock_activity():
     activity = mock_itinerary()[0].items[0].model_dump()
     return ActivityModel(**activity)

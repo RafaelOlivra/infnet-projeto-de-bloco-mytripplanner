@@ -5,7 +5,7 @@ import pandas as pd
 
 from services.OpenWeatherMap import OpenWeatherMap
 from services.GoogleMaps import GoogleMaps
-from services.YelpScrapper import YelpScrapper
+from app.services.YelpAttractionsScrapper import YelpAttractionsScrapper
 
 from models.Attraction import AttractionModel
 
@@ -113,7 +113,7 @@ def yelp_example():
     )
 
     # Create YelpScrapper instance
-    yelp = YelpScrapper()
+    yelp = YelpAttractionsScrapper()
 
     # Get Attractions JSON
     st.write("### Atrações Perto de Sorocaba-SP")

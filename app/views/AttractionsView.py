@@ -2,7 +2,9 @@ import streamlit as st
 import datetime
 import random
 
-from services.YelpScrapper import YelpScrapper
+from services.YelpAttractionsScrapper import YelpAttractionsScrapper
+from services.GooglePlacesAttractionsScrapper import GooglePlacesAttractionsScrapper
+
 from services.AttractionsData import AttractionsData
 from services.Logger import _log
 from lib.Utils import Utils
@@ -169,9 +171,16 @@ class AttractionsView:
         Returns:
             list[Attraction]: List of Attraction objects.
         """
-        attractions = YelpScrapper().get_near_attractions(
+        # Try to fetch the attractions from Google Places first
+        attractions = GooglePlacesAttractionsScrapper().get_near_attractions(
             self.city_name, self.state_name, self.start, self.limit
         )
+
+        # If no attractions are found, try fetching from Yelp
+        if not attractions:
+            attractions = YelpAttractionsScrapper().get_near_attractions(
+                self.city_name, self.state_name, self.start, self.limit
+            )
 
         # Save the attractions data
         AttractionsData().save(slug=self.slug, attractions=attractions)

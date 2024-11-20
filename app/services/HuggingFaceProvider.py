@@ -48,7 +48,7 @@ class HuggingFaceProvider(AiProvider):
         )
 
         try:
-            _log("HuggingFace: Generating content...")
+            _log("[HuggingFace] Generating content...")
 
             # Count the time taken to generate the content
             start_time = time.time()
@@ -64,7 +64,7 @@ class HuggingFaceProvider(AiProvider):
             end_time = time.time()
             time_taken = end_time - start_time
 
-            _log("HuggingFace: Content ready! Time taken: {:.2f} seconds".format(time_taken))
+            _log("[HuggingFace] Content ready! Time taken: {:.2f} seconds".format(time_taken))
 
             # Clean the response and return it
             return {

@@ -30,7 +30,7 @@ class SentimentAnalyzer(AiProvider):
 
     def ask(self, prompt: str) -> dict[str, str]:
         try:
-            _log("HuggingFace: Performing sentiment analysis...")
+            _log("[HuggingFace] Performing sentiment analysis...")
 
             # Count the time taken to generate the content
             start_time = time.time()
@@ -43,7 +43,7 @@ class SentimentAnalyzer(AiProvider):
             time_taken = end_time - start_time
 
             _log(
-                "HuggingFace: Analysis is ready! Time taken: {:.2f} seconds".format(
+                "[HuggingFace] Analysis is ready! Time taken: {:.2f} seconds".format(
                     time_taken
                 )
             )
