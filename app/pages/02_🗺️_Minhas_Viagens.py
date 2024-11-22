@@ -14,26 +14,43 @@ from views.TripView import TripView
 if "selected_trip_id" not in st.session_state:
     st.session_state.selected_trip_id = None
 
-if "feedback_text" not in st.session_state:
-    st.session_state.feedback_text = None
-
 
 def set_selected_trip_id(selected_trip_id):
     if selected_trip_id != st.session_state.selected_trip_id:
         st.session_state.selected_trip_id = selected_trip_id
         st.session_state.feedback_text = None
+        st.session_state.old_feedback_text = None
         st.rerun()
 
 
-def update_feedback_text(feedback_text):
-    if feedback_text != st.session_state.feedback_text:
-        st.session_state.feedback_text = feedback_text
-        st.rerun()
+if "feedback_text" not in st.session_state:
+    st.session_state.feedback_text = None
 
+if "old_feedback_text" not in st.session_state:
+    st.session_state.old_feedback_text = None
+
+
+def get_feedback_text():
+    return st.session_state.feedback_text
+
+
+def set_feedback_text(feedback_text):
+    st.session_state.feedback_text = feedback_text
+
+
+def get_old_feedback_text():
+    return st.session_state.old_feedback_text
+
+
+def set_old_feedback_text(old_feedback_text):
+    if old_feedback_text != get_old_feedback_text():
+        st.session_state.old_feedback_text = old_feedback_text
 
 # --------------------------
 # View Trip Data
 # --------------------------
+
+
 def View_Trip():
     # Set page title
     st.set_page_config(
@@ -65,7 +82,8 @@ def View_Trip():
             # Display a select box for the available trips, if the selected trip is not in the available trips
             # the first trip in the list will be selected by default.
             # Options can have the same name, but the id is unique. So we add a prefix to the title to make it unique.
-            options = [f"{trip['title']} ({trip['id']})" for trip in available_trips]
+            options = [
+                f"{trip['title']} ({trip['id']})" for trip in available_trips]
 
             # Check selected_trip_id is contained in the options and set the selected index
             # The first trip in the list will be selected by default
@@ -98,7 +116,8 @@ def View_Trip():
     trip = Trip(trip_id=selected_trip_id)
 
     # Render the selected trip
-    TripView(trip).render_trip()
+    tip_view = TripView(trip)
+    tip_view.render_trip()
 
     # Allow users to export the trip data
     st.write("---")
@@ -130,24 +149,47 @@ def View_Trip():
     st.write("Deixe seu feedback sobre a viagem.")
 
     if trip.is_expired():
-        feedback_text = st.session_state.feedback_text
-        if not feedback_text:
+        feedback_text = get_feedback_text()
+        if feedback_text is None:
             feedback_text = trip.get_meta("feedback")
 
-        feedback_text = st.text_area(
-            "Feedback", key="send_feedback", value=feedback_text
-        )
-        if st.button(
-            "Enviar Feedback",
-            key="send_feedback_btn",
-            type="primary",
-            use_container_width=True,
-        ):
-            trip.update_meta("feedback", feedback_text)
-            st.success("Feedback atualizado com sucesso!")
-            update_feedback_text(feedback_text)
+        # Display the current feedback text if available
+        if feedback_text:
+            with st.container(border=True):
+                st.text(f"{feedback_text}")
+                set_old_feedback_text(feedback_text)
+
+            if st.button(
+                "Editar Feedback",
+                key="edit_feedback_btn",
+                type="secondary",
+                use_container_width=True,
+            ):
+                set_feedback_text("")
+                set_old_feedback_text(feedback_text)
+                st.rerun()
+
+        # Allow users to add/update the feedback
+        if not feedback_text:
+            feedback_text = st.text_area(
+                "Feedback", key="send_feedback", value=get_old_feedback_text()
+            )
+            if st.button(
+                "Enviar Feedback",
+                key="send_feedback_btn",
+                type="primary",
+                use_container_width=True,
+            ):
+                trip.update_meta("feedback", feedback_text)
+
+                st.success("Feedback atualizado com sucesso!")
+                set_feedback_text(feedback_text)
+                set_old_feedback_text(feedback_text)
+                st.rerun()
+
     else:
-        st.warning("💡 Você poderá deixar seu feedback assim que a viagem terminar.")
+        st.warning(
+            "💡 Você poderá deixar seu feedback assim que a viagem terminar.")
 
     # Allow users to delete the trip
     st.write("---")
@@ -155,7 +197,8 @@ def View_Trip():
     st.write("Clique no botão abaixo para deletar a viagem.")
     st.error("**Atenção:** Esta ação é irreversível.")
 
-    confirm_delete = st.checkbox("Confirmar a exclusão da viagem", key="confirm_delete")
+    confirm_delete = st.checkbox(
+        "Confirmar a exclusão da viagem", key="confirm_delete")
     if (
         st.button(
             "Deletar Viagem",

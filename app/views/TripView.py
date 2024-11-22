@@ -211,3 +211,16 @@ class TripView:
         if self.trip_model.notes:
             with st.container(border=True):
                 st.text(f"{self.trip_model.notes}")
+
+    def render_feedback(self):
+        """
+        Render the trip feedback.
+        """
+        if not self.trip_model:
+            return
+
+        # Display feedback
+        feedback = self.trip.get_meta("feedback")
+        if feedback:
+            with st.container(border=True):
+                st.text(f"{feedback}")
