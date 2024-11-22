@@ -42,8 +42,7 @@ class AiProvider:
         self.trip_model = None
 
     def ask(self, prompt: str) -> dict[str, str]:
-        raise NotImplementedError(
-            "Ask method must be implemented in child class")
+        raise NotImplementedError("Ask method must be implemented in child class")
 
     def prepare(
         self,
@@ -247,8 +246,7 @@ class AiProvider:
 
         locations = ""
         for attraction in attractions_list:
-            locations += f"* {attraction.name} - {
-                attraction.city_name}, {attraction.state_name} \n"
+            locations += f"* {attraction.name} - {attraction.city_name}, {attraction.state_name} \n"
         return locations
 
     def _generate_itinerary_summary(self, itinerary: List[DailyItineraryModel]) -> str:
