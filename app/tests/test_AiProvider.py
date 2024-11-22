@@ -138,13 +138,11 @@ def test_generate_itinerary_summary():
     _log(summary, level="DEBUG")
 
     # Check for the presence of the test strings
-    test_summary = f"### {Utils.to_date_string(
-        itinerary[0].date, format='display')} - {itinerary[0].title} \n"
+    test_summary = f"### {Utils.to_date_string(itinerary[0].date, format='display')} - {itinerary[0].title} \n"
     assert test_summary in summary
 
     activity = itinerary[0].items[0]
-    test_summary = f"* [{Utils.to_time_string(activity.start_time)} - {
-        Utils.to_time_string(activity.end_time)}] {activity.title} | {activity.location}"
+    test_summary = f"* [{Utils.to_time_string(activity.start_time)} - {Utils.to_time_string(activity.end_time)}] {activity.title} | {activity.location}"
 
     assert test_summary in summary
 
@@ -156,8 +154,7 @@ def test_full_trip_template_replace():
     test_prompt = "%%TRIP_JSON%%"
     ai_provider.prepare(trip_model=trip_model)
 
-    final_prompt = ai_provider._generate_prompt_from_template(
-        base_prompt=test_prompt)
+    final_prompt = ai_provider._generate_prompt_from_template(base_prompt=test_prompt)
     _log(final_prompt, level="DEBUG")
 
     assert "destination_city" in final_prompt
@@ -381,8 +378,7 @@ def test_sentiment_analysis_init():
 # Test the ask method with a "negative" prompt
 def test_sentiment_analysis_negative():
     ai_provider = SentimentAnalyzer()
-    sentiment = ai_provider.analyze_sentiment(
-        "I hate this movie, it's terrible!")
+    sentiment = ai_provider.analyze_sentiment("I hate this movie, it's terrible!")
     assert sentiment is not None
     assert sentiment != ""
     assert "NEGATIVE" in sentiment
