@@ -317,28 +317,14 @@ def View_Stats():
     st.write("#### 👤 Usuários")
 
     # Stopwords
-    stopwords_pt_br = """
-    a à agora aí ainda além algumas algo algumas alguns ali ano anos ante antes 
-    ao aos apenas apoio após aquela aquelas aquele aqueles aqui aquilo as às assim 
-    até atrás bem bom cada cá casa caso coisa com como comprido conhecido contra 
-    contudo custa da daquele daqueles das de debaixo dela delas dele deles demais 
-    dentro depois desde dessa dessas desse desses desta destas deste destes deve 
-    devem devendo dever deverá deverão deveria deveriam devia deviam disse disso disto 
-    dito diz dizem do dois dos doze duas durante e é ela elas ele eles em 
-    embora enquanto entre era eram essa essas esse esses esta está estamos estão 
-    estar estas estava estavam este estes estou eu fazer faz fiz foi for foram 
-    fosse foram fui há isso isto já la lá lhe lhes lo mais maior mas me 
-    mesma mesmas mesmo mesmos meu meus minha minhas muito muitos na não nas 
-    nem nenhum nessa nessas neste nossos nossa nossas num numa nós o os onde 
-    ou outra outras outro outros para pela pelas pelo pelos perante pode poder 
-    poderá podia podia pois por porque portanto pouco poucos pra qual qualquer 
-    quando quanto que quem ser se seja sejam sem sempre sendo seu seus só 
-    sob sobre sua suas tal também tanta tantas tanto tão te tem tendo tenha 
-    ter teu teus tive tivemos tiver tiveram tivesse tivessem tiveste tivestes toda 
-    todas todo todos tu tua tuas tudo último um uma umas uns vendo ver 
-    vez vindo vir você vocês vos
-    """
-    stopwords_pt_br = stopwords_pt_br.split()
+    stopwords = ""
+    stopwords_file = AppData().get_config("stopwords_file")
+
+    # Load the stopwords file
+    with open(stopwords_file, "r", encoding="utf-8") as file:
+        stopwords = file.read()
+
+    stopwords = stopwords.split()
 
     # --------------------------
     # Do sentiment analysis on the trips
@@ -384,9 +370,7 @@ def View_Stats():
         if feedback:
             feedback_words = re.sub(r"[^\w\s]", "", feedback.lower()).split()
             # remove stopwords
-            feedback_words = [
-                word for word in feedback_words if word not in stopwords_pt_br
-            ]
+            feedback_words = [word for word in feedback_words if word not in stopwords]
             if destination not in words_by_destination:
                 words_by_destination[destination] = []
             words_by_destination[destination].extend(feedback_words)
@@ -465,7 +449,7 @@ def View_Stats():
         """
     )
     st.image(
-        generate_wordcloud(words=words, stopwords=stopwords_pt_br),
+        generate_wordcloud(words=words, stopwords=stopwords),
         use_column_width=True,
     )
 
