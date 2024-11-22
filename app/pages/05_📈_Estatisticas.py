@@ -37,11 +37,15 @@ def View_Stats():
 
     # Show metrics for the overall project
 
+    trips = TripData().get_all_trips()
+
+    ######################## Trip Stats ########################
+
     # --------------------------
-    # Overall Stats
+    # Total trips
     # --------------------------
 
-    trips = TripData().get_all_trips()
+    st.write("#### 🧳 Viagens")
 
     # Total users
     with st.container(border=True):
@@ -72,11 +76,7 @@ def View_Stats():
     # --------------------------
     # Plotly Graphs with Trips by City
     # --------------------------
-    st.write(
-        """
-        ###### Total de Viagens por Cidade
-        """
-    )
+    st.write("###### Total de Viagens por Cidade")
 
     ##### Plot the a map with most visited cities
 
@@ -140,14 +140,91 @@ def View_Stats():
     st.pydeck_chart(r)
 
     # --------------------------
+    # Bar with the number os trips by month and year
+    # --------------------------
+    trips_by_month = {}
+    for trip_model in trips:
+        month = trip_model.start_date.strftime("%b %Y")
+        if month not in trips_by_month:
+            trips_by_month[month] = 0
+        trips_by_month[month] += 1
+
+    try:
+        # Plot a bar chart with the number of trips by month
+        fig = px.bar(
+            x=list(trips_by_month.keys()),
+            y=list(trips_by_month.values()),
+            labels={"x": "Mês", "y": "Número de Viagens"},
+            title="Viagens por Mês",
+        )
+        st.plotly_chart(fig)
+    except ValueError:
+        st.write("Nenhuma viagem encontrada.")
+
+    # --------------------------
+    # Pie chart with the number with the transport used
+    # --------------------------
+    col1, col2 = st.columns(2)
+    transport_tracker = []
+    for trip_model in trips:
+        transport = trip_model.travel_by
+        if transport not in transport_tracker:
+            transport_tracker.append(transport)
+
+    transport_count = {}
+    transport_labels = Trip()._get_travel_by_options()
+    for transport in transport_tracker:
+        transport_name = transport_labels[transport]
+        transport_count[transport_name] = 0
+        for trip_model in trips:
+            if trip_model.travel_by == transport:
+                transport_count[transport_name] += 1
+
+    try:
+        # Plot a pie chart
+        fig = px.pie(
+            values=list(transport_count.values()),
+            names=list(transport_count.keys()),
+            title="Meio de Transporte Utilizado",
+        )
+        col1.plotly_chart(fig)
+
+    except ValueError:
+        col1.write("Nenhuma viagem encontrada.")
+
+    # --------------------------
+    # Pier chart with most common weather conditions
+    # --------------------------
+    weather_tracker = {}
+    for trip_model in trips:
+        weather = trip_model.weather
+        if weather:
+            for forecast in weather:
+                condition = forecast.weather
+                if condition not in weather_tracker:
+                    weather_tracker[condition] = 0
+                weather_tracker[condition] += 1
+
+    try:
+        # Plot a pie chart
+        fig = px.pie(
+            values=list(weather_tracker.values()),
+            names=list(weather_tracker.keys()),
+            title="Condições do Tempo",
+        )
+        col2.plotly_chart(fig)
+    except ValueError:
+        col2.write("Nenhuma condição do tempo encontrada.")
+
+    ######################## Attractions ########################
+
+    st.write("#### 🚩 Atrações")
+
+    # --------------------------
     # Plotly Graphs with Attractions by City
     # --------------------------
     st.write("")
-    st.write(
-        """
-        ###### Total de Atrações por Cidade
-        """
-    )
+    st.write("###### Total de Atrações por Cidade")
 
     ##### Plot the a map with the attractions by city
 
@@ -235,6 +312,34 @@ def View_Stats():
     except ValueError:
         st.write("Nenhuma atração encontrada.")
 
+    ######################## Users ########################
+
+    st.write("#### 👤 Usuários")
+
+    # Stopwords
+    stopwords_pt_br = """
+    a à agora aí ainda além algumas algo algumas alguns ali ano anos ante antes 
+    ao aos apenas apoio após aquela aquelas aquele aqueles aqui aquilo as às assim 
+    até atrás bem bom cada cá casa caso coisa com como comprido conhecido contra 
+    contudo custa da daquele daqueles das de debaixo dela delas dele deles demais 
+    dentro depois desde dessa dessas desse desses desta destas deste destes deve 
+    devem devendo dever deverá deverão deveria deveriam devia deviam disse disso disto 
+    dito diz dizem do dois dos doze duas durante e é ela elas ele eles em 
+    embora enquanto entre era eram essa essas esse esses esta está estamos estão 
+    estar estas estava estavam este estes estou eu fazer faz fiz foi for foram 
+    fosse foram fui há isso isto já la lá lhe lhes lo mais maior mas me 
+    mesma mesmas mesmo mesmos meu meus minha minhas muito muitos na não nas 
+    nem nenhum nessa nessas neste nossos nossa nossas num numa nós o os onde 
+    ou outra outras outro outros para pela pelas pelo pelos perante pode poder 
+    poderá podia podia pois por porque portanto pouco poucos pra qual qualquer 
+    quando quanto que quem ser se seja sejam sem sempre sendo seu seus só 
+    sob sobre sua suas tal também tanta tantas tanto tão te tem tendo tenha 
+    ter teu teus tive tivemos tiver tiveram tivesse tivessem tiveste tivestes toda 
+    todas todo todos tu tua tuas tudo último um uma umas uns vendo ver 
+    vez vindo vir você vocês vos
+    """
+    stopwords_pt_br = stopwords_pt_br.split()
+
     # --------------------------
     # Do sentiment analysis on the trips
     # --------------------------
@@ -268,6 +373,54 @@ def View_Stats():
         st.write("Nenhum sentimento encontrado.")
 
     # --------------------------
+    # Crate a bar char with the most common words in the feedback,
+    # grouped  and colored by the trip destination
+    # --------------------------
+    words_by_destination = {}
+    for trip_model in trips:
+        trip = Trip().from_model(trip_model)
+        destination = trip_model.destination_city + ", " + trip_model.destination_state
+        feedback = trip.get_meta("feedback")
+        if feedback:
+            feedback_words = re.sub(r"[^\w\s]", "", feedback.lower()).split()
+            # remove stopwords
+            feedback_words = [
+                word for word in feedback_words if word not in stopwords_pt_br
+            ]
+            if destination not in words_by_destination:
+                words_by_destination[destination] = []
+            words_by_destination[destination].extend(feedback_words)
+
+    # Create a DataFrame
+    df = pd.DataFrame(
+        [
+            {"Destination": dest, "Word": word}
+            for dest, words in words_by_destination.items()
+            for word in words
+        ]
+    )
+
+    # Count occurrences of words per destination
+    word_counts = df.groupby(["Destination", "Word"]).size().reset_index(name="Count")
+
+    # Plotting with Plotly
+    fig = px.bar(
+        word_counts,
+        x="Word",
+        y="Count",
+        color="Destination",
+        barmode="group",
+        title="Palavras mais Comuns nos Feedbacks (Por Destino)",
+        labels={"Word": "Feedback", "Count": "Contagem"},
+    )
+
+    fig.update_layout(
+        xaxis_title="Words", yaxis_title="Count", legend_title="Destination"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # --------------------------
     # Word Cloud with words from the trips
     # --------------------------
     words = []
@@ -290,30 +443,6 @@ def View_Stats():
         words.extend(get_words(trip_model.destination_state))
         words.extend(get_words(trip_model.goals))
         words.extend(get_words(trip_model.notes))
-
-    # Stopwords
-    stopwords_pt_br = """
-    a à agora aí ainda além algumas algo algumas alguns ali ano anos ante antes 
-    ao aos apenas apoio após aquela aquelas aquele aqueles aqui aquilo as às assim 
-    até atrás bem bom cada cá casa caso coisa com como comprido conhecido contra 
-    contudo custa da daquele daqueles das de debaixo dela delas dele deles demais 
-    dentro depois desde dessa dessas desse desses desta destas deste destes deve 
-    devem devendo dever deverá deverão deveria deveriam devia deviam disse disso disto 
-    dito diz dizem do dois dos doze duas durante e é ela elas ele eles em 
-    embora enquanto entre era eram essa essas esse esses esta está estamos estão 
-    estar estas estava estavam este estes estou eu fazer faz fiz foi for foram 
-    fosse foram fui há isso isto já la lá lhe lhes lo mais maior mas me 
-    mesma mesmas mesmo mesmos meu meus minha minhas muito muitos na não nas 
-    nem nenhum nessa nessas neste nossos nossa nossas num numa nós o os onde 
-    ou outra outras outro outros para pela pelas pelo pelos perante pode poder 
-    poderá podia podia pois por porque portanto pouco poucos pra qual qualquer 
-    quando quanto que quem ser se seja sejam sem sempre sendo seu seus só 
-    sob sobre sua suas tal também tanta tantas tanto tão te tem tendo tenha 
-    ter teu teus tive tivemos tiver tiveram tivesse tivessem tiveste tivestes toda 
-    todas todo todos tu tua tuas tudo último um uma umas uns vendo ver 
-    vez vindo vir você vocês vos
-    """
-    stopwords_pt_br = stopwords_pt_br.split()
 
     # Create the word cloud
     @st.cache_data(ttl=60 * 60 * 24, show_spinner=True)

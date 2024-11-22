@@ -46,6 +46,7 @@ def set_old_feedback_text(old_feedback_text):
     if old_feedback_text != get_old_feedback_text():
         st.session_state.old_feedback_text = old_feedback_text
 
+
 # --------------------------
 # View Trip Data
 # --------------------------
@@ -82,8 +83,7 @@ def View_Trip():
             # Display a select box for the available trips, if the selected trip is not in the available trips
             # the first trip in the list will be selected by default.
             # Options can have the same name, but the id is unique. So we add a prefix to the title to make it unique.
-            options = [
-                f"{trip['title']} ({trip['id']})" for trip in available_trips]
+            options = [f"{trip['title']} ({trip['id']})" for trip in available_trips]
 
             # Check selected_trip_id is contained in the options and set the selected index
             # The first trip in the list will be selected by default
@@ -146,7 +146,9 @@ def View_Trip():
     # Add Feedback field
     st.write("---")
     st.write("### 📝 Feedback")
-    st.write("Deixe seu feedback sobre a viagem.")
+    st.write(
+        "Deixe seu feedback sobre a viagem. Informe problemas que ocorreram, o que você gostou, o que não gostou e o que pode melhorar."
+    )
 
     if trip.is_expired():
         feedback_text = get_feedback_text()
@@ -188,8 +190,7 @@ def View_Trip():
                 st.rerun()
 
     else:
-        st.warning(
-            "💡 Você poderá deixar seu feedback assim que a viagem terminar.")
+        st.warning("💡 Você poderá deixar seu feedback assim que a viagem terminar.")
 
     # Allow users to delete the trip
     st.write("---")
@@ -197,8 +198,7 @@ def View_Trip():
     st.write("Clique no botão abaixo para deletar a viagem.")
     st.error("**Atenção:** Esta ação é irreversível.")
 
-    confirm_delete = st.checkbox(
-        "Confirmar a exclusão da viagem", key="confirm_delete")
+    confirm_delete = st.checkbox("Confirmar a exclusão da viagem", key="confirm_delete")
     if (
         st.button(
             "Deletar Viagem",

@@ -5,6 +5,7 @@ from datetime import datetime, date, timedelta
 
 from services.OpenWeatherMap import OpenWeatherMap
 from services.GeminiProvider import GeminiProvider
+from services.OpenAIProvider import OpenAIProvider
 from lib.Utils import Utils
 
 from models.Itinerary import DailyItineraryModel, ActivityModel
@@ -67,7 +68,7 @@ class ItineraryView:
         attractions_list: List[AttractionModel] = None,
     ) -> List[DailyItineraryModel]:
 
-        ai_provider = GeminiProvider()
+        ai_provider = OpenAIProvider()
         ai_provider.prepare(
             location=location,
             start_date=start_date,

@@ -42,8 +42,7 @@ class AiProvider:
         self.trip_model = None
 
     def ask(self, prompt: str) -> dict[str, str]:
-        raise NotImplementedError(
-            "Ask method must be implemented in child class")
+        raise NotImplementedError("Ask method must be implemented in child class")
 
     def prepare(
         self,

@@ -17,7 +17,7 @@ class OpenAIProvider(AiProvider):
 
         openai.api_key = self.api_key
         self.model_name = "gpt-4o-mini"
-        self.max_tokens = 1000
+        self.max_tokens = 1500
 
     def ask(self, prompt: str) -> dict[str, str]:
         try:
@@ -41,11 +41,13 @@ class OpenAIProvider(AiProvider):
             time_taken = end_time - start_time
 
             _log(
-                "[OpenAI] Content ready! Time taken: {:.2f} seconds".format(
-                    time_taken)
+                "[OpenAI] Content ready! Time taken: {:.2f} seconds".format(time_taken)
             )
 
-            return {"response": response.choices[0].message.content, "provider": "OpenAI"}
+            return {
+                "response": response.choices[0].message.content,
+                "provider": "OpenAI",
+            }
         except Exception as e:
             _log(f"{str(e)}", level="ERROR")
             return None
