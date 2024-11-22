@@ -71,22 +71,22 @@ class TripView:
         col1, col2 = st.columns(2)
         with col1.container(border=True):
             st.write(
-                f"##### 🏠 Origem: {self.trip_model.origin_city}, {
-                    self.trip_model.origin_state}"
+                f"""##### 🏠 Origem: {self.trip_model.origin_city}, {
+                    self.trip_model.origin_state}"""
             )
             st.write(
-                f"📆 Partida: {Utils.to_date_string(
-                    self.trip_model.start_date, format='display')}"
+                f"""📆 Partida: {Utils.to_date_string(
+                    self.trip_model.start_date, format='display')}"""
             )
 
         with col2.container(border=True):
             st.write(
-                f"##### 📍 Destino: {self.trip_model.destination_city}, {
-                    self.trip_model.destination_state}"
+                f"""##### 📍 Destino: {self.trip_model.destination_city}, {
+                    self.trip_model.destination_state}"""
             )
             st.write(
-                f"📆 Retorno: {Utils.to_date_string(
-                    self.trip_model.end_date, format='display')}"
+                f"""📆 Retorno: {Utils.to_date_string(
+                    self.trip_model.end_date, format='display')}"""
             )
 
     def render_title(self):
@@ -141,10 +141,10 @@ class TripView:
 
         # Display Google Maps directions iframe
         google_maps = GoogleMaps()
-        origin = f"{self.trip_model.origin_city}, {
-            CityStateData().uf_to_state(self.trip_model.origin_state)}"
-        destination = f"{self.trip_model.destination_city}, {
-            CityStateData().uf_to_state(self.trip_model.destination_state)}"
+        origin = f"""{self.trip_model.origin_city}, {
+            CityStateData().uf_to_state(self.trip_model.origin_state)}"""
+        destination = f"""{self.trip_model.destination_city}, {
+            CityStateData().uf_to_state(self.trip_model.destination_state)}"""
         iframe_url = google_maps.get_google_maps_directions_iframe_url(
             origin, destination, mode=self.trip_model.travel_by
         )
