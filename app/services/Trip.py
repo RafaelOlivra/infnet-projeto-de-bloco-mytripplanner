@@ -334,9 +334,7 @@ class Trip:
             return Trip(trip_data=data, date_verify=False)
         except Exception as e:
             raise ValueError(
-                f"The CSV data is not in the correct format. Please check the data and try again. {
-                    e}"
-            )
+                f"The CSV data is not in the correct format. Please check the data and try again. {e}")
 
     def from_model(self, trip_model: TripModel) -> "Trip":
         if not trip_model:
