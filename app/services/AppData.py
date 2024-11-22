@@ -78,6 +78,7 @@ class AppData:
             "fastapi": "FASTAPI_KEYS",
             "huggingface": "HUGGINGFACE_API_KEY",
             "googlegemini": "GEMINY_API_KEY",
+            "openai": "OPENAI_API_KEY",
         }
 
         try:
@@ -162,7 +163,8 @@ class AppData:
                     if isinstance(data, str):
                         data = json.loads(data)
                 except Exception as e:
-                    _log(f"Error loading data from {file_path}: {e}", level="ERROR")
+                    _log(f"Error loading data from {
+                         file_path}: {e}", level="ERROR")
                     data = None
             return data
         return None

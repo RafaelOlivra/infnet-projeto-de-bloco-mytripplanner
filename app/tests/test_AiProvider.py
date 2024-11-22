@@ -6,6 +6,7 @@ from services.AiProvider import AiProvider
 from services.Logger import _log
 from services.HuggingFaceProvider import HuggingFaceProvider
 from services.GeminiProvider import GeminiProvider
+from services.OpenAIProvider import OpenAIProvider
 from services.SentimentAnalysisProvider import SentimentAnalyzer
 
 from tests.test_Trip import mock_trip_model, mock_trip
@@ -137,11 +138,13 @@ def test_generate_itinerary_summary():
     _log(summary, level="DEBUG")
 
     # Check for the presence of the test strings
-    test_summary = f"### {Utils.to_date_string(itinerary[0].date, format='display')} - {itinerary[0].title} \n"
+    test_summary = f"### {Utils.to_date_string(
+        itinerary[0].date, format='display')} - {itinerary[0].title} \n"
     assert test_summary in summary
 
     activity = itinerary[0].items[0]
-    test_summary = f"* [{Utils.to_time_string(activity.start_time)} - {Utils.to_time_string(activity.end_time)}] {activity.title} | {activity.location}"
+    test_summary = f"* [{Utils.to_time_string(activity.start_time)} - {
+        Utils.to_time_string(activity.end_time)}] {activity.title} | {activity.location}"
 
     assert test_summary in summary
 
@@ -153,7 +156,8 @@ def test_full_trip_template_replace():
     test_prompt = "%%TRIP_JSON%%"
     ai_provider.prepare(trip_model=trip_model)
 
-    final_prompt = ai_provider._generate_prompt_from_template(base_prompt=test_prompt)
+    final_prompt = ai_provider._generate_prompt_from_template(
+        base_prompt=test_prompt)
     _log(final_prompt, level="DEBUG")
 
     assert "destination_city" in final_prompt
@@ -314,6 +318,58 @@ def test_gemini_generate_trip_summary():
 
 
 # --------------------------
+# OpenAi Tests
+# --------------------------
+def test_openai_provider_init():
+    ai_provider = OpenAIProvider()
+    assert ai_provider.api_key is not None
+    assert ai_provider.model_name is not None
+
+
+@pytest.mark.skip(
+    reason="We can skip this as it will be tested in the test_openai_generate_itinerary"
+)
+def test_openai_simple_response():
+    ai_provider = OpenAIProvider()
+
+    response = ai_provider.prompt("1+1 = ?")
+
+    _log(response, level="DEBUG")
+
+    assert response is not None
+    assert response != ""
+    assert "2" in response
+
+
+def test_openai_generate_itinerary():
+    ai_provider = OpenAIProvider()
+    itinerary_request = mock_ai_gen_itinerary_request()
+
+    ai_provider.prepare(**itinerary_request)
+    response = ai_provider.generate_itinerary()
+
+    # Test the response
+    _log(response, level="DEBUG")
+
+    assert response is not None
+    assert response != ""
+    assert type(response[0]) == DailyItineraryModel
+
+
+def test_openai_generate_trip_summary():
+    ai_provider = OpenAIProvider()
+    trip_model = mock_trip_model()
+
+    ai_provider.prepare(trip_model=trip_model)
+    trip_summary = ai_provider.generate_trip_summary()
+
+    _log(trip_summary, level="DEBUG")
+
+    assert trip_summary is not None
+    assert trip_summary != ""
+
+
+# --------------------------
 # Sentiment Analysis Tests
 # --------------------------
 # Test initialization
@@ -325,7 +381,8 @@ def test_sentiment_analysis_init():
 # Test the ask method with a "negative" prompt
 def test_sentiment_analysis_negative():
     ai_provider = SentimentAnalyzer()
-    sentiment = ai_provider.analyze_sentiment("I hate this movie, it's terrible!")
+    sentiment = ai_provider.analyze_sentiment(
+        "I hate this movie, it's terrible!")
     assert sentiment is not None
     assert sentiment != ""
     assert "NEGATIVE" in sentiment

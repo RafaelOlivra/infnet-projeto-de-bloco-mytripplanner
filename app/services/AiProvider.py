@@ -42,7 +42,8 @@ class AiProvider:
         self.trip_model = None
 
     def ask(self, prompt: str) -> dict[str, str]:
-        raise NotImplementedError("Ask method must be implemented in child class")
+        raise NotImplementedError(
+            "Ask method must be implemented in child class")
 
     def prepare(
         self,
@@ -68,13 +69,13 @@ class AiProvider:
             template_key="gen_itinerary_prompt"
         )
         response = self.ask(prompt=prompt)
+        _log(response, level="DEBUG")
         return self._to_itinerary(response) if response else []
 
     def generate_trip_summary(self) -> str:
         prompt = self._generate_prompt_from_template(
             template_key="gen_trip_summary_prompt"
         )
-        _log(prompt, level="DEBUG")
         response = self.ask(prompt=prompt)
         return response.get("response", "") if response else ""
 
@@ -246,7 +247,8 @@ class AiProvider:
 
         locations = ""
         for attraction in attractions_list:
-            locations += f"* {attraction.name} - {attraction.city_name}, {attraction.state_name} \n"
+            locations += f"* {attraction.name} - {
+                attraction.city_name}, {attraction.state_name} \n"
         return locations
 
     def _generate_itinerary_summary(self, itinerary: List[DailyItineraryModel]) -> str:
@@ -256,9 +258,11 @@ class AiProvider:
 
         summary = ""
         for day in itinerary:
-            summary += f"### {Utils.to_date_string(day.date, format='display')} - {day.title} \n"
+            summary += f"### {Utils.to_date_string(day.date, format='display')} - {
+                day.title} \n"
             for activity in day.items:
-                summary += f"* [{Utils.to_time_string(activity.start_time)} - {Utils.to_time_string(activity.end_time)}] {activity.title} | {activity.location}\n"
+                summary += f"* [{Utils.to_time_string(activity.start_time)} - {Utils.to_time_string(
+                    activity.end_time)}] {activity.title} | {activity.location}\n"
         return summary
 
     def _to_json(self, response: dict) -> dict:
