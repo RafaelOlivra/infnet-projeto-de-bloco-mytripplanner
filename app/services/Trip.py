@@ -460,7 +460,7 @@ class Trip:
     # --------------------------
     def is_expired(self) -> bool:
         end_date = Utils.to_datetime(self.get("end_date"))
-        return self.get("end_date") < datetime.now()
+        return end_date < datetime.now()
 
     def has_summary(self) -> bool:
         return bool(self.get_meta("summary_generated"))
