@@ -248,7 +248,7 @@ def View_Stats():
                 feedback = trip.get_meta("feedback")
                 if feedback:
                     sentiment = SentimentAnalyzer().analyze_sentiment(feedback)
-                    trip.set_meta("sentiment", sentiment)
+                    trip.save_meta("sentiment", sentiment)
                 else:
                     sentiment = "N/A"
             sentiments_tracker.append(sentiment)

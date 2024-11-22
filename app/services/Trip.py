@@ -12,6 +12,7 @@ from lib.Utils import Utils
 
 from services.TripData import TripData
 from services.OpenWeatherMap import OpenWeatherMap
+from services.OpenAIProvider import OpenAIProvider
 from services.Logger import _log
 
 from models.Weather import ForecastModel
@@ -24,7 +25,8 @@ class Trip:
     ):
         if trip_id:
             if not self._load(trip_id):
-                raise ValueError(f"Trip with ID {trip_id} could not be loaded.")
+                raise ValueError(
+                    f"Trip with ID {trip_id} could not be loaded.")
         elif trip_data:
             self.create(trip_data, date_verify=date_verify, save=save)
 
@@ -79,7 +81,8 @@ class Trip:
         # Get weather forecast for the trip if not provided
         if "weather" not in trip_data:
             trip_data["weather"] = OpenWeatherMap().get_forecast_for_next_5_days(
-                trip_data.get("destination_city"), trip_data.get("destination_state")
+                trip_data.get("destination_city"), trip_data.get(
+                    "destination_state")
             )
 
         # Only store weather that are within the trip dates
@@ -139,8 +142,10 @@ class Trip:
                 updated_data["destination_longitude"],
                 updated_data["destination_latitude"],
             ) = self._get_coordinates(
-                trip_data.get("destination_city", self.get("destination_city")),
-                trip_data.get("destination_state", self.get("destination_state")),
+                trip_data.get("destination_city",
+                              self.get("destination_city")),
+                trip_data.get("destination_state",
+                              self.get("destination_state")),
             )
 
         self.model = TripModel(**updated_data)
@@ -167,6 +172,10 @@ class Trip:
         except Exception as e:
             return None
 
+    def save_meta(self, meta_key: str, value) -> bool:
+        self.set_meta(meta_key, value)
+        return self._save()
+
     def set_meta(self, meta_key: str, value) -> bool:
         if not self.model:
             return False
@@ -182,10 +191,8 @@ class Trip:
         meta[meta_key] = value
         self.model.meta = meta
 
-        return self._save()
-
     def update_meta(self, meta_key: dict, value) -> bool:
-        return self.set_meta(meta_key, value)
+        return self.save_meta(meta_key, value)
 
     def delete_meta(self, meta_key: str) -> bool:
         if not self.model:
@@ -327,7 +334,8 @@ class Trip:
             return Trip(trip_data=data, date_verify=False)
         except Exception as e:
             raise ValueError(
-                f"The CSV data is not in the correct format. Please check the data and try again. {e}"
+                f"The CSV data is not in the correct format. Please check the data and try again. {
+                    e}"
             )
 
     def from_model(self, trip_model: TripModel) -> "Trip":
@@ -429,12 +437,37 @@ class Trip:
         except Exception as e:
             _log(f"Error deserializing base64: {str(e)}")
             return []
+    # --------------------------
+    # Ai Integration
+    # --------------------------
+
+    def _generate_summary(self) -> str:
+        if not self.model:
+            return ""
+
+        # Get the summary from the AI provider
+        ai_provider = OpenAIProvider()
+        ai_provider.prepare(trip_model=self.model)
+        summary = ai_provider.generate_trip_summary()
+
+        self.set_meta("summary_generated",
+                      Utils.to_date_string(datetime.now()))
+        self.model.summary = summary
+        return summary
+
+    def summarize(self) -> str:
+        self._generate_summary()
+        self._save()
+        return self.get("summary")
 
     # --------------------------
     # Utils
     # --------------------------
     def is_expired(self) -> bool:
         return self.get("end_date") < datetime.now()
+
+    def has_summary(self) -> bool:
+        return bool(self.get_meta("summary_generated"))
 
     @staticmethod
     def _calculate_trip_length(start_date: datetime = None, end_date: datetime = None):

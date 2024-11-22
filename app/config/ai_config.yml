@@ -72,7 +72,7 @@ gen_trip_summary_prompt: |
 
     Focus on the weather, the main activities, and the trip's vibe.
     The tone should be relaxed and inspiring.
-    The summary should be a single paragraph with a maximum of 80 words.
+    The summary should be a single paragraph with a maximum of 70 words.
 
     Examples of sumaries:
 
