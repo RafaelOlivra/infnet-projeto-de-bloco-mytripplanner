@@ -258,8 +258,8 @@ class AiProvider:
 
         summary = ""
         for day in itinerary:
-            summary += f"### {Utils.to_date_string(day.date, format='display')} - {
-                day.title} \n"
+            summary += f"""### {Utils.to_date_string(day.date, format='display')} - {
+                day.title} \n"""
             for activity in day.items:
                 summary += f"""* [{Utils.to_time_string(activity.start_time)} - {Utils.to_time_string(
                     activity.end_time)}] {activity.title} | {activity.location}\n"""
