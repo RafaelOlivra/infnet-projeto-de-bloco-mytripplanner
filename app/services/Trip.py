@@ -25,8 +25,7 @@ class Trip:
     ):
         if trip_id:
             if not self._load(trip_id):
-                raise ValueError(
-                    f"Trip with ID {trip_id} could not be loaded.")
+                raise ValueError(f"Trip with ID {trip_id} could not be loaded.")
         elif trip_data:
             self.create(trip_data, date_verify=date_verify, save=save)
 
@@ -81,8 +80,7 @@ class Trip:
         # Get weather forecast for the trip if not provided
         if "weather" not in trip_data:
             trip_data["weather"] = OpenWeatherMap().get_forecast_for_next_5_days(
-                trip_data.get("destination_city"), trip_data.get(
-                    "destination_state")
+                trip_data.get("destination_city"), trip_data.get("destination_state")
             )
 
         # Only store weather that are within the trip dates
@@ -142,10 +140,8 @@ class Trip:
                 updated_data["destination_longitude"],
                 updated_data["destination_latitude"],
             ) = self._get_coordinates(
-                trip_data.get("destination_city",
-                              self.get("destination_city")),
-                trip_data.get("destination_state",
-                              self.get("destination_state")),
+                trip_data.get("destination_city", self.get("destination_city")),
+                trip_data.get("destination_state", self.get("destination_state")),
             )
 
         self.model = TripModel(**updated_data)
@@ -334,7 +330,8 @@ class Trip:
             return Trip(trip_data=data, date_verify=False)
         except Exception as e:
             raise ValueError(
-                f"The CSV data is not in the correct format. Please check the data and try again. {e}")
+                f"The CSV data is not in the correct format. Please check the data and try again. {e}"
+            )
 
     def from_model(self, trip_model: TripModel) -> "Trip":
         if not trip_model:
@@ -435,6 +432,7 @@ class Trip:
         except Exception as e:
             _log(f"Error deserializing base64: {str(e)}")
             return []
+
     # --------------------------
     # Ai Integration
     # --------------------------
@@ -448,8 +446,7 @@ class Trip:
         ai_provider.prepare(trip_model=self.model)
         summary = ai_provider.generate_trip_summary()
 
-        self.set_meta("summary_generated",
-                      Utils.to_date_string(datetime.now()))
+        self.set_meta("summary_generated", Utils.to_date_string(datetime.now()))
         self.model.summary = summary
         return summary
 
@@ -462,6 +459,7 @@ class Trip:
     # Utils
     # --------------------------
     def is_expired(self) -> bool:
+        end_date = Utils.to_datetime(self.get("end_date"))
         return self.get("end_date") < datetime.now()
 
     def has_summary(self) -> bool:
