@@ -247,8 +247,8 @@ class AiProvider:
 
         locations = ""
         for attraction in attractions_list:
-            locations += f"* {attraction.name} - {
-                attraction.city_name}, {attraction.state_name} \n"
+            locations += f"""* {attraction.name} - {
+                attraction.city_name}, {attraction.state_name} \n"""
         return locations
 
     def _generate_itinerary_summary(self, itinerary: List[DailyItineraryModel]) -> str:
