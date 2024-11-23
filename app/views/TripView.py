@@ -5,6 +5,8 @@ import streamlit.components.v1 as components
 
 from services.GoogleMaps import GoogleMaps
 from services.CityState import CityStateData
+from services.Logger import _log
+
 from lib.Utils import Utils
 
 from views.WeatherView import WeatherView
@@ -185,6 +187,7 @@ class TripView:
             self.trip_model.start_date, self.trip_model.end_date
         )
         with st.container(border=True):
+            _log("Forecast", self.trip_model.weather)
             WeatherView(
                 city_name=self.trip_model.destination_city,
                 state_name=self.trip_model.destination_state,
