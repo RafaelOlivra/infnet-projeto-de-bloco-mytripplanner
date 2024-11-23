@@ -107,7 +107,7 @@ class TripView:
         if not self.trip_model:
             return
 
-        if (self.trip.has_summary()):
+        if self.trip.has_summary():
             summary = self.trip.get("summary")
         else:
             with st.spinner("🤖 Gerando resumo..."):

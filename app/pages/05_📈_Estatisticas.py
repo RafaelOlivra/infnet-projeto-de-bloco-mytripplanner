@@ -131,7 +131,7 @@ def View_Stats():
     )
 
     view_state = pdk.ViewState(
-        latitude=-19.793889, longitude=-47.882778, zoom=4.5, pitch=10, bearing=0
+        latitude=-15.793889, longitude=-47.882778, zoom=3.5, pitch=10, bearing=0
     )
 
     r = pdk.Deck(

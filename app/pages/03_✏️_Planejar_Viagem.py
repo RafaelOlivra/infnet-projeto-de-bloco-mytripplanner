@@ -2,6 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 import streamlit_tags as st_tags
 import datetime
+import time
 
 from services.Trip import Trip
 
@@ -383,6 +384,7 @@ def Cadastrar():
             # Change to the trip view
             st.session_state.selected_trip_id = trip.get("id")
             with st.spinner("Redirecionando..."):
+                time.sleep(2)
                 st.switch_page("pages/02_🗺️_Minhas_Viagens.py")
 
         else:
