@@ -77,6 +77,10 @@ def View_Stats():
     # Plotly Graphs with Trips by City
     # --------------------------
     st.write("###### Total de Viagens por Cidade")
+    st.write(
+        """Este mapa permite visualizar as cidades mais visitadas pelos usuários, representando a popularidade decada destino com base no número de viagens realizadas.
+        É útil para identificar tendências e locais com maior interesse dos viajantes."""
+    )
 
     ##### Plot the a map with most visited cities
 
@@ -142,6 +146,13 @@ def View_Stats():
     # --------------------------
     # Bar with the number os trips by month and year
     # --------------------------
+    st.write("")
+    st.write("###### Viagens por Mês")
+    st.write(
+        """Este gráfico de barras mostra o número de viagens realizadas por mês, permitindo identificar
+        sazonalidadese períodos de maior atividade no planejamento de viagens."""
+    )
+
     trips_by_month = {}
     for trip_model in trips:
         month = trip_model.start_date.strftime("%b %Y")
@@ -155,7 +166,7 @@ def View_Stats():
             x=list(trips_by_month.keys()),
             y=list(trips_by_month.values()),
             labels={"x": "Mês", "y": "Número de Viagens"},
-            title="Viagens por Mês",
+            title=None,
         )
         st.plotly_chart(fig)
     except ValueError:
@@ -164,7 +175,16 @@ def View_Stats():
     # --------------------------
     # Pie chart with the number with the transport used
     # --------------------------
+
     col1, col2 = st.columns(2)
+
+    col1.write("")
+    col1.write("###### Meio de Transporte Utilizado")
+    col1.write(
+        """Este gráfico de pizza apresenta os meios de transporte mais utilizados pelos viajantes,
+        ajudando a entender preferências e comportamentos de deslocamento."""
+    )
+
     transport_tracker = []
     for trip_model in trips:
         transport = trip_model.travel_by
@@ -185,7 +205,7 @@ def View_Stats():
         fig = px.pie(
             values=list(transport_count.values()),
             names=list(transport_count.keys()),
-            title="Meio de Transporte Utilizado",
+            title=None,
         )
         col1.plotly_chart(fig)
 
@@ -195,6 +215,13 @@ def View_Stats():
     # --------------------------
     # Pier chart with most common weather conditions
     # --------------------------
+    col2.write("")
+    col2.write("###### Condições do Tempo")
+    col2.write(
+        """Este gráfico ilustra as condições climáticas mais frequentes durante as viagens.
+        Isso é útil para identificar padrões de planejamento e condições mais comuns enfrentadas pelos usuários."""
+    )
+
     weather_tracker = {}
     for trip_model in trips:
         weather = trip_model.weather
@@ -210,7 +237,7 @@ def View_Stats():
         fig = px.pie(
             values=list(weather_tracker.values()),
             names=list(weather_tracker.keys()),
-            title="Condições do Tempo",
+            title=None,
         )
         col2.plotly_chart(fig)
     except ValueError:
@@ -225,6 +252,10 @@ def View_Stats():
     # --------------------------
     st.write("")
     st.write("###### Total de Atrações por Cidade")
+    st.write(
+        """Este mapa exibe o número de atrações turísticas por cidade, permitindo identificar
+        locais com maior oferta de atividades turísticas."""
+    )
 
     ##### Plot the a map with the attractions by city
 
@@ -287,6 +318,12 @@ def View_Stats():
     # --------------------------
     # Bar chart with the number of attractions by state
     # --------------------------
+    st.write("")
+    st.write("###### Atrações por Estado")
+    st.write(
+        """Este gráfico de barras mostra o número de atrações turísticas por estado,
+        útil para analisar a distribuição de pontos turísticos em uma região."""
+    )
 
     ##### Plot a bar chart with the number of attractions by state
     attractions_by_city = AttractionsData().get_attractions_by_city()
@@ -306,7 +343,7 @@ def View_Stats():
             x=list(attractions_count_by_state.keys()),
             y=list(attractions_count_by_state.values()),
             labels={"x": "UF", "y": "Número de Atrações"},
-            title="Atrações por Estado",
+            title=None,
         )
         st.plotly_chart(fig)
     except ValueError:
@@ -325,10 +362,19 @@ def View_Stats():
         stopwords = file.read()
 
     stopwords = stopwords.split()
+    stopwords = set(stopwords)
 
     # --------------------------
     # Do sentiment analysis on the trips
     # --------------------------
+
+    st.write("")
+    st.write("###### Análise de Sentimentos (Feedback das Viagens)")
+    st.write(
+        """Este gráfico apresenta a análise de sentimentos dos feedbacks das viagens. Ele ajuda a avaliar a satisfação geral dos
+        viajantes com o cenário turístico atual."""
+    )
+
     # Get the sentiment of the trips
     with st.spinner("Analisando sentimentos..."):
         sentiments_tracker = []
@@ -352,7 +398,7 @@ def View_Stats():
         fig = px.pie(
             df,
             names="Sentimento",
-            title="Análise de Sentimentos (Feedback das Viagens)",
+            title=None,
         )
         st.plotly_chart(fig)
     except ValueError:
@@ -362,6 +408,15 @@ def View_Stats():
     # Crate a bar char with the most common words in the feedback,
     # grouped  and colored by the trip destination
     # --------------------------
+
+    st.write("")
+    st.write("###### Palavras mais Comuns nos Feedbacks (Por Destino)")
+    st.write(
+        """Este gráfico de barras agrupa as palavras mais comuns nos feedbacks dos usuários, categorizadas por destino,
+        oferecendo insights qualitativos sobre as experiências de viagem. Por exemplo, palavras negativas podem indicar
+        áreas de melhoria."""
+    )
+
     words_by_destination = {}
     for trip_model in trips:
         trip = Trip().from_model(trip_model)
@@ -394,7 +449,7 @@ def View_Stats():
         y="Count",
         color="Destination",
         barmode="group",
-        title="Palavras mais Comuns nos Feedbacks (Por Destino)",
+        title=None,
         labels={"Word": "Feedback", "Count": "Contagem"},
     )
 
@@ -407,6 +462,13 @@ def View_Stats():
     # --------------------------
     # Word Cloud with words from the trips
     # --------------------------
+    st.write("")
+    st.write("###### Nuvem de Palavras")
+    st.write(
+        """A nuvem de palavras exibe os termos mais recorrentes nos feedbacks, destacando palavras-chave
+        que resumem as experiências dos usuários."""
+    )
+
     words = []
 
     def get_words(phrase: str = ""):
@@ -443,11 +505,6 @@ def View_Stats():
             .to_image()
         )
 
-    st.write(
-        """
-        ###### Nuvem de Palavras
-        """
-    )
     st.image(
         generate_wordcloud(words=words, stopwords=stopwords),
         use_column_width=True,
