@@ -453,9 +453,7 @@ def View_Stats():
         labels={"Word": "Feedback", "Count": "Contagem"},
     )
 
-    fig.update_layout(
-        xaxis_title="Words", yaxis_title="Count", legend_title="Destination"
-    )
+    fig.update_layout(legend_title="Destination")
 
     st.plotly_chart(fig, use_container_width=True)
 
