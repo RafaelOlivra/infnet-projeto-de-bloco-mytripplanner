@@ -353,6 +353,11 @@ def Cadastrar():
     if st.button(
         "Cadastrar", key="cadastrar", type="primary", use_container_width=True
     ):
+
+        if itinerary:
+            # Convert DailyItineraryModel to dict to avoid errors
+            itinerary = [daily_itinerary.model_dump() for daily_itinerary in itinerary]
+
         trip_data = {
             "title": title,
             "origin_city": origin_city,
@@ -364,11 +369,7 @@ def Cadastrar():
             "end_date": end_date,
             "weather": weather,
             "attractions": attractions,
-            "itinerary": [
-                # Convert DailyItineraryModel to dict to avoid errors
-                daily_itinerary.model_dump()
-                for daily_itinerary in itinerary
-            ],
+            "itinerary": itinerary,
             "goals": goals,
             "tags": tags,
             "notes": notes,

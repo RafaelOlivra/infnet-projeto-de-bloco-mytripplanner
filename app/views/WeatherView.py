@@ -3,6 +3,8 @@ import streamlit as st
 from datetime import datetime
 
 from services.OpenWeatherMap import OpenWeatherMap
+from services.Logger import _log
+
 from lib.Utils import Utils
 
 from models.Weather import ForecastModel
@@ -35,7 +37,6 @@ class WeatherView:
         """
         Display the weather forecast for the specified city and state.
         """
-
         # Check if the forecast data is available
         # Currently, the forecast data is only available for the next 5 days
         if not self.forecast:
@@ -55,7 +56,6 @@ class WeatherView:
                 forecast = forecast.__dict__
 
             with cols[i % columns]:
-
                 # Skip if no forecast data is available
                 if not forecast or not forecast["weather"]:
                     weather_icon = self._get_weather_icon("desconhecido")

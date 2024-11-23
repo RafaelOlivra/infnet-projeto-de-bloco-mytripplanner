@@ -187,7 +187,6 @@ class TripView:
             self.trip_model.start_date, self.trip_model.end_date
         )
         with st.container(border=True):
-            _log("Forecast", self.trip_model.weather)
             WeatherView(
                 city_name=self.trip_model.destination_city,
                 state_name=self.trip_model.destination_state,
