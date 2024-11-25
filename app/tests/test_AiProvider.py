@@ -285,7 +285,9 @@ def test_gemini_simple_response():
     assert response != ""
     assert "2" in response
 
-
+@pytest.mark.skip(
+    reason="We changed the system to use OpenAI for this purpose"
+)
 def test_gemini_generate_itinerary():
     ai_provider = GeminiProvider()
     itinerary_request = mock_ai_gen_itinerary_request()
@@ -378,7 +380,7 @@ def test_sentiment_analysis_init():
 # Test the ask method with a "negative" prompt
 def test_sentiment_analysis_negative():
     ai_provider = SentimentAnalyzer()
-    sentiment = ai_provider.analyze_sentiment("I hate this movie, it's terrible!")
+    sentiment = ai_provider.analyze_sentiment("Eu odeio esse filme!")
     assert sentiment is not None
     assert sentiment != ""
     assert "NEGATIVE" in sentiment
