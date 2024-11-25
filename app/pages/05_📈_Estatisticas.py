@@ -385,6 +385,7 @@ def View_Stats():
                 feedback = trip.get_meta("feedback")
                 if feedback:
                     sentiment = SentimentAnalyzer().analyze_sentiment(feedback)
+                    trip.save_meta("sentiment", sentiment)
 
                     # Rename the sentiment to their portuguese equivalent
                     if sentiment == "POSITIVE":
@@ -393,8 +394,6 @@ def View_Stats():
                         sentiment = "NEGATIVO"
                     elif sentiment == "NEUTRAL":
                         sentiment = "NEUTRO"
-
-                    trip.save_meta("sentiment", sentiment)
                 else:
                     sentiment = "N/A"
             sentiments_tracker.append(sentiment)
