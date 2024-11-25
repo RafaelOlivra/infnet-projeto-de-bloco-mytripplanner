@@ -386,16 +386,17 @@ def View_Stats():
                 if feedback:
                     sentiment = SentimentAnalyzer().analyze_sentiment(feedback)
                     trip.save_meta("sentiment", sentiment)
-
-                    # Rename the sentiment to their portuguese equivalent
-                    if sentiment == "POSITIVE":
-                        sentiment = "POSITIVO"
-                    elif sentiment == "NEGATIVE":
-                        sentiment = "NEGATIVO"
-                    elif sentiment == "NEUTRAL":
-                        sentiment = "NEUTRO"
                 else:
                     sentiment = "N/A"
+
+            # Rename the sentiment to their portuguese equivalent
+            if sentiment == "POSITIVE":
+                sentiment = "POSITIVO"
+            elif sentiment == "NEGATIVE":
+                sentiment = "NEGATIVO"
+            elif sentiment == "NEUTRAL":
+                sentiment = "NEUTRO"
+
             sentiments_tracker.append(sentiment)
 
     # Create a DataFrame with the data
