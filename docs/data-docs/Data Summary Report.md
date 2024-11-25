@@ -19,14 +19,25 @@ Este documento resume as fontes de dados que serão utilizadas no desenvolviment
 * **Objetivo de Uso**:  
   * Fornecer informações sobre as condições de tráfego e rotas otimizadas, ajudando os usuários a planejar seus itinerários de viagem.
 
-### [Yelp](https://www.yelp.com.br/s%C3%A3o-paulo)
+### [Google Places API](https://developers.google.com/maps/documentation/places/web-service/overview?hl=pt-br)
 
-*   
-  **Tipo de Dados:** Informações sobre atrações turísticas, restaurantes, e serviços locais.  
+* **Tipo de Dados:** Informações sobre atrações turísticas, restaurantes, e serviços locais.  
 * **Objetivo de Uso:**  
   * Integrar informações sobre atrações e locais de interesse nos destinos de viagem, permitindo que os usuários descubram e planejem visitas a esses pontos durante suas viagens.
 
-### [GoogleGemini](https://ai.google.dev/)
+### [Yelp](https://www.yelp.com.br/s%C3%A3o-paulo) (Alternativa)
+
+* **Tipo de Dados:** Informações sobre atrações turísticas, restaurantes, e serviços locais.  
+* **Objetivo de Uso:**  
+  * Integrar informações sobre atrações e locais de interesse nos destinos de viagem, permitindo que os usuários descubram e planejem visitas a esses pontos durante suas viagens.
+
+### [OpenAI](https://openai.com/index/openai-api/)
+
+* **Tipo de Dados**: Inteligência Artificial para geração de textos e sugestões de roteiros.  
+* **Objetivo de Uso**:  
+  * Integrar com o MyTripPlanner para gerar roteiros de viagem personalizados e oferecer recomendações baseadas em preferências do usuário e dados coletados.
+
+### [GoogleGemini](https://ai.google.dev/) (Alternativa)
 
 * **Tipo de Dados**: Inteligência Artificial para geração de textos e sugestões de roteiros.  
 * **Objetivo de Uso**:  
@@ -39,5 +50,3 @@ Este documento resume as fontes de dados que serão utilizadas no desenvolviment
   * Integrar com o MyTripPlanner fornecendo análise de sentimento baseado no feedback fornecido pelos usuários.
 
 Essas fontes de dados foram selecionadas para garantir que o MyTripPlanner possa fornecer previsões precisas e em tempo real sobre condições que podem impactar as viagens dos usuários. O objetivo é utilizar essas informações para otimizar a experiência de viagem, ajudando os usuários a evitar contratempos relacionados ao clima, trânsito e outras variáveis externas.
-
-Este é o primeiro esboço do **Data Summary Report** para o MyTripPlanner e será expandido conforme novas fontes de dados sejam identificadas e integradas ao projeto.

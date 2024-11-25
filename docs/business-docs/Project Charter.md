@@ -50,7 +50,7 @@
 
 * **Phases**:  
   1. **Phase 1: Pesquisa e Planejamento** (3 semanas)  
-     * Pesquisa de campo para analisar as dificuldades e necessidades dos usuários ao planejar uma viagem.  
+     * Pesquisa de viabilidade para analisar as dificuldades e necessidades dos usuários ao planejar uma viagem.  
      * Pesquisa de APIs que forneçam os dados necessários para o app.  
      * Análise de aplicações semelhantes ou possíveis competidores a fim de descobrir padrões e possíveis áreas de melhoria.  
      * Esboço inicial da aplicação.  
@@ -79,12 +79,13 @@
 * **Data**:  
   * **Expected Data**: Dados meteorológicos em tempo real, dados de localização de usuários, dados gerados de forma dinâmica por provedores de IA, HTML proveniente de Scraping.  
   * **Data Movement**:  
-    * Dados coletados de APIs externas são movidos para o banco de dados central do MyTripPlanner.  
+    * Dados coletados de APIs externas são movidos para o banco de dados ou storage central do MyTripPlanner.  
     * Dados históricos são armazenados localmente e ficam disponíveis para análise.  
     * Roteiros recomendados por IA também serão salvos para consultas e aprimoramentos futuros.  
-    * Dados processados de páginas HTML serão processadas e salvas localmente no banco de dados.  
+    * Dados processados de páginas HTML serão processadas e salvas internamente no storage da aplicação.  
 * **Tools and Resources**:  
   * **Database SQLite** para armazenamento de dados.  
+  * **File Storage** como alternativa de armazenamento de arquivos.  
   * **Streamlit** como ferramenta para criação da aplicação inicial.  
 * **Web Service Consumption**:  
   * Os dados coletados serão utilizados pelo app Streamlit, que utilizará os mesmos para gerar um planejamento de viagem para o usuário.  

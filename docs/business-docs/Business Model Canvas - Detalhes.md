@@ -6,12 +6,12 @@
 
 ### Provedores de Dados Meteorológicos
 
-* **Exemplos:** OpenWeatherMap, INMET,  Meteoblue.  
+* **Exemplos:** OpenWeatherMap.  
 * **Valor:** Fornecem dados climáticos essenciais para prever o tempo e enviar notificações aos usuários sobre condições meteorológicas adversas que possam afetar suas viagens.
 
 ### Provedores de Serviços de Mapas
 
-* **Exemplos:** Google Maps API, Waze, Here Maps.  
+* **Exemplos:** Google Maps API.  
 * **Valor:** Oferecem dados em tempo real sobre o tráfego e APIs para criação de rotas, ajudando a recomendar as melhores rotas e horários para viajar, além de alertar sobre congestionamentos e acidentes.
 
 ### Desenvolvedores de Tecnologias e Plataformas
@@ -26,7 +26,7 @@
 
 ### Provedores de Atrações e Serviços Locais
 
-* **Exemplos**:  Plataformas como o Yelp.  
+* **Exemplos**:  Yelp, Google Places.  
 * **Valor:** Fornecem informações sobre atrações turísticas, restaurantes e outros pontos de interesse no destino de viagem, ajudando os usuários a encontrar as melhores opções para enriquecer sua experiência durante a viagem.
 
 ### Empresas de Tecnologia de Viagem
@@ -77,7 +77,7 @@
 ### Recursos da Aplicação
 
 * **Aplicativo Web Streamlit:** A plataforma Streamlit será usada para criar a interface do usuário, permitindo uma interação fluida e visualização das previsões e dados.  
-* **Dados Provenientes de APIs:** Dados meteorológicos, de trânsito, e outras informações serão obtidos através de APIs externas, como o INMET, Meteoblue, e OpenWeatherMap.  
+* **Dados Provenientes de APIs:** Dados meteorológicos, de trânsito, e outras informações serão obtidos através de APIs externas, como o OpenWeatherMap.  
 * **Dados Captados pelo App:** O aplicativo também capta dados diretamente dos usuários, como localização e preferências de viagem, para personalizar as recomendações e alertas.  
 * **Infraestrutura de Funcionamento:** Infraestrutura tecnológica necessária para suportar o aplicativo, incluindo servidores, armazenamento em nuvem, e plataformas de processamento de dados para garantir desempenho e escalabilidade. Incluir previsão de custos para desenvolvimento da aplicação.
 
