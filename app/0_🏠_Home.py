@@ -19,12 +19,7 @@ load_dotenv(find_dotenv("../.env"))
 def Home():
 
     # Set page title
-    st.set_page_config(
-        page_title="MyTripPlanner",
-        page_icon="🗺️",
-        layout="wide",
-        initial_sidebar_state="expanded",
-    )
+    st.set_page_config(page_title="MyTripPlanner", page_icon="🗺️", layout="wide")
 
     st.title("🗺️ MyTripPlanner")
     st.write(
@@ -60,7 +55,9 @@ def Home():
             """
             )
             open_csv_sheet_importer = st.button(
-                "Planejar Nova Viagem", use_container_width=True, key="open_trip_planner"
+                "Planejar Nova Viagem",
+                use_container_width=True,
+                key="open_trip_planner",
             )
             if open_csv_sheet_importer:
                 switch_page("planejar viagem")
