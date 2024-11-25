@@ -28,6 +28,7 @@ def About():
         ### Artefatos
         - [Repositório no GitHub](https://github.com/RafaelOlivra/python-llms-if-tp1)
         - [Business Model Canvas](https://docs.google.com/drawings/d/1LDVFgGZBJcKsntF1MJgB_Y5skqeSBI1mjtDtm7hmOt8/edit)
+        - [Business Model Canvas - Detalhado](https://docs.google.com/document/d/1dMvBe4FH52Bsh3mDYgn-a84B_LyIfZvZKMUeaZPACbw/edit)
         - [Project Charter](https://docs.google.com/document/d/1aqE3sguPtd9xvBwgypT2NwycYuOskVr0EFID9omDIic/edit?usp=sharing)
         - [Data Summary Report](https://docs.google.com/document/d/1jie_4x3r550BwLlOtSxuLYOwWTwRtqeiXuroQSZUtJQ/edit?usp=sharing)
 
