@@ -78,7 +78,7 @@ def View_Stats():
     # --------------------------
     st.write("###### Total de Viagens por Cidade")
     st.write(
-        """Este mapa permite visualizar as cidades mais visitadas pelos usuários, representando a popularidade decada destino com base no número de viagens realizadas.
+        """Este mapa permite visualizar as cidades mais visitadas pelos usuários, representando a popularidade de cada destino com base no número de viagens realizadas.
         É útil para identificar tendências e locais com maior interesse dos viajantes."""
     )
 
