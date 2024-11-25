@@ -1,4 +1,4 @@
-from transformers import pipeline, AutoTokenizer
+from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import time
 
@@ -15,13 +15,14 @@ class SentimentAnalyzer(AiProvider):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         # Define model details and load the sentiment analysis pipeline
-        self.model_name = "distilbert-base-uncased-finetuned-sst-2-english"
+        self.model_name = "pysentimiento/bertweet-pt-sentiment"
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        self.model = AutoModelForSequenceClassification.from_pretrained(self.model_name)
 
         # Define the pipeline for sentiment analysis
         self.pipe = pipeline(
             task="sentiment-analysis",
-            model=self.model_name,
+            model=self.model,
             tokenizer=self.tokenizer,
             device=(
                 0 if torch.cuda.is_available() else -1
@@ -61,6 +62,15 @@ class SentimentAnalyzer(AiProvider):
         # Format the sentiment analysis result into a readable string
         sentiment = response[0]["label"]
         confidence = response[0]["score"]
+
+        # Map the sentiment label to ensure it matches POSITIVE, NEGATIVE, or NEUTRAL
+        sentiment_mapping = {
+            "POS": "POSITIVE",
+            "NEG": "NEGATIVE",
+            "NEU": "NEUTRAL",
+        }
+        sentiment = sentiment_mapping.get(sentiment.upper(), "UNKNOWN")
+
         return f"Text: '{prompt}'\nSentiment: {sentiment}\nConfidence: {confidence:.2f}"
 
     def analyze_sentiment(self, text: str) -> str:
