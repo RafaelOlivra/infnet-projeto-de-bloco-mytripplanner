@@ -27,7 +27,9 @@ Esse é um projeto criado para o curso de Ciência de Dados da faculdade Infnet.
 
 ## Changelog
 
--   27/Nov/2024 \* Atualizado Business Docs
+-   25/Nov/2024 \* Atualizado Business Docs
+-   22/Nov/2024 \* Adicionado Suporte a OpenAI
+-   20/Nov/2024 \* Atualizado Business Docs
 -   17/Nov/2024 \* Adicionado Analisador de Sentimentos
 -   15/Nov/2024 \* Adicionado Suporte a geração de Roteiros
 -   03/Nov/2024 \* Adicionado Suporte para .env Overrides
