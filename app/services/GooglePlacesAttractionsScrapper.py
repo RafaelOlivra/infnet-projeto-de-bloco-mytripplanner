@@ -44,7 +44,7 @@ class GooglePlacesAttractionsScrapper:
             "query": f"attractions in {location}",
             "key": _self.api_key,
             "type": "tourist_attraction",
-            "hl": "pt-BR",
+            "language": "pt-BR",
         }
 
         _log(f"[GoogleMapsScrapper] Fetching attractions for: {location}")
