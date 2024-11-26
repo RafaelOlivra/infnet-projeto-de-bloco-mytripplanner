@@ -183,7 +183,7 @@ class TripView:
         ItineraryView(itinerary=self.trip_model.itinerary).render_itinerary()
 
     def render_forecast(self):
-        trip_length = Trip._calculate_trip_length(
+        trip_length = self.trip._calculate_trip_length(
             self.trip_model.start_date, self.trip_model.end_date
         )
         with st.container(border=True):

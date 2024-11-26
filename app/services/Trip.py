@@ -469,10 +469,16 @@ class Trip:
     def _calculate_trip_length(start_date: datetime = None, end_date: datetime = None):
         if not start_date or not end_date:
             return 0
-
         try:
+            # If dates are strings, convert them to datetime objects
+            if isinstance(start_date, str):
+                start_date = Utils.to_datetime(start_date)
+            if isinstance(end_date, str):
+                end_date = Utils.to_datetime(end_date)
+            
             return (end_date - start_date).days + 1
         except Exception as e:
+            _log(f"Error calculating trip length: {str(e)}")
             return 0
 
     @staticmethod

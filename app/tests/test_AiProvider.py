@@ -12,12 +12,9 @@ from services.SentimentAnalysisProvider import SentimentAnalyzer
 from tests.test_Trip import mock_trip_model, mock_trip
 from tests.test_Itinerary import mock_activity, mock_itinerary
 from tests.test_Attractions import mock_attractions
+from tests.test_Weather import mock_weather
 
 from models.Itinerary import DailyItineraryModel
-
-
-def mock_weather():
-    return mock_trip_model().weather
 
 
 def mock_ai_gen_itinerary_request() -> dict:
@@ -285,9 +282,8 @@ def test_gemini_simple_response():
     assert response != ""
     assert "2" in response
 
-@pytest.mark.skip(
-    reason="We changed the system to use OpenAI for this purpose"
-)
+
+@pytest.mark.skip(reason="We changed the system to use OpenAI for this purpose")
 def test_gemini_generate_itinerary():
     ai_provider = GeminiProvider()
     itinerary_request = mock_ai_gen_itinerary_request()

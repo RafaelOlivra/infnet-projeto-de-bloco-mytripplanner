@@ -33,13 +33,13 @@ class WeatherView:
         self.days = days
         self.forecast = weather_data if weather_data else self._get_forecast()
 
-    def render_forecast(self):
+    def render_forecast(self) -> bool:
         """
         Display the weather forecast for the specified city and state.
         """
         # Check if the forecast data is available
         # Currently, the forecast data is only available for the next 5 days
-        if not self.forecast:
+        if not self.forecast or type(self.forecast) != list:
             st.info("Ainda não temos previsão do tempo para a data selecionada.")
             return
 
@@ -47,6 +47,8 @@ class WeatherView:
         columns = 6
         cols = st.columns(columns)
         i = 0
+
+        forecast = None
         for d in range(self.days):
 
             if d >= len(self.forecast):
@@ -80,6 +82,7 @@ class WeatherView:
                     delta=f"Min: {int(forecast['temperature_min'])}°C",
                 )
                 i += 1
+        return bool(forecast)
 
     def _get_forecast(self):
         """

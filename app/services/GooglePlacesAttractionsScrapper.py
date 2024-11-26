@@ -15,7 +15,7 @@ class GooglePlacesAttractionsScrapper:
             self.image_cache_dir, exist_ok=True
         )  # Ensure cache directory exists
 
-    @st.cache_data(ttl=86400, show_spinner=False)
+    @st.cache_resource(ttl=86400, show_spinner=False)
     def get_near_attractions(
         _self,
         city_name: str,
@@ -44,6 +44,7 @@ class GooglePlacesAttractionsScrapper:
             "query": f"attractions in {location}",
             "key": _self.api_key,
             "type": "tourist_attraction",
+            "hl": "pt-BR",
         }
 
         _log(f"[GoogleMapsScrapper] Fetching attractions for: {location}")
