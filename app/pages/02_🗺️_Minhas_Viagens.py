@@ -5,6 +5,7 @@ from streamlit_js_eval import streamlit_js_eval
 from services.TripData import TripData
 from services.Trip import Trip
 from services.Logger import _log
+from services.AppData import AppData
 
 from views.TripView import TripView
 
@@ -53,6 +54,10 @@ def set_old_feedback_text(old_feedback_text):
 
 
 def View_Trip():
+    # Set logo
+    assets_dir = AppData().get_config("assets_dir")
+    st.logo(f"{assets_dir}my-trip-planner-logo.svg", size="large")
+
     # Set page title
     st.set_page_config(
         page_title="Minhas Viagens",
@@ -60,6 +65,10 @@ def View_Trip():
         layout="wide",
         initial_sidebar_state="expanded",
     )
+
+    # Styles
+    with open(f"{assets_dir}style.css") as css:
+        st.markdown(f"<style>{css.read()}</style>", unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     with col1:

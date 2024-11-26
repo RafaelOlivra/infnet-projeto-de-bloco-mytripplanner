@@ -15,7 +15,7 @@ slowapi
 streamlit_js_eval
 streamlit-extras==0.4.7
 streamlit-tags==1.2.8
-streamlit<1.38.0
+streamlit==1.40.0
 torch
 torchaudio
 torchvision

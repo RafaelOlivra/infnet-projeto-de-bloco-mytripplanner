@@ -3,6 +3,9 @@ from services.AppData import AppData
 
 
 def About():
+    # Set logo
+    assets_dir = AppData().get_config("assets_dir")
+    st.logo(f"{assets_dir}my-trip-planner-logo.svg", size="large")
 
     # Set page title
     st.set_page_config(
@@ -12,7 +15,7 @@ def About():
         initial_sidebar_state="expanded",
     )
 
-    st.title("🗺️ MyTripPlanner")
+    st.image(f"{assets_dir}my-trip-planner-logo.svg", width=350)
     st.write(
         """
         O MyTripPlanner é um aplicativo de planejamento de viagens, projetado para ajudar os usuários a organizarem suas jornadas de forma eficiente e personalizada. O app oferece previsões meteorológicas detalhadas e sugestões de roteiros para o destino escolhido, utilizando dados precisos de diversas APIs e integração com Inteligência Artificial. Com o MyTripPlanner, os viajantes podem desfrutar de uma experiência tranquila e agradável, sem surpresas indesejadas pelo caminho.
@@ -21,9 +24,13 @@ def About():
         """
     )
 
+    # Styles
+    with open(f"{assets_dir}style.css") as css:
+        st.markdown(f"<style>{css.read()}</style>", unsafe_allow_html=True)
+
     st.write("### ODS e ESG")
     assets_dir = AppData().get_config("assets_dir")
-    st.image(f"{assets_dir}objetivos_port.png", use_column_width=True)
+    st.image(f"{assets_dir}objetivos_port.png", use_container_width=True)
     st.write(
         """
         Os dados obtidos e analisados pelo MyTripPlanner podem gerar um impacto social e ambiental positivo. Ao obter informações como

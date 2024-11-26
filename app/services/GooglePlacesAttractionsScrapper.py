@@ -8,7 +8,20 @@ from models.Attraction import AttractionModel
 
 
 class GooglePlacesAttractionsScrapper:
+    """
+    A class for scraping tourist attractions using the Google Places API.
+
+    This class interacts with the Google Places API to fetch information about attractions
+    in a specified location. It handles caching of attraction images and supports
+    recursive fetching of results when pagination is required.
+    """
     def __init__(self):
+        """
+        Initialize the GooglePlacesAttractionsScrapper class.
+
+        Sets up the API key for Google Places, configures the image cache directory,
+        and ensures the cache directory exists.
+        """
         self.api_key = AppData().get_api_key("googlemaps")
         self.image_cache_dir = AppData()._get_storage_map().get("image_cache")
         os.makedirs(
@@ -35,7 +48,7 @@ class GooglePlacesAttractionsScrapper:
             recursive (bool, optional): If True, fetch additional results recursively. Defaults to True.
 
         Returns:
-            list[AttractionModel]: A list of AttractionModel objects.
+            list[AttractionModel]: A list of AttractionModel objects containing attraction details.
         """
         location = f"{city_name}, {state_name}"
         url = "https://maps.googleapis.com/maps/api/place/textsearch/json"

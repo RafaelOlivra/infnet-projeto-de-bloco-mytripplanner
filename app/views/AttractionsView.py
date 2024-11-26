@@ -83,7 +83,7 @@ class AttractionsView:
             attraction (Attraction): Attraction object.
         """
         try:
-            st.image(str(attraction.image), use_column_width=True)
+            st.image(str(attraction.image), use_container_width=True)
 
             # Display a star for review_stars
             stars = "⭐" * int(attraction.review_stars)
@@ -119,7 +119,7 @@ class AttractionsView:
             selected (bool): Whether the attraction is pre-selected (default: False).
         """
         try:
-            st.image(str(attraction.image), use_column_width=True)
+            st.image(str(attraction.image), use_container_width=True)
 
             # Display a star for review_stars
             stars = "⭐" * int(attraction.review_stars)

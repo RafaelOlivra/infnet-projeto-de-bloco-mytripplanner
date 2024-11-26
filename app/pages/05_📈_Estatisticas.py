@@ -19,6 +19,10 @@ from services.SentimentAnalysisProvider import SentimentAnalyzer
 # View Stats
 # --------------------------
 def View_Stats():
+    # Set logo
+    assets_dir = AppData().get_config("assets_dir")
+    st.logo(f"{assets_dir}my-trip-planner-logo.svg", size="large")
+    
     # Set page title
     st.set_page_config(
         page_title="Estatísticas",
@@ -26,14 +30,19 @@ def View_Stats():
         layout="wide",
         initial_sidebar_state="expanded",
     )
+    
+    # Styles
+    with open(f"{assets_dir}style.css") as css:
+        st.markdown(f"<style>{css.read()}</style>", unsafe_allow_html=True)
 
     st.title("📈 Estatísticas")
     st.write(
         """
         Aqui você pode ver estatísticas sobre os dados do projeto.
+        
+        ---
         """
     )
-    st.write("")
 
     # Show metrics for the overall project
 
@@ -514,7 +523,7 @@ def View_Stats():
 
     st.image(
         generate_wordcloud(words=words, stopwords=stopwords),
-        use_column_width=True,
+         use_container_width=True,
     )
 
 

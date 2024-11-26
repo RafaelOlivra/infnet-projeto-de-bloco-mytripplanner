@@ -3,6 +3,7 @@ import time
 
 from services.Trip import Trip
 from services.Logger import _log
+from services.AppData import AppData
 
 # --------------------------
 # Session State
@@ -15,6 +16,10 @@ if "selected_trip_id" not in st.session_state:
 # View Trip Data
 # --------------------------
 def View_Trip():
+    # Set logo
+    assets_dir = AppData().get_config("assets_dir")
+    st.logo(f"{assets_dir}my-trip-planner-logo.svg", size="large")
+    
     # Set page title
     st.set_page_config(
         page_title="Importar Viagem",
@@ -22,6 +27,10 @@ def View_Trip():
         layout="wide",
         initial_sidebar_state="expanded",
     )
+    
+    # Styles
+    with open(f"{assets_dir}style.css") as css:
+        st.markdown(f"<style>{css.read()}</style>", unsafe_allow_html=True)
 
     st.title("⬆️ Importar Viagem")
     st.write(

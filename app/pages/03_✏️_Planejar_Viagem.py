@@ -9,6 +9,7 @@ from services.Trip import Trip
 from services.CityState import CityStateData
 from services.GoogleMaps import GoogleMaps
 from services.Logger import _log
+from services.AppData import AppData
 
 from lib.Utils import Utils
 
@@ -83,6 +84,10 @@ def clear_cached_values():
 # Add new trip form
 # --------------------------
 def Cadastrar():
+    # Set logo
+    assets_dir = AppData().get_config("assets_dir")
+    st.logo(f"{assets_dir}my-trip-planner-logo.svg", size="large")
+    
     # Set page title
     st.set_page_config(
         page_title="Planejar Viagem",
@@ -90,7 +95,11 @@ def Cadastrar():
         layout="wide",
         initial_sidebar_state="expanded",
     )
-
+    
+    # Styles
+    with open(f"{assets_dir}style.css") as css:
+        st.markdown(f"<style>{css.read()}</style>", unsafe_allow_html=True)
+        
     st.title("✏️ Planejar Nova Viagem")
     st.write(
         """
