@@ -259,7 +259,7 @@ def Cadastrar():
     with st.container(border=True):
         st.write("##### Atrações")
         st.write(
-            "Você pode selecionar algumas das sugestões de atrações que para conhecer durante a viagem."
+            "Você pode selecionar algumas das sugestões de atrações para conhecer durante a viagem."
         )
 
         attractions = []
