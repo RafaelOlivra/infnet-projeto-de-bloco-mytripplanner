@@ -34,7 +34,7 @@ class GoogleMaps:
         Raises:
         - ValueError: If the location cannot be geocoded.
         """
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={Utils().url_encode(location)}&key={self.api_key}"
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={Utils().url_encode(location)},Brazil&key={self.api_key}"
         data = self._fetch_json(url)
 
         # Check if the request was successful
@@ -131,7 +131,9 @@ class GoogleMaps:
             origin_lat_long = self.get_latitude_longitude(origin)
             destination_lat_long = self.get_latitude_longitude(destination)
             origin = f"{origin_lat_long[0]}, {origin_lat_long[1]}"
-            destination = f"{destination_lat_long[0]}, {destination_lat_long[1]}"
+            destination = (
+                f"{destination_lat_long[0]}, {destination_lat_long[1]}"
+            )
         else:
             origin = Utils().url_encode(origin)
             destination = Utils().url_encode(destination)
@@ -160,7 +162,7 @@ class GoogleMaps:
         """
         try:
             response = requests.get(url)
-            response.raise_for_status()  # Raise exception for bad responses
+            response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
             raise ValueError(f"Error fetching data from {url}: {str(e)}")

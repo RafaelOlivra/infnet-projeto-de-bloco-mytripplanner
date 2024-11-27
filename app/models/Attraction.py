@@ -1,7 +1,10 @@
 import uuid
+
 from pydantic import BaseModel, HttpUrl, Field, conint, confloat, field_validator
 from datetime import datetime, date, timedelta
 from typing import List, Optional
+
+from services.AppData import AppData
 
 
 class AttractionModel(BaseModel):
@@ -25,4 +28,11 @@ class AttractionModel(BaseModel):
         """
         if isinstance(value, date) and not isinstance(value, datetime):
             return datetime(value.year, value.month, value.day)
+        return value
+
+    # Add dummy image for empty images
+    @field_validator("image")
+    def set_location_placeholder(cls, value):
+        if not value:
+            return AppData().get_assets_dir() + "location-placeholder.png"
         return value

@@ -15,6 +15,7 @@ class GooglePlacesAttractionsScrapper:
     in a specified location. It handles caching of attraction images and supports
     recursive fetching of results when pagination is required.
     """
+
     def __init__(self):
         """
         Initialize the GooglePlacesAttractionsScrapper class.
@@ -50,11 +51,11 @@ class GooglePlacesAttractionsScrapper:
         Returns:
             list[AttractionModel]: A list of AttractionModel objects containing attraction details.
         """
-        location = f"{city_name}, {state_name}"
+        location = f"{city_name}, {state_name}, Brasil"
         url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 
         params = {
-            "query": f"attractions in {location}",
+            "query": f"attractions in {location}, Brasil",
             "key": _self.api_key,
             "type": "tourist_attraction",
             "language": "pt-BR",

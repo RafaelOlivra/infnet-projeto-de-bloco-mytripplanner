@@ -19,7 +19,7 @@ load_dotenv(find_dotenv("../.env"))
 def Home():
 
     # Set logo
-    assets_dir = AppData().get_config("assets_dir")
+    assets_dir = AppData().get_assets_dir()
     st.logo(f"{assets_dir}my-trip-planner-logo.svg", size="large")
 
     # Set page title

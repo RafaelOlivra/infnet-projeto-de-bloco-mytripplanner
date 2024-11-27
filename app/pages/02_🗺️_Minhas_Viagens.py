@@ -55,7 +55,7 @@ def set_old_feedback_text(old_feedback_text):
 
 def View_Trip():
     # Set logo
-    assets_dir = AppData().get_config("assets_dir")
+    assets_dir = AppData().get_assets_dir()
     st.logo(f"{assets_dir}my-trip-planner-logo.svg", size="large")
 
     # Set page title

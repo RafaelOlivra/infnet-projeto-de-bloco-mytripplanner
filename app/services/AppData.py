@@ -163,10 +163,7 @@ class AppData:
                     if isinstance(data, str):
                         data = json.loads(data)
                 except Exception as e:
-                    _log(
-                        f"Error loading data from {file_path}: {e}",
-                        level="ERROR"
-                    )
+                    _log(f"Error loading data from {file_path}: {e}", level="ERROR")
                     data = None
             return data
         return None
@@ -354,6 +351,15 @@ class AppData:
             "image_cache": f"{temp_storage_dir}/_image-cache",
             "attractions": f"{permanent_storage_dir}/attractions",
         }
+
+    def get_assets_dir(self) -> str:
+        """
+        Get the directory path for storing assets.
+
+        Returns:
+            str: The directory path for storing assets.
+        """
+        return self.get_config("assets_dir")
 
     def sanitize_id(self, id: str) -> str:
         """

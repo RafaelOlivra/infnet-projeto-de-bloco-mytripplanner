@@ -4,7 +4,7 @@ from services.AppData import AppData
 
 def About():
     # Set logo
-    assets_dir = AppData().get_config("assets_dir")
+    assets_dir = AppData().get_assets_dir()
     st.logo(f"{assets_dir}my-trip-planner-logo.svg", size="large")
 
     # Set page title
@@ -29,7 +29,7 @@ def About():
         st.markdown(f"<style>{css.read()}</style>", unsafe_allow_html=True)
 
     st.write("### ODS e ESG")
-    assets_dir = AppData().get_config("assets_dir")
+    assets_dir = AppData().get_assets_dir()
     st.image(f"{assets_dir}objetivos_port.png", use_container_width=True)
     st.write(
         """

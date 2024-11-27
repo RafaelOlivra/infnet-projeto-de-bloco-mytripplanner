@@ -85,9 +85,9 @@ def clear_cached_values():
 # --------------------------
 def Cadastrar():
     # Set logo
-    assets_dir = AppData().get_config("assets_dir")
+    assets_dir = AppData().get_assets_dir()
     st.logo(f"{assets_dir}my-trip-planner-logo.svg", size="large")
-    
+
     # Set page title
     st.set_page_config(
         page_title="Planejar Viagem",
@@ -95,11 +95,11 @@ def Cadastrar():
         layout="wide",
         initial_sidebar_state="expanded",
     )
-    
+
     # Styles
     with open(f"{assets_dir}style.css") as css:
         st.markdown(f"<style>{css.read()}</style>", unsafe_allow_html=True)
-        
+
     st.title("✏️ Planejar Nova Viagem")
     st.write(
         """
@@ -278,7 +278,8 @@ def Cadastrar():
 
             # Filter selected attractions
             for attraction in attractions_ideas.attractions:
-                if attraction.name in get_selected_attractions():
+                selected_attractions = get_selected_attractions()
+                if selected_attractions and attraction.name in selected_attractions:
                     attractions.append(attraction)
 
         # Convert to AttractionModel
