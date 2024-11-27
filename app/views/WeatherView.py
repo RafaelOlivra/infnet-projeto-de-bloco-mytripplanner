@@ -48,7 +48,7 @@ class WeatherView:
         cols = st.columns(columns)
         i = 0
 
-        forecast = None
+        _rendered_forecast = None
         for d in range(self.days):
 
             if d >= len(self.forecast):
@@ -82,7 +82,9 @@ class WeatherView:
                     delta=f"Min: {int(forecast['temperature_min'])}°C",
                 )
                 i += 1
-        return bool(forecast)
+                _rendered_forecast = True
+
+        return bool(_rendered_forecast)
 
     def _get_forecast(self):
         """
