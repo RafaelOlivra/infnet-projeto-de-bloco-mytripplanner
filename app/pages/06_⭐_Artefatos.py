@@ -70,6 +70,7 @@ def About():
         - [Google Places API](https://developers.google.com/maps/documentation/places/web-service/overview?hl=pt-br)
         - [Google Gemini](https://ai.google.dev/)
         - [OpenAI](https://openai.com/index/openai-api/)
+        - [HuggingFace](https://huggingface.co/)
 
         #### Inspirações
         - [Agenda 2030](https://brasil.un.org/pt-br/91863-agenda-2030-para-o-desenvolvimento-sustent%C3%A1vel)
