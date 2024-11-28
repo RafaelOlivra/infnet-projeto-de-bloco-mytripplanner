@@ -56,7 +56,7 @@ class AppData:
 
         return None  # Return None if the key is not found in either place
 
-    def get_api_key(self, key: str) -> None:
+    def get_api_key(self, key: str) -> str:
         """
         Retrieve an API key from environment variables.
 
@@ -200,7 +200,7 @@ class AppData:
 
         return data
 
-    def get_all_ids(self, type: str) -> list:
+    def get_all_ids(self, type: str) -> list[str]:
         """
         Retrieve all data IDs of a specific type.
 

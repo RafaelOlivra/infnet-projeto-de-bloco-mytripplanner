@@ -27,9 +27,7 @@ class DailyItineraryModel(BaseModel):
 
     @field_validator("date")
     def convert_to_datetime(cls, value):
-        """
-        Convert date to datetime if necessary.
-        """
+        """Convert date to datetime if necessary."""
         if isinstance(value, date) and not isinstance(value, datetime):
             return datetime(value.year, value.month, value.day)
 

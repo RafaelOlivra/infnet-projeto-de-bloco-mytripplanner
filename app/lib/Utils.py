@@ -56,10 +56,10 @@ class Utils:
         Check if a given string is valid JSON.
 
         Args:
-        - data (str): The string to check.
+            data (str): The string to check.
 
         Returns:
-        - bool: True if the string is valid JSON, False otherwise.
+            bool: True if the string is valid JSON, False otherwise.
         """
         try:
             json.loads(data)
@@ -73,13 +73,13 @@ class Utils:
         Encode a text string for use in a URL.
 
         Args:
-        - text (str): The text to encode.
+            text (str): The text to encode.
 
         Returns:
-        - str: The URL-encoded text.
+            str: The URL-encoded text.
 
         Raises:
-        - ValueError: If the input is not a string.
+            ValueError: If the input is not a string.
         """
         if not isinstance(text, str):
             raise ValueError("Input must be a string")
@@ -87,6 +87,16 @@ class Utils:
 
     @staticmethod
     def to_date_string(_date: date | datetime | str, format="") -> str:
+        """
+        Convert a date object to a string.
+
+        Args:
+            _date (date | datetime | str): The date object to convert.
+            format (str, optional): The format to convert to. Defaults to "".
+                (Currently supports 'display' and 'iso_date_only')
+        Returns:
+            str: The date string in the specified format.
+        """
         # Convert string to datetime object from isoformat
         if isinstance(_date, str):
             _date = datetime.fromisoformat(_date)
@@ -106,7 +116,15 @@ class Utils:
     @staticmethod
     def to_date_string_recursive(items: list | dict, format="") -> list | dict:
         """
-        Convert all date or time objects to strings.
+        Convert all date or time objects in a list or dictionary to strings.
+
+        Args:
+            items (list | dict): The list or dictionary to convert.
+            format (str, optional): The format to convert to. Defaults to "".
+                (Currently supports 'display' and 'iso_date_only')
+
+        Returns:
+            (list | dict): The list or dictionary with date or datetime objects converted to strings.
         """
         # Ignore objects that are not lists or dictionaries
         if not (isinstance(items, list) or isinstance(items, dict)):
@@ -127,6 +145,17 @@ class Utils:
 
     @staticmethod
     def to_time_string(_time: datetime | str) -> str:
+        """
+        Convert a time object to a string.
+        If the input is a string, it is assumed to be in iso format.
+
+        Args:
+            _time (datetime | str): The time object to convert.
+                    The format can be set with 'time_display_format' the config file.
+
+        Returns:
+            str: The formatted time string.
+        """
         # Convert string to datetime object from isoformat
         if isinstance(_time, str):
             _time = datetime.fromisoformat(_time)
@@ -134,9 +163,17 @@ class Utils:
         return str(_time.strftime(AppData().get_config("time_display_format")))
 
     @staticmethod
-    def to_datetime(_date) -> datetime:
+    def to_datetime(_date: str | date) -> datetime:
         """
         Convert a date string to a datetime object.
+        By default, the date is assumed to be in iso format.
+        If the conversion fails, the date is assumed to be in the 'datetime_display_format' config format.
+
+        Args:
+            _date (str | date): The date string to convert.
+
+        Returns:
+            datetime: The datetime object.
         """
         # Attempt to convert from isoformat
         try:

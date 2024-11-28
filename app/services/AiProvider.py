@@ -51,7 +51,7 @@ class AiProvider:
         Main method to interact with the AI provider
 
         Args:
-            prompt (str): The prompt to send to the AI provider
+            prompt (str): The prompt to send to the AI provider.
 
         Returns:
             dict[str, str]: The response from the AI provider formatted
@@ -95,7 +95,7 @@ class AiProvider:
         Generate the itinerary for the trip.
 
         Returns:
-            List[DailyItineraryModel]: The generated itinerary
+            List[DailyItineraryModel]: The generated itinerary.
         """
         prompt = self._generate_prompt_from_template(
             template_key="gen_itinerary_prompt"
@@ -122,10 +122,10 @@ class AiProvider:
         Prompt the AI provider with a custom prompt, and return the response text.
 
         Args:
-            prompt (str): The custom prompt to send to the AI provider
+            prompt (str): The custom prompt to send to the AI provider.
 
         Returns:
-            str: The response from the AI provider
+            str: The response from the AI provider.
         """
         response = self.ask(prompt=prompt)
         return response.get("response", "")
@@ -139,11 +139,11 @@ class AiProvider:
         Generate a prompt from a template, replacing the variables with the data provided on the prepare() method.
 
         Args:
-            template_key (str): The key of the template to use (Retrieved from the config file)
-            base_prompt (str): The base prompt to use (overrides the template_key template)
+            template_key (str): The key of the template to use (Retrieved from the config file).
+            base_prompt (str): The base prompt to use (overrides the template_key template).
 
         Returns:
-            str: The final generated prompt
+            str: The final generated prompt.
 
         """
         # Allow prompt to be overridden
@@ -272,13 +272,13 @@ class AiProvider:
         Generate a summary of the weather forecast for the trip.
 
         Args:
-            forecast_list (List[ForecastModel]): The list of weather forecasts
-            start_date (date): The start date of the trip
-            end_date (date): The end date of the trip
-            strip_time (bool): Whether to strip the time from the date
+            forecast_list (List[ForecastModel]): The list of weather forecasts.
+            start_date (date): The start date of the trip.
+            end_date (date): The end date of the trip.
+            strip_time (bool): Whether to strip the time from the date.
 
         Returns:
-            str: The generated weather summary
+            str: The generated weather summary.
         """
         if not forecast_list:
             return "* Não há dados do tempo disponíveis"
@@ -314,10 +314,10 @@ class AiProvider:
         Generate a summary of the attractions for the trip.
 
         Args:
-            attractions_list (List[AttractionModel]): The list of attractions
+            attractions_list (List[AttractionModel]): The list of attractions.
 
         Returns:
-            str: The generated attractions summary
+            str: The generated attractions summary.
         """
 
         if not attractions_list:
@@ -334,10 +334,10 @@ class AiProvider:
         Generate a summary of the itinerary for the trip.
 
         Args:
-            itinerary (List[DailyItineraryModel]): The itinerary for the trip
+            itinerary (List[DailyItineraryModel]): The itinerary for the trip.
 
         Returns:
-            str: The generated itinerary summary
+            str: The generated itinerary summary.
         """
         if not itinerary:
             return "* Não há roteiro disponível"
@@ -360,7 +360,7 @@ class AiProvider:
             as a dictionary containing a "response" key with the text response.
 
         Returns:
-            dict: The response as a JSON object
+            dict: The response as a JSON object.
         """
         if not response or "response" not in response:
             return {}
@@ -385,7 +385,7 @@ class AiProvider:
             as a dictionary containing a "response" key with the text response.
 
         Returns:
-            List[DailyItineraryModel]: The generated itinerary
+            List[DailyItineraryModel]: The generated itinerary.
         """
         json = self._to_json(response)
 
@@ -399,10 +399,10 @@ class AiProvider:
         Load the base prompt from the config file.
 
         Args:
-            template_key (str): The key of the template to load from the config file
+            template_key (str): The key of the template to load from the config file.
 
         Returns:
-            str: The loaded base prompt
+            str: The loaded base prompt.
         """
         if self.get(template_key):
             return self.get(template_key)
@@ -428,10 +428,10 @@ class AiProvider:
         Remove the reserved templates from the text.
 
         Args:
-            text (str): The text to remove the templates from
+            text (str): The text to remove the templates from.
 
         Returns:
-            str: The text with the templates removed
+            str: The text with the templates removed.
         """
         for template in self.reserved_templates:
             text = text.replace(template, "")
@@ -442,10 +442,10 @@ class AiProvider:
         Get the value of an attribute by name.
 
         Args:
-            name (str): The name of the attribute to get
+            name (str): The name of the attribute to get.
 
         Returns:
-            Any: The value of the attribute
+            Any: The value of the attribute.
         """
         return getattr(self, name)
 
@@ -454,11 +454,11 @@ class AiProvider:
         Set the value of an attribute by name.
 
         Args:
-            name (str): The name of the attribute to set
-            value (Any): The value to set
+            name (str): The name of the attribute to set.
+            value (Any): The value to set.
 
         Returns:
-            Any: The value that was set
+            Any: The value that was set.
         """
         setattr(self, name, value)
         return value

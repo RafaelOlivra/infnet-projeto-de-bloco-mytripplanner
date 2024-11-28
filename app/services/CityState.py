@@ -4,19 +4,13 @@ from services.AppData import AppData
 
 
 class CityStateData:
+    """
+    City and state data service.
+    Provides methods to retrieve city and state data based on the data stored in a JSON file.
+    """
+
     def __init__(self):
-        """
-        Initializes the CityStateData class by loading city and state names
-        from a JSON file.
 
-        The JSON file is specified in the application configuration and is expected
-        to contain data in the format of a list of states, each with a name and
-        a list of cities.
-
-        Attributes:
-            city_state_data (dict): A dictionary containing the city and state data
-            loaded from the JSON file. This is empty if the file is not found.
-        """
         # Load the JSON file with city and state data
         json_file = AppData().get_config("city_state_json")
         try:

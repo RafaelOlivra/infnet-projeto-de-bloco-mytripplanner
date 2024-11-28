@@ -40,12 +40,11 @@ class TripModel(BaseModel):
 
     @field_validator("created_at", "start_date", "end_date")
     def convert_to_datetime(cls, value) -> datetime:
-        """
-        Convert date to datetime if necessary.
-        """
+        """Convert date to datetime if necessary."""
         if isinstance(value, date) and not isinstance(value, datetime):
             return datetime(value.year, value.month, value.day)
         return Utils.to_datetime(value)
 
     def __getitem__(self, attribute: str):
+        """Get the value of an attribute."""
         return self.__getattribute__(attribute)

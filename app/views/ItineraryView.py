@@ -16,13 +16,26 @@ from typing import List
 
 
 class ItineraryView:
+    """
+    A class that handles the itinerary view and generation in Streamlit.
+    """
+
     def __init__(
         self,
         itinerary: List[DailyItineraryModel] = None,
     ):
+        """
+        Initialize the ItineraryView class.
+
+        Args:
+            itinerary (List[DailyItineraryModel], optional): The itinerary data to render. Defaults to None.
+        """
         self.itinerary = itinerary
 
     def render_itinerary(self):
+        """
+        Render the streamlit itinerary view using the provided itinerary data.
+        """
 
         if not self.itinerary:
             st.info("Não há nenhum roteiro programado para essa viagem.")
@@ -40,16 +53,28 @@ class ItineraryView:
             if col == cols[1]:
                 cols = st.columns(2)
 
-    def render_daily_itinerary(self, day: DailyItineraryModel):
+    def render_daily_itinerary(self, daily_itinerary: DailyItineraryModel):
+        """
+        Render the daily itinerary view for a given day.
+
+        Args:
+            daily_itinerary (DailyItineraryModel): The daily itinerary data.
+        """
         with st.container(border=True):
-            if day.items.__len__() > 0:
+            if daily_itinerary.items.__len__() > 0:
                 st.write(
-                    f"#### 📅 {Utils.to_date_string(day.date, format='display')} - {day.title}"
+                    f"#### 📅 {Utils.to_date_string(daily_itinerary.date, format='display')} - {daily_itinerary.title}"
                 )
-                for activity in day.items:
+                for activity in daily_itinerary.items:
                     self.render_activity(activity)
 
     def render_activity(self, activity: ActivityModel):
+        """
+        Render the activity view for a given activity.
+
+        Args:
+            activity (ActivityModel): The activity data.
+        """
         with st.container(border=True):
             st.write(
                 f"""
@@ -67,6 +92,19 @@ class ItineraryView:
         forecast_list: List[ForecastModel] = None,
         attractions_list: List[AttractionModel] = None,
     ) -> List[DailyItineraryModel]:
+        """
+        Render the itinerary generator view.
+
+        Args:
+            location (str): The destination location (city, state).
+            start_date (date): The start date of the trip.
+            end_date (date): The end date of the trip.
+            forecast_list (List[ForecastModel]): The weather forecast data.
+            attractions_list (List[AttractionModel]): The attractions data.
+
+        Returns:
+            List[DailyItineraryModel]: The generated itinerary data.
+        """
 
         ai_provider = OpenAIProvider()
         ai_provider.prepare(

@@ -16,14 +16,14 @@ class GooglePlacesAttractionsScrapper:
     recursive fetching of results when pagination is required.
     """
 
-    def __init__(self):
+    def __init__(self, api_key: str = None):
         """
         Initialize the GooglePlacesAttractionsScrapper class.
 
         Sets up the API key for Google Places, configures the image cache directory,
         and ensures the cache directory exists.
         """
-        self.api_key = AppData().get_api_key("googlemaps")
+        self.api_key = api_key or AppData().get_api_key("googlemaps")
         self.image_cache_dir = AppData()._get_storage_map().get("image_cache")
         os.makedirs(
             self.image_cache_dir, exist_ok=True

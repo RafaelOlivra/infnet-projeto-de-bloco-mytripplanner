@@ -14,6 +14,10 @@ from typing import List
 
 
 class AttractionsView:
+    """
+    A class for displaying attractions data in a Streamlit app.
+    """
+
     def __init__(
         self,
         city_name: str = "",
@@ -32,6 +36,7 @@ class AttractionsView:
             start (int): Starting index for fetching attractions.
             limit (int): Number of attractions to fetch.
             attractions (list[Attraction]): Pre-fetched attractions data (optional).
+            expire_time (int): Time in seconds to expire the data (default: 100 days).
         """
         self.city_name = city_name
         self.state_name = state_name
@@ -52,12 +57,14 @@ class AttractionsView:
         columns=6,
     ):
         """
-        Display the attractions data in a grid layout.
+        Display the attractions in a streamlit grid layout.
 
         Args:
             display_selector (bool): Whether to display a checkbox selector.
             selected_attractions (list): List of selected attractions (optional).
             on_change (function): Callback function to handle changes in selection (optional).
+            st (streamlit): Streamlit object (for appending items).
+            columns (int): Number of columns for the grid layout.
         """
         if self.attractions:
             cols = st.columns(columns)
@@ -80,7 +87,7 @@ class AttractionsView:
         Display a single attraction card with image, name, and description.
 
         Args:
-            attraction (Attraction): Attraction object.
+            attraction (AttractionModel): AttractionModel object.
         """
         try:
             st.image(str(attraction.image), use_container_width=True)
@@ -114,7 +121,7 @@ class AttractionsView:
         Display a single attraction card with a checkbox for selection.
 
         Args:
-            attraction (Attraction): Attraction object.
+            attraction (AttractionModel): AttractionModel object.
             on_change (function): Callback function to handle changes in selection (optional).
             selected (bool): Whether the attraction is pre-selected (default: False).
         """
@@ -155,7 +162,7 @@ class AttractionsView:
         Get the attractions data for the specified city and state.
 
         Returns:
-            list[Attraction]: List of validated Attraction objects.
+            list[AttractionModel]: List of validated AttractionModel objects.
         """
         with st.spinner("Buscando atrações..."):
             attractions = AttractionsData().get(self.slug)
@@ -181,10 +188,11 @@ class AttractionsView:
 
     def _fetch_attractions(self) -> List[AttractionModel]:
         """
-        Fetch the attractions data from the Yelp API.
+        Fetch the attractions data from the available sources.
+        Currently, it tries to fetch from Google Places and Yelp as fallback.
 
         Returns:
-            list[Attraction]: List of Attraction objects.
+            list[AttractionModel]: List of AttractionModel objects.
         """
         # Try to fetch the attractions from Google Places first
         attractions = GooglePlacesAttractionsScrapper().get_near_attractions(
@@ -207,7 +215,7 @@ class AttractionsView:
         Check if the attractions data is expired.
 
         Args:
-            last_updated (datetime): The last updated timestamp.
+            created_at (datetime): The creation date of the data.
 
         Returns:
             bool: True if the data is expired, False otherwise.

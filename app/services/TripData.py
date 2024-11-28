@@ -8,10 +8,11 @@ from models.Trip import TripModel
 
 
 class TripData:
+    """
+    TripData service class to handle trip data operations for app.
+    """
+
     def __init__(self):
-        """
-        Initialize the TripData class.
-        """
         self.app_data = AppData()
 
     def save(self, trip_id, trip_data: TripModel) -> bool:
@@ -93,7 +94,7 @@ class TripData:
         Retrieve trip data for the specified ID.
 
         Args:
-            id (str): The trip ID.
+            trip_id (str): The trip ID.
 
         Returns:
             TripModel or None: The trip data as a TripModel object.
@@ -105,7 +106,7 @@ class TripData:
         Delete the trip data for the specified trip ID.
 
         Args:
-            id (str): The trip ID to delete.
+            trip_id (str): The trip ID to delete.
 
         Returns:
             bool: True if the file was deleted, False otherwise.
@@ -118,6 +119,10 @@ class TripData:
     def get_user_trip_ids(self, user_id: int = 0, limit: int = 0) -> list[str]:
         """
         Retrieve a list of available trip IDs.
+
+        Args:
+            user_id (int): The user ID.
+            limit (int): The maximum number of trips to retrieve.
 
         Returns:
             list: A list of trip IDs.
@@ -151,6 +156,11 @@ class TripData:
         """
         Retrieve a list of available trips with their IDs and titles.
 
+        Args:
+            user_id (int): The user ID.
+            limit (int): The maximum number of trips to retrieve.
+            order_by (str): The field to sort the trips by.
+
         Returns:
             list: A list of dictionaries containing trip ID and title.
         """
@@ -179,6 +189,10 @@ class TripData:
     ) -> list[TripModel]:
         """
         Retrieve a list of all available trips.
+
+        Args:
+            limit (int): The maximum number of trips to retrieve.
+            order_by (str): The field to sort the trips by.
 
         Returns:
             list: A list of TripModel objects.

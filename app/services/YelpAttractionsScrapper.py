@@ -30,6 +30,7 @@ class YelpAttractionsScrapper:
             state_name (str): The name of the state.
             start (int, optional): The starting index of the attractions to retrieve. Defaults to 0 (Yelp outputs 10 cards for each page).
             limit (int, optional): The maximum number of attractions to retrieve. Defaults to 50.
+            recursive (bool, optional): Whether to recursively fetch more attractions if the limit is not reached. Defaults to True.
 
         Returns:
             list[Attraction]: A list of Attraction objects.

@@ -6,16 +6,20 @@ from lib.Utils import Utils
 
 
 class GoogleMaps:
-    def __init__(self, api_key=None):
+    """
+    Google Maps service class to interact with the Google Maps Geocoding and Directions APIs.
+    """
+
+    def __init__(self, api_key: str = None):
         """
         Initializes the GoogleMaps class.
 
         Args:
-        - api_key (str, optional): The API key for Google Maps. If not provided, it attempts to retrieve the key
-          from AppData.
+            api_key (str, optional): The API key for Google Maps. If not provided, it attempts to retrieve the key
+            from AppData.
 
         Raises:
-        - ValueError: If the API key is not provided or cannot be retrieved from AppData.
+            ValueError: If the API key is not provided or cannot be retrieved from AppData.
         """
         self.api_key = api_key or AppData().get_api_key("googlemaps")
         if not self.api_key:
@@ -26,13 +30,13 @@ class GoogleMaps:
         Retrieve latitude and longitude for a given location using the Google Maps Geocoding API.
 
         Args:
-        - location (str): The location (e.g., city, state, or address) to geocode.
+            location (str): The location (e.g., city, state, or address) to geocode.
 
         Returns:
-        - tuple: A tuple containing (latitude, longitude).
+            tuple: A tuple containing (latitude, longitude).
 
         Raises:
-        - ValueError: If the location cannot be geocoded.
+            ValueError: If the location cannot be geocoded.
         """
         url = f"https://maps.googleapis.com/maps/api/geocode/json?address={Utils().url_encode(location)},Brazil&key={self.api_key}"
         data = self._fetch_json(url)
@@ -55,12 +59,13 @@ class GoogleMaps:
         Generate Google Maps directions URL.
 
         Args:
-        - origin (str): Starting location.
-        - destination (str): Destination location.
-        - location_mode (str, optional): Whether to use coordinates or addresses. Defaults to "coordinates".
+            origin (str): Starting location.
+            destination (str): Destination location.
+            location_mode (str, optional): Whether to use coordinates or addresses. Defaults to "coordinates".
+            mode (str, optional): The mode of transportation (e.g., driving, walking). Defaults to 'car'.
 
         Returns:
-        - str: URL for Google Maps directions.
+            str: URL for Google Maps directions.
         """
         if location_mode == "coordinates":
             origin_lat_long = self.get_latitude_longitude(origin)
@@ -87,12 +92,13 @@ class GoogleMaps:
         Get directions from an origin to a destination using the Google Maps Directions API.
 
         Args:
-        - origin (str): The starting location for directions.
-        - destination (str): The destination location for directions.
-        - mode (str, optional): The mode of transportation (e.g., driving, walking). Defaults to 'car'.
+            origin (str): The starting location for directions.
+            destination (str): The destination location for directions.
+            location_mode (str, optional): Whether to use coordinates or addresses. Defaults to "coordinates".
+            mode (str, optional): The mode of transportation (e.g., driving, walking). Defaults to 'car'.
 
         Returns:
-        - dict: The directions data.
+            dict: The directions data.
         """
         if location_mode == "coordinates":
             origin_lat_long = self.get_latitude_longitude(origin)
@@ -119,21 +125,20 @@ class GoogleMaps:
         Generate URL code for an iframe that displays Google Maps directions.
 
         Args:
-        - origin (str): The starting location for directions.
-        - destination (str): The destination location for directions.
-        - zoom (int, optional): The zoom level for the map.
-        - mode (str, optional): The mode of transportation (e.g., driving, walking).
+            origin (str): The starting location for directions.
+            destination (str): The destination location for directions.
+            zoom (int, optional): The zoom level for the map.
+            location_mode (str, optional): Whether to use coordinates or addresses. Defaults to "coordinates".
+            mode (str, optional): The mode of transportation (e.g., driving, walking).
 
         Returns:
-        - str: URL for the embeddable iframe.
+            str: URL for the embeddable iframe.
         """
         if location_mode == "coordinates":
             origin_lat_long = self.get_latitude_longitude(origin)
             destination_lat_long = self.get_latitude_longitude(destination)
             origin = f"{origin_lat_long[0]}, {origin_lat_long[1]}"
-            destination = (
-                f"{destination_lat_long[0]}, {destination_lat_long[1]}"
-            )
+            destination = f"{destination_lat_long[0]}, {destination_lat_long[1]}"
         else:
             origin = Utils().url_encode(origin)
             destination = Utils().url_encode(destination)
@@ -152,13 +157,13 @@ class GoogleMaps:
         Fetch JSON data from the specified URL.
 
         Args:
-        - url (str): The URL to fetch the JSON data from.
+            url (str): The URL to fetch the JSON data from.
 
         Returns:
-        - dict: The JSON data as a dictionary.
+            dict: The JSON data as a dictionary.
 
         Raises:
-        - requests.exceptions.RequestException: For any network-related errors.
+            requests.exceptions.RequestException: For any network-related errors.
         """
         try:
             response = requests.get(url)

@@ -58,4 +58,10 @@ class OpenAIProvider(AiProvider):
             return None
 
     def set_max_tokens(self, max_tokens: int):
+        """
+        Sets the maximum number of tokens for text generation.
+
+        Args:
+            max_tokens (int): The maximum number of tokens.
+        """
         self.max_tokens = max_tokens

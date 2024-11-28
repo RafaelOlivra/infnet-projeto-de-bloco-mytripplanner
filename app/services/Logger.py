@@ -3,7 +3,6 @@ import logging
 import json
 
 from logging.handlers import RotatingFileHandler
-from datetime import datetime
 
 
 class SimpleLogger:

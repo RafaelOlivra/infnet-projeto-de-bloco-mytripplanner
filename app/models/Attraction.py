@@ -23,16 +23,14 @@ class AttractionModel(BaseModel):
 
     @field_validator("created_at")
     def convert_to_datetime(cls, value):
-        """
-        Convert date to datetime if necessary.
-        """
+        """Convert date to datetime if necessary."""
         if isinstance(value, date) and not isinstance(value, datetime):
             return datetime(value.year, value.month, value.day)
         return value
 
-    # Add dummy image for empty images
     @field_validator("image")
     def set_location_placeholder(cls, value):
+        """Add a placeholder image if the image URL is empty."""
         if not value:
             return AppData().get_assets_dir() + "location-placeholder.png"
         return value

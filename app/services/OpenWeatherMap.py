@@ -52,6 +52,7 @@ class OpenWeatherMap:
     # --------------------------
     # Forecast Operations
     # --------------------------
+
     def get_hourly_forecast(
         _self, city_name: str, state_name: str, days: int = 10
     ) -> List[ForecastModel]:

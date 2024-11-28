@@ -12,6 +12,10 @@ from typing import List
 
 
 class WeatherView:
+    """
+    A class that handles the weather view and generation in Streamlit.
+    """
+
     def __init__(
         self,
         city_name="",
@@ -26,7 +30,7 @@ class WeatherView:
             city_name (str): The name of the city.
             state_name (str): The name of the state.
             days (int): The number of days to forecast.
-            weather_data (dict): The weather data for the specified city and state.
+            weather_data (List[ForecastModel], optional): The weather data to render. Defaults to None.
         """
         self.city_name = city_name
         self.state_name = state_name
@@ -94,7 +98,7 @@ class WeatherView:
             self.city_name, self.state_name
         )
 
-    def _get_weather_icon(self, weather_desc):
+    def _get_weather_icon(self, weather_desc: str) -> str:
         """
         Maps the Portuguese weather descriptions from OpenWeatherMap to weather icons (emojis).
 

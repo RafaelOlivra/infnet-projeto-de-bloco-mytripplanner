@@ -19,7 +19,21 @@ from tests.test_AiProvider import mock_itinerary
 
 
 class TripView:
-    def __init__(self, trip: str):
+    """
+    A class that handles the trip view and generation in Streamlit.
+    """
+
+    def __init__(self, trip: str | Trip):
+        """
+        Initialize the TripView class.
+
+        Args:
+            trip (str): The trip ID or Trip object to render.
+
+        Raises:
+            ValueError: If the trip ID is invalid.
+        """
+
         # Check if got a trip object
         if isinstance(trip, Trip):
             self.trip_model = trip.model
@@ -33,7 +47,7 @@ class TripView:
 
     def render_trip(self):
         """
-        Render the trip view.
+        Render the main trip visualization.
         """
         if not self.trip_model:
             return
@@ -70,6 +84,12 @@ class TripView:
             self.render_notes()
 
     def render_origin_destination(self):
+        """
+        Render the trip origin and destination.
+        """
+        if not self.trip_model:
+            return
+
         col1, col2 = st.columns(2)
         with col1.container(border=True):
             st.write(
@@ -164,7 +184,7 @@ class TripView:
 
     def render_goals(self):
         """
-        Render the trip objectives.
+        Render the trip goals.
         """
         if not self.trip_model:
             return
