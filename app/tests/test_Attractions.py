@@ -10,23 +10,9 @@ from services.Logger import _log
 from services.YelpAttractionsScrapper import YelpAttractionsScrapper
 from app.services.GooglePlacesAttractionsScrapper import GooglePlacesAttractionsScrapper
 
-from views.AttractionsView import AttractionsView
-
 from models.Attraction import AttractionModel
 
-from tests.test_Trip import mock_trip_dict
-
-
-# Mock data for testing
-
-
-def mock_attractions() -> list[AttractionModel]:
-    attraction_data = mock_trip_dict()["attractions"]
-    return [AttractionModel(**attraction) for attraction in attraction_data]
-
-
-def mock_attraction() -> AttractionModel:
-    return mock_attractions()[0]
+from tests.mocks import mock_attraction, mock_attractions
 
 
 # --------------------------

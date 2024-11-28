@@ -1,14 +1,12 @@
-import pytest
 from fastapi.testclient import TestClient
 from fastapi import status
-from unittest import mock
 from unittest.mock import patch
 
 from routers.api import app, ApiKeyHandler
 from services.TripData import TripData
 from services.Trip import Trip
 
-from tests.test_Trip import mock_trip_dict
+from tests.mocks import mock_trip_dict
 
 # Create a test client for the FastAPI app
 client = TestClient(app)

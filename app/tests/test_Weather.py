@@ -1,18 +1,6 @@
-from models.Weather import ForecastModel
-
 from services.Logger import _log
-
 from views.WeatherView import WeatherView
-
-from tests.test_Trip import mock_trip_model, mock_trip
-
-
-def mock_weather() -> list[ForecastModel]:
-    return mock_trip_model().weather
-
-
-def mock_weather_model() -> ForecastModel:
-    return mock_weather()[0]
+from tests.mocks import mock_weather, mock_trip_model, mock_trip
 
 
 def test_render_forecast():

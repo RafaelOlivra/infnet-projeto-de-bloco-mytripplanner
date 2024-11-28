@@ -1,22 +1,11 @@
-import json
 import pytest
 
-from datetime import datetime, time
+from datetime import time
 
 from unittest.mock import patch
-from models.Itinerary import DailyItineraryModel, ActivityModel
+from models.Itinerary import ActivityModel
 
-from tests.test_Trip import mock_trip_dict
-
-
-# Mock data for testing
-def mock_itinerary() -> list[DailyItineraryModel]:
-    attraction_data = mock_trip_dict()["itinerary"]
-    return [DailyItineraryModel(**attraction) for attraction in attraction_data]
-
-def mock_activity():
-    activity = mock_itinerary()[0].items[0].model_dump()
-    return ActivityModel(**activity)
+from tests.mocks import mock_activity
 
 
 def test_invalid_time_order():

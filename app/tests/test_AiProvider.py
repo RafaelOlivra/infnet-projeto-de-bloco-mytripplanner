@@ -9,39 +9,14 @@ from services.GeminiProvider import GeminiProvider
 from services.OpenAIProvider import OpenAIProvider
 from services.SentimentAnalysisProvider import SentimentAnalyzer
 
-from tests.test_Trip import mock_trip_model, mock_trip
-from tests.test_Itinerary import mock_activity, mock_itinerary
-from tests.test_Attractions import mock_attractions
-from tests.test_Weather import mock_weather
+from tests.mocks import (
+    mock_ai_gen_itinerary_request,
+    mock_ai_gen_itinerary_response,
+    mock_trip_model,
+    mock_itinerary,
+)
 
 from models.Itinerary import DailyItineraryModel
-
-
-def mock_ai_gen_itinerary_request() -> dict:
-    location = (
-        mock_trip_model().destination_city + ", " + mock_trip_model().destination_state
-    )
-    attractions_list = mock_attractions()
-    forecast_list = mock_weather()
-    start_date = Utils.to_datetime(mock_trip_model().start_date)
-    end_date = Utils.to_datetime(mock_trip_model().end_date)
-    goals = mock_trip_model().goals
-
-    return dict(
-        location=location,
-        start_date=start_date,
-        end_date=end_date,
-        goals=goals,
-        forecast_list=forecast_list,
-        attractions_list=attractions_list,
-    )
-
-
-def mock_ai_gen_itinerary_response() -> dict:
-    return {
-        "response": '```json\n[\n  {\n    "date": "2024-11-14",\n    "title": "Dia 1",\n    "items": [\n      {\n        "start_time": "09:00",\n        "end_time": "12:00",\n        "location": "Praia do Arraial - Arraial do Cabo, RJ",\n        "title": "Manhã na Praia do Arraial",\n        "description": "Comece o dia relaxando nas areias brancas da Praia do Arraial, aproveitando o sol e as águas cristalinas. Com o céu com nuvens dispersas, o dia promete ser agradável para um mergulho refrescante ou para simplesmente apreciar a beleza natural da região."\n      },\n      {\n        "start_time": "13:00",\n        "end_time": "15:00",\n        "location": "Atração Genérica - Arraial do Cabo, RJ",\n        "title": "Visita à Atração Genérica",\n        "description": "Após a praia, explore a Atração Genérica, uma atração local que oferece uma experiência única. Aproveite o tempo para conhecer mais sobre a história e a cultura da região."\n      }\n    ]\n  },\n  {\n    "date": "2024-11-15",\n    "title": "Dia 2",\n    "items": [\n      {\n        "start_time": "10:00",\n        "end_time": "12:00",\n        "location": "Praia do Arraial - Arraial do Cabo, RJ",\n        "title": "Caminhada pela Praia do Arraial",\n        "description": "Aproveite a manhã para uma caminhada relaxante pela Praia do Arraial. As condições climáticas podem ser imprevisíveis, mas a beleza natural da praia vale a pena, mesmo com o tempo nublado."\n      },\n      {\n        "start_time": "14:00",\n        "end_time": "17:00",\n        "location": "Atração Genérica - Arraial do Cabo, RJ",\n        "title": "Tarde na Atração Genérica",\n        "description": "Aproveite a tarde para explorar mais a fundo a Atração Genérica. Desfrute de atividades locais, como compras de artesanato ou degustação de pratos típicos da região."\n      }\n    ]\n  },\n  {\n    "date": "2024-11-21",\n    "title": "Dia 3",\n    "items": [\n      {\n        "start_time": "10:00",\n        "end_time": "12:00",\n        "location": "Praia do Arraial - Arraial do Cabo, RJ",\n        "title": "Dia na Praia do Arraial (com chuva)",\n        "description": "Aproveite a manhã para um dia relaxante na Praia do Arraial, mesmo com chuva. A Praia do Arraial é um lugar mágico, e a beleza natural da região é ainda mais encantadora sob a chuva."\n      },\n      {\n        "start_time": "13:00",\n        "end_time": "15:00",\n        "location": "Atração Genérica - Arraial do Cabo, RJ",\n        "title": "Visita à Atração Genérica",\n        "description": "Após a praia, aproveite a tarde para visitar a Atração Genérica. Procure um lugar coberto para se proteger da chuva e desfrutar de um momento cultural."\n      }\n    ]\n  }\n]\n```',
-        "provider": "Google Gemini",
-    }
 
 
 # --------------------------
