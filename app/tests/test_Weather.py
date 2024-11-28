@@ -1,6 +1,6 @@
 from services.Logger import _log
 from views.WeatherView import WeatherView
-from tests.mocks import mock_weather, mock_trip_model, mock_trip
+from tests.mocks import mock_forecast_list, mock_trip_model, mock_trip
 
 
 def test_render_forecast():
@@ -10,7 +10,7 @@ def test_render_forecast():
         mock_trip_model().start_date, mock_trip_model().end_date
     )
 
-    weather = mock_weather()
+    weather = mock_forecast_list()
     weather_view = WeatherView(city_name, state_name, days, weather)
 
     rendered_forecast = weather_view.render_forecast()

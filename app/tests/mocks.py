@@ -178,12 +178,12 @@ def mock_activity():
 # --------------------------
 
 
-def mock_weather() -> list[ForecastModel]:
+def mock_forecast_list() -> list[ForecastModel]:
     return mock_trip_model().weather
 
 
-def mock_weather_model() -> ForecastModel:
-    return mock_weather()[0]
+def mock_forecast_model() -> ForecastModel:
+    return mock_forecast_list()[0]
 
 
 # --------------------------
@@ -230,7 +230,7 @@ def mock_ai_gen_itinerary_request() -> dict:
         mock_trip_model().destination_city + ", " + mock_trip_model().destination_state
     )
     attractions_list = mock_attractions()
-    forecast_list = mock_weather()
+    forecast_list = mock_forecast_list()
     start_date = Utils.to_datetime(mock_trip_model().start_date)
     end_date = Utils.to_datetime(mock_trip_model().end_date)
     goals = mock_trip_model().goals
