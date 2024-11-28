@@ -1,7 +1,7 @@
 import torch
 import time
 
-from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer
+from transformers import pipeline, AutoTokenizer
 
 from services.AiProvider import AiProvider
 from services.AppData import AppData
@@ -9,6 +9,11 @@ from services.Logger import _log
 
 
 class HuggingFaceProvider(AiProvider):
+    """
+    Hugging Face provider.
+    Extends the AiProvider class and implements the ask method to generate content using the Hugging Face API.
+    """
+
     def __init__(self, api_key=None):
         super().__init__()  # Initialize the parent class
 
@@ -64,7 +69,11 @@ class HuggingFaceProvider(AiProvider):
             end_time = time.time()
             time_taken = end_time - start_time
 
-            _log("[HuggingFace] Content ready! Time taken: {:.2f} seconds".format(time_taken))
+            _log(
+                "[HuggingFace] Content ready! Time taken: {:.2f} seconds".format(
+                    time_taken
+                )
+            )
 
             # Clean the response and return it
             return {

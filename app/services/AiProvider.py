@@ -2,8 +2,8 @@ import yaml
 import json
 import re
 
-from datetime import datetime, date, timedelta
-from typing import List, Optional
+from datetime import date, timedelta
+from typing import List
 
 from services.AppData import AppData
 from services.Logger import _log
@@ -17,6 +17,11 @@ from lib.Utils import Utils
 
 
 class AiProvider:
+    """
+    Abstract class for AI providers.
+    Provides methods to interact with an AI provider, prepare data for the provider, and generate trip artifacts.
+    """
+
     def __init__(self):
         self.config_file = AppData().get_config("ai_config_file")
         self.reserved_templates = [
@@ -42,6 +47,16 @@ class AiProvider:
         self.trip_model = None
 
     def ask(self, prompt: str) -> dict[str, str]:
+        """
+        Main method to interact with the AI provider
+
+        Args:
+            prompt (str): The prompt to send to the AI provider
+
+        Returns:
+            dict[str, str]: The response from the AI provider formatted
+            as a dictionary containing a "response" key with the text response.
+        """
         raise NotImplementedError("Ask method must be implemented in child class")
 
     def prepare(
@@ -54,6 +69,18 @@ class AiProvider:
         attractions_list: List[AttractionModel] = None,
         trip_model: TripModel = None,
     ) -> dict:
+        """
+        Prepare the data for the AI provider.
+
+        Args:
+            location (str): The destination location (city, state)
+            start_date (date): The start date of the trip
+            end_date (date): The end date of the trip
+            goals (str): The goals of the trip
+            forecast_list (List[ForecastModel]): The weather forecast list
+            attractions_list (List[AttractionModel]): The list of attractions
+            trip_model (TripModel): The trip model object
+        """
 
         self.location = location
         self.start_date = start_date
@@ -64,6 +91,12 @@ class AiProvider:
         self.trip_model = trip_model
 
     def generate_itinerary(self) -> List[DailyItineraryModel]:
+        """
+        Generate the itinerary for the trip.
+
+        Returns:
+            List[DailyItineraryModel]: The generated itinerary
+        """
         prompt = self._generate_prompt_from_template(
             template_key="gen_itinerary_prompt"
         )
@@ -72,6 +105,12 @@ class AiProvider:
         return self._to_itinerary(response) if response else []
 
     def generate_trip_summary(self) -> str:
+        """
+        Generate a summary of the trip.
+
+        Returns:
+            str: The generated trip summary
+        """
         prompt = self._generate_prompt_from_template(
             template_key="gen_trip_summary_prompt"
         )
@@ -79,6 +118,15 @@ class AiProvider:
         return response.get("response", "") if response else ""
 
     def prompt(self, prompt: str) -> str:
+        """
+        Prompt the AI provider with a custom prompt, and return the response text.
+
+        Args:
+            prompt (str): The custom prompt to send to the AI provider
+
+        Returns:
+            str: The response from the AI provider
+        """
         response = self.ask(prompt=prompt)
         return response.get("response", "")
 
@@ -87,6 +135,17 @@ class AiProvider:
         template_key: str = "gen_itinerary_prompt",
         base_prompt: str = None,
     ) -> str:
+        """
+        Generate a prompt from a template, replacing the variables with the data provided on the prepare() method.
+
+        Args:
+            template_key (str): The key of the template to use (Retrieved from the config file)
+            base_prompt (str): The base prompt to use (overrides the template_key template)
+
+        Returns:
+            str: The final generated prompt
+
+        """
         # Allow prompt to be overridden
         prompt = (
             base_prompt
@@ -209,7 +268,18 @@ class AiProvider:
         end_date: date,
         strip_time: bool = False,
     ) -> str:
+        """
+        Generate a summary of the weather forecast for the trip.
 
+        Args:
+            forecast_list (List[ForecastModel]): The list of weather forecasts
+            start_date (date): The start date of the trip
+            end_date (date): The end date of the trip
+            strip_time (bool): Whether to strip the time from the date
+
+        Returns:
+            str: The generated weather summary
+        """
         if not forecast_list:
             return "* Não há dados do tempo disponíveis"
 
@@ -240,6 +310,15 @@ class AiProvider:
     def _generate_attractions_summary(
         self, attractions_list: List[AttractionModel]
     ) -> str:
+        """
+        Generate a summary of the attractions for the trip.
+
+        Args:
+            attractions_list (List[AttractionModel]): The list of attractions
+
+        Returns:
+            str: The generated attractions summary
+        """
 
         if not attractions_list:
             return "* Não há atrações disponíveis"
@@ -251,7 +330,15 @@ class AiProvider:
         return locations
 
     def _generate_itinerary_summary(self, itinerary: List[DailyItineraryModel]) -> str:
+        """
+        Generate a summary of the itinerary for the trip.
 
+        Args:
+            itinerary (List[DailyItineraryModel]): The itinerary for the trip
+
+        Returns:
+            str: The generated itinerary summary
+        """
         if not itinerary:
             return "* Não há roteiro disponível"
 
@@ -265,6 +352,16 @@ class AiProvider:
         return summary
 
     def _to_json(self, response: dict) -> dict:
+        """
+        Convert the response from the AI provider to a JSON object.
+
+        Args:
+            response (dict): The response from the AI provider formatted
+            as a dictionary containing a "response" key with the text response.
+
+        Returns:
+            dict: The response as a JSON object
+        """
         if not response or "response" not in response:
             return {}
 
@@ -280,6 +377,16 @@ class AiProvider:
         return parsed_json
 
     def _to_itinerary(self, response: dict) -> List[DailyItineraryModel]:
+        """
+        Convert the response from the AI provider to a list of DailyItineraryModel objects.
+
+        Args:
+            response (dict): The response from the AI provider formatted
+            as a dictionary containing a "response" key with the text response.
+
+        Returns:
+            List[DailyItineraryModel]: The generated itinerary
+        """
         json = self._to_json(response)
 
         if not json:
@@ -288,6 +395,15 @@ class AiProvider:
         return [DailyItineraryModel(**itinerary) for itinerary in json]
 
     def _load_base_prompt(self, template_key: str = "gen_itinerary_prompt") -> str:
+        """
+        Load the base prompt from the config file.
+
+        Args:
+            template_key (str): The key of the template to load from the config file
+
+        Returns:
+            str: The loaded base prompt
+        """
         if self.get(template_key):
             return self.get(template_key)
 
@@ -298,16 +414,51 @@ class AiProvider:
     def _override_base_prompt(
         self, prompt: str = "", template_key: str = "gen_itinerary_prompt"
     ) -> None:
+        """
+        Override the base prompt with a custom prompt.
+
+        Args:
+            prompt (str): The custom prompt to set
+            template_key (str): The key of the template to override
+        """
         self.set(template_key, prompt)
 
     def _strip_reserved_templates(self, text: str) -> str:
+        """
+        Remove the reserved templates from the text.
+
+        Args:
+            text (str): The text to remove the templates from
+
+        Returns:
+            str: The text with the templates removed
+        """
         for template in self.reserved_templates:
             text = text.replace(template, "")
         return text
 
     def get(self, name):
+        """
+        Get the value of an attribute by name.
+
+        Args:
+            name (str): The name of the attribute to get
+
+        Returns:
+            Any: The value of the attribute
+        """
         return getattr(self, name)
 
     def set(self, name, value):
+        """
+        Set the value of an attribute by name.
+
+        Args:
+            name (str): The name of the attribute to set
+            value (Any): The value to set
+
+        Returns:
+            Any: The value that was set
+        """
         setattr(self, name, value)
         return value

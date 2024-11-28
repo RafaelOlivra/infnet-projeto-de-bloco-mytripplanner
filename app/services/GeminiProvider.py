@@ -7,6 +7,11 @@ from services.Logger import _log
 
 
 class GeminiProvider(AiProvider):
+    """
+    Google Gemini AI provider.
+    Extends the AiProvider class and implements the ask method to generate content using the Google Gemini API.
+    """
+
     def __init__(self, api_key=None):
         super().__init__()  # Initialize the parent class
 
