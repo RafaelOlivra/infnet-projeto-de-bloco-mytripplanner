@@ -8,6 +8,12 @@ from services.Logger import _log
 
 
 class SentimentAnalyzer(AiProvider):
+    """
+    Sentiment analysis provider using the Hugging Face pipeline.
+    Extends the AiProvider class and implements the ask method to perform sentiment analysis
+    using the "pysentimiento/bertweet-pt-sentiment" model.
+    """
+
     def __init__(self):
         super().__init__()  # Initialize the parent class
 
@@ -59,6 +65,16 @@ class SentimentAnalyzer(AiProvider):
             return None
 
     def _format_response(self, prompt: str, response: list[dict]) -> str:
+        """
+        Format the sentiment analysis result into the desired format.
+
+        Args:
+            prompt (str): The input text for sentiment analysis
+            response (list[dict]): The sentiment analysis response
+
+        Returns:
+            str: The formatted sentiment analysis result
+        """
         # Format the sentiment analysis result into a readable string
         sentiment = response[0]["label"]
         confidence = response[0]["score"]
@@ -74,6 +90,15 @@ class SentimentAnalyzer(AiProvider):
         return f"Text: '{prompt}'\nSentiment: {sentiment}\nConfidence: {confidence:.2f}"
 
     def analyze_sentiment(self, text: str) -> str:
+        """
+        Analyze the sentiment of the given text.
+
+        Args:
+            text (str): The text to analyze
+
+        Returns:
+            str: The sentiment of the text (POSITIVE, NEGATIVE, NEUTRAL)
+        """
         response = self.ask(prompt=text)
         if not response:
             return None
