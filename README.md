@@ -27,6 +27,7 @@ Esse é um projeto criado para o curso de Ciência de Dados da faculdade Infnet.
 
 ## Changelog
 
+-   29/Nov/2024 \* Entrega de Projeto
 -   25/Nov/2024 \* Atualizado Business Docs
 -   22/Nov/2024 \* Adicionado Suporte a OpenAI
 -   20/Nov/2024 \* Atualizado Business Docs
