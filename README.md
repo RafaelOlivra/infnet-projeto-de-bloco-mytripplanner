@@ -6,9 +6,9 @@ O MyTripPlanner é um aplicativo de planejamento de viagens, projetado para ajud
 
 ## Funcionalidades
 
--   **Notificações Climáticas**: Receba alertas se houver previsão de chuva ou condições climáticas adversas nas datas da sua viagem.
+-   **Atualizações Climáticas**: Verifique previsões de chuva ou condições climáticas adversas nas datas da sua viagem.
 -   **Sugestões de Roteiros Personalizados**: Explore sugestões de itinerários que combinam as melhores atrações, atividades e pontos de interesse no destino escolhido, adaptados ao seu perfil e preferências.
--   **Recomendações Baseadas em IA**: Desfrute de uma experiência personalizada com recomendações inteligentes que levam em conta suas preferências e histórico de viagens para sugerir as melhores opções de rotas e atividades.
+-   **Recomendações Baseadas em IA**: Desfrute de uma experiência personalizada com recomendações inteligentes que levam em conta suas preferências e objetivos de viagens para sugerir as melhores opções de rotas e atividades.
 -   **Interface Intuitiva**: Planeje suas viagens facilmente com uma interface web amigável.
 
 ## Preview
