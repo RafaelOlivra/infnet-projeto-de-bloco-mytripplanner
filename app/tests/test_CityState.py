@@ -5,6 +5,10 @@ from services.CityState import CityStateData
 from tests.mocks import mock_city_state_json_data
 
 
+# --------------------------
+# CityState Tests
+# --------------------------
+
 @patch("services.AppData")
 @patch("builtins.open", new_callable=mock_open)
 def test_init(mock_open, mock_get_config):

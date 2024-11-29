@@ -7,6 +7,10 @@ from models.Itinerary import ActivityModel
 
 from tests.mocks import mock_activity
 
+# --------------------------
+# Itinerary Tests
+# --------------------------
+
 
 def test_invalid_time_order():
     activity = mock_activity().model_dump()

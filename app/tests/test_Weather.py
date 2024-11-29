@@ -1,6 +1,12 @@
 from services.Logger import _log
 from views.WeatherView import WeatherView
+
 from tests.mocks import mock_forecast_list, mock_trip_model, mock_trip
+
+
+# --------------------------
+# WeatherView Tests
+# --------------------------
 
 
 def test_render_forecast():

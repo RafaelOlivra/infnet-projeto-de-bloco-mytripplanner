@@ -11,6 +11,11 @@ def app_data():
     return AppData()
 
 
+# --------------------------
+# AppData Tests
+# --------------------------
+
+
 def test_get_config_key_exists(app_data, tmpdir):
     # Create a temporary config file
     config_data = {"database_host": "localhost"}
