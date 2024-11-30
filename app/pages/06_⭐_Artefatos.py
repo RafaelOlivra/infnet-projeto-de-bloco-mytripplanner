@@ -2,6 +2,9 @@ import streamlit as st
 from services.AppData import AppData
 
 
+# --------------------------
+# About Page
+# --------------------------
 def About():
     # Set logo
     assets_dir = AppData().get_assets_dir()
