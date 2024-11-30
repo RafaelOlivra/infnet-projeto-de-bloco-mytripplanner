@@ -10,7 +10,6 @@ class CityStateData:
     """
 
     def __init__(self):
-
         # Load the JSON file with city and state data
         json_file = AppData().get_config("city_state_json")
         try:

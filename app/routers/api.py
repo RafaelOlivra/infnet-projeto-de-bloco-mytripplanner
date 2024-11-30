@@ -132,8 +132,6 @@ async def delete_user_trip(
 # --------------------------
 # Trip AI API
 # --------------------------
-
-
 # Generate a new itinerary for a trip
 @app.put("/trip/gen/itinerary/{trip_id}", response_model=TripModel, tags=["trip - AI"])
 @limiter.limit("5/minute")
@@ -185,8 +183,6 @@ async def generate_trip_itinerary(
 # --------------------------
 # SentimentAnalysis API
 # --------------------------
-
-
 # Prepare the request and response models for the sentiment analysis API
 class TextModel(BaseModel):
     text: str
