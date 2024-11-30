@@ -15,7 +15,7 @@ if "selected_trip_id" not in st.session_state:
 # --------------------------
 # View Trip Data
 # --------------------------
-def View_Trip():
+def Import_Trip():
     # Set logo
     assets_dir = AppData().get_assets_dir()
     st.logo(f"{assets_dir}my-trip-planner-logo.svg", size="large")
@@ -80,4 +80,4 @@ def View_Trip():
 # --------------------------
 # INIT
 # --------------------------
-View_Trip()
+Import_Trip()

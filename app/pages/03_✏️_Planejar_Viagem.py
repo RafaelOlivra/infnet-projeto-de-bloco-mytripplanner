@@ -389,7 +389,7 @@ def Cadastrar():
         if trip:
             st.success("Viagem cadastrada com sucesso!")
 
-            # Clear the required session state
+            # Clear cached session states
             clear_cached_values()
 
             # Change to the trip view
