@@ -66,7 +66,7 @@ def About():
         - [Data Summary Report](https://docs.google.com/document/d/1jie_4x3r550BwLlOtSxuLYOwWTwRtqeiXuroQSZUtJQ/edit?usp=sharing)
 
         #### Fontes de dados e APIs
-        Essas fontes **poderão** ser utilizadas no desenvolvimento do MyTripPlanner
+        Essas fontes são utilizadas no desenvolvimento do MyTripPlanner
         - [OpenWeatherMap](https://openweathermap.org/)
         - [Google Maps](https://cloud.google.com/maps-platform)
         - [Yelp](https://www.yelp.com.br/)

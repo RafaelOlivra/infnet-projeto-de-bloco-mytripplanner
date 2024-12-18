@@ -76,8 +76,8 @@ gen_trip_summary_prompt: |
 
     Examples of sumaries:
 
-    - "Uma viagem de 5 dias para Paris, com transporte de trem. O clima será ensolarado, perfeito para explorar a cidade. O itinerário inclui visitas à Torre Eiffel, Louvre e passeios de barco pelo Sena. Uma viagem cultural e romântica."
-    - "Uma aventura de 3 dias em Machu Picchu, com transporte de ônibus. O clima será nublado, mas ideal para caminhadas. O itinerário inclui trilhas, visita às ruínas e banhos termais. Uma viagem mística e enriquecedora."
+    - "Uma viagem de 5 dias para Paris indo de carro. O clima será ensolarado, perfeito para explorar a cidade. O itinerário inclui visitas à Torre Eiffel, Louvre e passeios de barco pelo Sena. Uma viagem cultural e romântica."
+    - "Uma aventura de 3 dias em Machu Picchu, saindo de avião. O clima será nublado, mas ideal para caminhadas. O itinerário inclui trilhas, visita às ruínas e banhos termais. Uma viagem mística e enriquecedora."
 
     ||JSON||
 

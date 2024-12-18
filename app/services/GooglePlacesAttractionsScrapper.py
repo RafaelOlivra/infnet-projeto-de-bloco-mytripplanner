@@ -1,6 +1,7 @@
 import os
 import requests
 import streamlit as st
+import time
 
 from services.AppData import AppData
 from services.Logger import _log
@@ -16,7 +17,7 @@ class GooglePlacesAttractionsScrapper:
     recursive fetching of results when pagination is required.
     """
 
-    def __init__(self, api_key: str = None):
+    def __init__(self, api_key: str = None, image_cache_dir: str = None):
         """
         Initialize the GooglePlacesAttractionsScrapper class.
 
@@ -24,7 +25,11 @@ class GooglePlacesAttractionsScrapper:
         and ensures the cache directory exists.
         """
         self.api_key = api_key or AppData().get_api_key("googlemaps")
-        self.image_cache_dir = AppData()._get_storage_map().get("image_cache")
+        self.image_cache_dir = (
+            image_cache_dir
+            if image_cache_dir
+            else AppData()._get_storage_map().get("image_cache")
+        )
         os.makedirs(
             self.image_cache_dir, exist_ok=True
         )  # Ensure cache directory exists
@@ -147,7 +152,9 @@ class GooglePlacesAttractionsScrapper:
             return ""
 
         # Path for the cached image
-        image_path = os.path.join(_self.image_cache_dir, f"{photo_reference}.jpg")
+        photo_id = photo_reference[:12] + "-" + str(int(time.time()))
+        image_path = os.path.join(_self.image_cache_dir, f"{photo_id}.jpg")
+        image_path = _self.normalize_path(image_path)
 
         # Check if the image is already cached
         if os.path.exists(image_path):
@@ -160,13 +167,36 @@ class GooglePlacesAttractionsScrapper:
         )
         response = requests.get(url, stream=True)
         if response.status_code == 200:
-            with open(image_path, "wb") as f:
-                for chunk in response.iter_content(1024):
-                    f.write(chunk)
-            _log(f"[GoogleMapsScrapper] Cached image: {image_path}")
-            return image_path
+            try:
+                with open(image_path, "wb") as f:
+                    for chunk in response.iter_content(1024):
+                        f.write(chunk)
+                _log(f"[GoogleMapsScrapper] Cached image: {image_path}")
+                return image_path
+            except Exception as e:
+                _log(f"[GoogleMapsScrapper] Failed to cache image: {e}")
+                return ""
 
         _log(
             f"[GoogleMapsScrapper] Failed to fetch photo for reference: {photo_reference}"
         )
         return ""
+
+    def normalize_path(self, path_str: str) -> str:
+        """
+        Normalizes a path string by removing special characters and spaces.
+        And changing // to /
+
+        Args:
+            path_str (str): The path string to normalize.
+
+        Returns:
+            str: The normalized path string.
+        """
+        path_str = path_str.replace("\\", "/")
+        # Adjust for Windows paths
+        # if os.name == "nt":
+        #     # CHange / to \
+        #     path_str = path_str.replace("/", "\\")
+        #     _log(f"Path: {path_str}")
+        return path_str

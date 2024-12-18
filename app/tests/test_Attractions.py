@@ -96,12 +96,13 @@ def test_YelpScrapper_get_near_attractions():
     assert type(results[0]) == AttractionModel
 
 
-# --------------------------
+# ---------------------------------------------
 # Google Maps Attractions Integration Tests
-# --------------------------
+# ---------------------------------------------
 
 
 # Test retrieving more than 10 attractions from Google Maps
+# @pytest.mark.skip(reason="Not needed now")
 def test_GoogleMapsScrapper_get_near_attractions():
     # Arrange
     city_name = "São Paulo"
