@@ -9,7 +9,7 @@ pandas==2.2.2
 plotly
 pydantic==2.9.2
 pydeck
-pytest==8.3.3
+pytest==9.0.3
 python-dotenv==1.0.1
 slowapi
 streamlit_js_eval
