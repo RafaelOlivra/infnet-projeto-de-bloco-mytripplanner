@@ -10,7 +10,7 @@ plotly
 pydantic==2.9.2
 pydeck
 pytest==9.0.3
-python-dotenv==1.0.1
+python-dotenv==1.2.2
 slowapi
 streamlit_js_eval
 streamlit-extras==0.4.7
